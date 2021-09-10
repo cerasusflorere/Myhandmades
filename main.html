@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A cool thing made with Glitch">
+    <title>メイン画面</title>
+    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
+  </head>
+  <body style="margin: 0px">
+    <div class="headerbg">
+      <div class="site-header">
+        <h1>Myhandmades</h1>
+        <nav>
+          <ul>
+              <li><a href="#">Home</a></li>
+              <li><a href="#">Favorite</a></li>
+              <li><a href="/">Private</a></li>
+          </ul>
+        </nav>
+        <div class="hamburger-menu">
+          <input type="checkbox" id="menu-btn-check"/>
+          <label for="menu-btn-check" class="menu-btn"><span></span></label>
+          <!--ここからメニュー-->
+          <div class="menu-content">
+            <ul>
+                <li><a href="#">Profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+          </div>
+          <!--ここまでメニュー-->
+        </div>
+      </div>
+　　</div>
+    
+    <label class="addbutton" for="pop-up">+Add</label>
+    <input type="checkbox" id="pop-up" onclick="findTags()"/>
+    <div class="overlay">
+	    <div class="window">
+		    <label class="close" for="pop-up">×</label>
+		      <p class="text">
+            <p class="holder">題名</p>
+              <input type="text" class="content" id="subject" placeholder="subject" value=""/>
+            <p class="holder">製作期間</p>
+              <input type="text" class="content" id="duration" placeholder="duration" value=""/>
+            <form id="taglabel"></form><!--タグリストを表示-->
+        　  <label class="tag-addbutton" for="tag-pop-up">+TagAdd</label>
+            <p class="holder">コメント</p>
+              <textarea class="content" id="comment" placeholder="comment" style="width:300px; height:50px;display:block;" value=""></textarea>
+            <p style="text-align:center";><input type="button" class="submitbutton" value="Submit" onclick="add()"/></p>
+          </p>
+       </div>
+    </div>
+   
+   <input type="checkbox" id="tag-pop-up"/>
+    <div class="tag-overlay">
+	    <div class="tag-window">
+		    <label class="tag-close" for="tag-pop-up">×</label>
+		      <div class="tag-text">
+          <p class="tag-add-name">追加するタグ名</p>
+            <input type="text" class="tag-content" id="tag-add" placeholder="tag" value=""/>
+            <p style="text-align:center";><input type="button" class="tag-submitbutton" value="Add" onclick="tagadd()"/></p>
+          </div>
+      </div>
+    </div>
+
+  
+    <div class="edit-overlay">
+	    <div class="edit-window">
+		    <label class="edit-close" for="edit-pop-up">×</label>
+		      <div class="edit-text" id="editlist">
+            <!-- 編集画面 -->
+          </div>
+      </div>
+    </div>
+    
+    <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
+    <div id="list" class="list"></div><!-- リスト表示部 -->
+    
+    <script>
+      window.onload = findDatas; // 画面ロード時に実行
+      const listArea = document.getElementById('list'); // リスト表示部
+      const editArea = document.getElementById('editlist');
+      
+      let flag = 1;
+      let number = 1;
+      const listAreaTag = document.getElementById('taglabel'); // リスト表示部
+      
+      // 全データの取得
+      function findDatas() {
+        const url = '/findDatas'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            const datas = JSON.parse(req.response);
+            for(let i in datas) {
+              const data = datas[i];
+              
+              const id = data._id;
+              const userid = data.userid;
+              const subject = data.subject;
+              const duration = data.duration;
+              const tag = data.tag;
+              const comment = data.comment;
+              addToList(id, subject, duration, tag, comment);
+            }
+          }
+        }
+        req.open('GET', url, true);
+        req.send();
+      }
+      
+      // 表示
+      function addToList(id, subject, duration, tag, comment) {
+        const workDiv = document.createElement('div'); // 追加する本の div 要素
+        workDiv.className = "worksarea";
+        workDiv.id = id; // レスポンスから得た ID を付与する
+
+        const subjectDiv = document.createElement('div');
+        subjectDiv.className = "subjectarea";
+        subjectDiv.innerText = subject;
+        
+        const durationDiv = document.createElement('div');
+        durationDiv.className = 'durationame';
+        durationDiv.innerText = 'Duration: ';
+
+        const durationSpan = document.createElement('span');
+        durationSpan.className = 'durationarea';
+        durationSpan.innerText = duration;
+
+        const tagDiv = document.createElement('div');
+        tagDiv.className = 'tagarea';
+        tagDiv.innerText = tag;
+        
+        const commentDiv = document.createElement('div');
+        commentDiv.className = 'commentbox';
+        
+        const commentP = document.createElement('p');
+        commentP.innerText = comment;
+
+        const delButton = document.createElement('button');
+        delButton.className = 'deletebutton';
+        delButton.onclick = function() {
+          disp(id);
+        }
+        
+        const delI = document.createElement('i');
+        delI.className = 'fas fa-trash worksicon fa-fw';
+        
+        const delDiv = document.createElement('div');
+        delDiv.className = 'deletediv';
+        delDiv.innerText = 'Delete';
+        
+        const editInput = document.createElement("input");
+        editInput.onclick = function() {
+          editData(id);
+        }
+        editInput.type = "checkbox";
+        editInput.id = 'edit-pop-up';
+        
+        const editLabel = document.createElement('label');
+        editLabel.className = 'editbutton';
+        editLabel.htmlFor = 'edit-pop-up';
+        
+        const editI = document.createElement('i');
+        editI.className = 'fas fa-edit worksicon fa-fw';
+                        
+        const editDiv = document.createElement('div');
+        editDiv.className = 'editdiv';
+        editDiv.innerText = 'Edit';
+
+        workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
+        durationDiv.appendChild(durationSpan);
+        workDiv.appendChild(durationDiv); // workDiv に値段を追加
+        workDiv.appendChild(tagDiv); // workDiv に感想を追加
+        commentDiv.appendChild(commentP);
+        workDiv.appendChild(commentDiv);// workDiv に削除ボタンを追加
+        delButton.appendChild(delI);
+        delButton.appendChild(delDiv);
+        workDiv.appendChild(delButton);// workDiv に削除ボタンを追加
+        
+        workDiv.insertBefore(editInput, editLabel.nextSibling);
+        editLabel.appendChild(editI);
+        editLabel.appendChild(editDiv);
+        workDiv.appendChild(editLabel); // workDiv に編集ボタン追加        
+        listArea.appendChild(workDiv); // リストに workDiv を追加
+      }
+            
+      // タグデータ取得
+      function findTags() {
+        if(flag == 1){
+          const url = '/findTags'; // 通信先
+          const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+          req.onreadystatechange = function() {
+            if(req.readyState == 4 && req.status == 200) {
+              const tags = JSON.parse(req.response);
+              for(let i in tags) {
+                const tag = tags[i];
+                addToListTag(tag.tag, tag._id);
+                number++;
+              }
+            }
+          }
+          req.open('GET', url, true);
+          req.send();
+          flag = 2;
+        }
+      }
+       
+      //　taglabelへ追加
+      function addToListTag(tag, id) {
+         const tagInput = document.createElement('input');
+         tagInput.type = "checkbox";
+         tagInput.id = "tag" + number; // ID を付与する
+         tagInput.value = tag;
+        
+         const tagLavel = document.createElement('label');
+         tagLavel.innerText = tag;
+ 
+         listAreaTag.appendChild(tagInput); // リストに tagLavel を追加
+         listAreaTag.appendChild(tagLavel);
+       }
+      
+      // 削除機能
+      function disp(id){
+        console.log(id);
+	       // 「OK」時の処理開始 ＋ 確認ダイアログの表示
+	      if(window.confirm('本当にいいんですね？')){
+          const url = '/deleteData'; // 通信先
+          const req = new XMLHttpRequest(); // 通信用オブジェクト
+          const data = {id:id};
+
+          req.onreadystatechange = function() {
+            if(req.readyState == 4 && req.status == 200) {
+              const target = document.getElementById(id); // ID で要素を特定
+              target.parentNode.removeChild(target); // 親要素に自分を削除させる
+            }
+          }
+          req.open('POST', url, true);
+          req.setRequestHeader('Content-Type', 'application/json');
+          req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
+      	    // 「OK」時の処理終了
+        }else{
+          // 「キャンセル」時の処理開始
+		      window.alert('キャンセルされました'); // 警告ダイアログを表示
+          // 「キャンセル」時の処理終了
+       	}
+       }
+      
+       // 編集
+      function editData(id){
+        console.log(id);
+        const url = '/findWork'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        const data = {id:id};
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            const datas = JSON.parse(req.response);
+            
+            for(let i in datas){
+              console.log(id);
+              console.log(datas);
+              const dataset = datas[i];
+              
+              const workid = dataset._id;
+              const userid = dataset.userid;
+              const subject = dataset.subject;
+              const duration = dataset.duration;
+              const tag = dataset.tag;
+              const comment = dataset.comment;
+              showedit(workid, userid, subject, duration, tag, comment);
+            }            
+          }
+        }
+        req.open('POST', url, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
+      }
+      
+      function showedit(id, userid, subject, duration, tag, comment){
+        const workP = document.createElement('p'); // 追加する本の div 要素
+        workP.className = "edit-text";
+        workP.id = id; // レスポンスから得た ID を付与する
+
+        const subjectP = document.createElement('p');
+        subjectP.className = 'holder';
+        subjectP.innerText = '題名';
+        
+        const subjectInput = document.createElement('input');
+        subjectInput.type = "text";
+        subjectInput.className = 'content';
+        subjectInput.id = 'edit-subject';
+        subjectInput.value= subject;
+        
+        const durationP = document.createElement('p');
+        durationP.className = 'holder';
+        durationP.innerText = '製作期間';
+        
+        const durationInput = document.createElement('input');
+        durationInput.type = "text";
+        durationInput.className = 'content';
+        durationInput.id = 'edit-duration';
+        durationInput.value = duration;
+        
+        const tagForm = document.createElement('form');
+        tagForm.id = "edit-taglabel";
+        
+        const tagLabel  = document.createElement('label');
+        tagLabel.className = 'tag-addbutton';
+        tagLabel.htmlFor = 'tag-pop-up';
+        tagLabel.innerText = '+TagAdd';
+        
+        const commentP = document.createElement('p');
+        commentP.className = 'holder';
+        commentP.innerText = 'コメント';
+        
+        const commentTextarea = document.createElement('textarea');
+        commentTextarea.className = 'edit-content';
+        commentTextarea.id = "comment";
+        commentTextarea.value = comment;
+        
+        const buttonP = document.createElement('p');
+        buttonP.className = 'buttonP';
+        
+        const buttonInput = document.createElement('input');
+        buttonInput.type = 'button';
+        buttonInput.className = 'submitbutton';
+        buttonInput.value = 'Edit';
+        buttonInput.onclick = function(){
+          editadd();
+        }
+        
+        workP.appendChild(subjectP); // workP にタイトルを追加 
+        workP.appendChild(subjectInput); 
+        workP.appendChild(durationP); // workPに製作期間を追加
+        workP.appendChild(durationInput);
+        workP.appendChild(tagForm); // workPにタグを追加
+        workP.appendChild(tagLabel);
+        workP.appendChild(commentP); // workPにコメントを追加
+        workP.appendChild(commentTextarea);
+        workP.appendChild(buttonP); // workPに送信ボタンを追加
+        workP.appendChild(buttonInput);//ここまで、クラス設定してない
+        editArea.appendChild(workP); // リストに workDiv を追加
+      }
+      
+       // データの保存
+      function add() {
+        const urladd = '/savework'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        const subject = document.getElementById('subject').value;
+        const duration = document.getElementById('duration').value;
+        let tag = "";
+        const comment = document.getElementById('comment').value;
+        
+        if (tag1.checked){
+          tag = document.getElementById('tag1').value;
+        }
+        if(tag2.checked) {
+          tag = document.getElementById('tag2').value;
+        }
+        if(tag3.checked){
+          tag = document.getElementById('tag3').value;
+        }
+        if(tag4.checked){
+          tag = document.getElementById('tag4').value;
+        }
+        if(tag5.checked){
+          tag = document.getElementById('tag5').value;
+        }
+        
+        // 取得した情報をもとにオブジェクトを作る
+        const data = {subject:subject, duration:duration, tag:tag, comment:comment};
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            // 追加が成功したらフォームを空にする
+            document.getElementById('subject').value = '';
+            document.getElementById('duration').value = '';
+            document.getElementById('comment').value = '';
+            location.href = '/';
+          }else if(req.readyState == 4 && req.status != 200) {
+            alert(req.response);
+          }
+        }
+        req.open('POST', urladd, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
+      }
+      
+      function tagadd(){
+        const url = '/savetag';
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        const tag = document.getElementById('tag-add').value;
+        const data = {tag:tag};
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            // 追加が成功したらフォームを空にする
+            document.getElementById('tag').value = '';
+          }else if(req.readyState == 4 && req.status != 200) {
+            alert(req.response);
+          }
+        }
+        req.open('POST', url, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
+      }
+      
+      // リロード
+      function home(){
+         scrollTo(0, 0);
+      }
+    </script>
+  </body>
+</html>
