@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A cool thing made with Glitch">
+    <title>ログイン</title>
+    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="login-page">
+      <form class="login-form" method="post" action="/login">
+        <p class="form-title">Myhandmades</p>
+        <p><i class="fas fa-user-circle user fa-fw"></i><input type="text" name="userName" placeholder="username"/></p>
+        <p><i class="fas fa-lock user fa-fw"></i><input type="password" name="password" placeholder="password"/></p>
+        <input type="submit" class="loginbutton" value="Login"/>
+        <p class="message"><a href="/signup">Create an account</a></p>
+        <p class="message"><a href="#">Forget username?</a></p>
+        <p class="message"><a href="#">Forget password?</a></p>
+      </form>
+    </div>
+  </body>
+</html>
