@@ -1,0 +1,799 @@
+/* this file is loaded by index.html and styles the page */
+
+* {
+  box-sizing: border-box;
+}
+
+* {
+  font-family:"Bell MT";
+}
+
+body {
+    background-color: #fdf5e6;
+}
+
+h1 {
+  padding: 0px 270px 0px 150px;
+  font-family:"edwardian script itc";
+  font-weight: lighter;
+  font-size: 50px;
+  color: #ffb6c1;
+  max-width: calc(100% - 5rem);
+  line-height: 0.2;
+}
+/*
+form {
+  background-color: #eee;
+  display: grid;
+  grid-gap: 1em;
+  padding: 1em;
+  max-width: 40ch;
+}
+
+
+input {
+  border: 1px solid silver;
+  display: block;
+  font-size: 16px;
+  margin-bottom: 10px;
+  padding: 5px;
+  width: 100%;
+}
+
+
+form button {
+  background-color: #bbbbf2;
+  border: 2px solid currentColor;
+  border-radius: .25em;
+  cursor: pointer;
+  font-size: inherit;
+  line-height: 1.4em;
+  padding: 0.25em 1em;
+  max-width: 20ch;
+}
+
+form button:hover {
+  background-color: lavender;
+}
+*/
+
+footer {
+  margin-top: 3em;
+  padding-top: 1.5em;
+  border-top: 1px solid lightgrey;
+}
+
+/*　ボタン　*/
+/*サインアップボタン*/
+.signupbutton {
+  overflow: hidden;
+  outline: 0;
+  width: 240px;
+  display: inline-block;
+  margin : 10px ;
+  padding: 0.5em 1em;
+  box-shadow: 0 0 0 5px #db7093, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 2px dashed #fff;/* 点線の色・サイズ */
+  border-radius: 15px;
+  background: #db7093;/*ボタン色*/
+  text-decoration: none;
+  text-align: center;
+  font-size: 20px;
+  color: #fff;
+}
+.signupbutton:hover {
+  /*カーソルを載せたとき*/
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+}
+.signupbutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+
+/*ログインボタン*/
+.loginbutton {
+  overflow: hidden;
+  outline: 0;
+  width: 240px;
+  display: inline-block;
+  margin : 10px ;
+  padding: 0.5em 1em;
+  box-shadow: 0 0 0 5px #ffc0cb, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 2px dashed #fff;/* 点線の色・サイズ */
+  border-radius: 15px;
+  background: #ffc0cb;/*ボタン色*/
+  text-decoration: none;
+  text-align: center;
+  font-size: 20px;
+  color: #fff;
+}
+.loginbutton:hover {
+  /*カーソルを載せたとき*/
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+}
+.loginbutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+
+/*リロードボタン*/
+.topbutton {
+  position:fixed;
+  right: 25px;
+  bottom:25px;
+  width: 40px;/* 円の大きさ */
+  height:40px;/* 円の大きさ */
+  line-height:40px;/* 円の大きさ */
+  border-radius: 50%;/* 角丸サイズ */
+  display: inline-block;
+  box-shadow: 0 0 0 5px #ffc0cb, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 1.5px dashed #fff;/* 点線の色・サイズ */
+  background: #ffc0cb;/*ボタン色*/
+  text-align: center;
+  text-decoration: none;
+  outline: 0;
+  overflow: hidden;
+  color: #fff;
+  font-size: 25px;
+}
+.topbutton:hover {
+  /*カーソルを載せたとき*/
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+}
+.topbutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+
+
+/*削除ボタン*/
+.deletebutton {
+  overflow: hidden;
+  outline: 0;
+  background: none;
+  border: none;
+  display: inline-block;
+  cursor: hand; 
+  cursor:pointer;
+}
+.deletediv{
+    display: none;
+    position: absolute;
+    margin-top: -2px;
+    left: 57px;
+    padding: 5px;
+    font-size: 12px;
+    line-height: 1em;
+    color: #808080;
+    border-radius: 10px;
+    background: #fdf5e6;
+    width: 60px;
+    text-align: center;
+    text-decoration: none;
+}
+.deletediv:before {
+    content: "";
+    position: absolute;
+    top: 0%;
+    right: 95%;
+    border: 7.5px solid transparent;
+    border-top: 15px solid #fdf5e6;
+    margin-left: -15px;
+    transform: rotateZ(90deg);
+}
+.deletebutton:hover .deletediv{
+  /*カーソルを載せたとき*/
+  display: inline-block;
+}
+.deletebutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+.worksicon{
+  color: #808080;
+  margin-bottom: 10px;
+}
+
+/*編集ボタン*/
+.list .editbutton {
+  overflow: hidden;
+  outline: 0;
+  display: inline-block;
+  margin-left: 375px;
+  background: none;
+  border: none;
+  cursor: hand; 
+  cursor:pointer;
+}
+.editdiv{
+    display: none;
+    position: absolute;
+    margin-top: -2px;
+    left: 460px;
+    padding: 5px;
+    font-size: 12px;
+    line-height: 1em;
+    color: #808080;
+    border-radius: 10px;
+    background: #fdf5e6;
+    width: 45px;
+    text-align: center;
+    text-decoration: none;
+}
+.editdiv:before {
+    content: "";
+    position: absolute;
+    top: 0%;
+    right: 95%;
+    border: 7.5px solid transparent;
+    border-top: 15px solid #fdf5e6;
+    margin-left: -15px;
+    transform: rotateZ(90deg);
+}
+.list .editbutton:hover .editdiv{
+  /*カーソルを載せたとき*/
+  display: inline-block;
+}
+.list .editbutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+
+
+
+/* main.html */
+/*ヘッダー*/
+.headerbg {
+  width:100%;
+  min-width:1000px;
+}
+
+.site-header{
+    z-index: 1000;
+    width: 100%;
+    height: 80px;
+    margin-right: auto;
+    margin-left: auto;
+    background: #fff;
+    display: flex;
+    position: fixed;
+    text-align: center;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+/*メニュー1*/
+nav ul{
+        padding: 0;
+        margin: 0;
+        list-style: none;
+} 
+nav li{
+        float: left;
+}
+nav a{
+  overflow: hidden;
+  outline: 0;
+  width: 70px;
+  display: inline-block;
+  margin : 20px 40px;
+  padding: 0.5em;
+  box-shadow: 0 0 0 5px #ffc0cb, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 2px dashed #fff;/* 点線の色・サイズ */
+  border-radius: 10px;
+  background: #ffc0cb;/*ボタン色*/
+  text-decoration: none;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+}
+nav a:hover{
+    border-style: solid;
+    cursor: hand; 
+    cursor:pointer
+} 
+nav a:active{
+    -webkit-transform: translateY(4px);
+    transform: translateY(4px);/*下に動く*/
+    border-bottom: none;/*線を消す*/
+}
+/*ハンバーガーメニュー*/
+.menu-btn {
+    position: fixed;
+    top: 40px;
+    right: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 90;
+}
+.menu-btn:hover{
+    cursor: hand; 
+    cursor: pointer
+} 
+.menu-btn span,
+.menu-btn span:before,
+.menu-btn span:after {
+    position: absolute;
+    height: 3px;/*線の太さ*/
+    width: 25px;/*長さ*/
+    border-radius: 3px;
+    background-color: #ffc0cb;
+    display: block;
+    content: '';
+    cursor: pointer;
+}
+.menu-btn span:before {
+    bottom: 8px;
+}
+.menu-btn span:after {
+    top: 8px;
+}
+#menu-btn-check:checked ~ .menu-btn span {
+    background-color: rgba(255, 255, 255, 0);/*メニューオープン時は真ん中の線を透明にする*/
+}
+#menu-btn-check:checked ~ .menu-btn span::before {
+    bottom: 0;
+    transform: rotate(45deg);
+}
+#menu-btn-check:checked ~ .menu-btn span::after {
+    top: 0;
+    transform: rotate(-45deg);
+}
+#menu-btn-check {
+    display: none;
+}
+.menu-content {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 80;
+    background-color: #ffe4e1;
+}
+.menu-content ul {
+    padding: 70px 10px 0;
+}
+.menu-content ul li {
+    border-bottom: solid 2px #c0c0c0;
+    list-style: none;
+}
+.menu-content ul li a {
+    display: block;
+    width: 100%;
+    font-size: 15px; 
+    font-weight: bold;
+    color: #c0c0c0;
+    text-decoration: none;
+    padding: 9px 15px 10px 0;
+    position: relative;
+}
+.menu-content ul li a::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    position: absolute;
+    right: 11px;
+    top: 16px;
+}
+.menu-content {
+    width: 25%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    right: -120%;/*rightの値を変更してメニューを画面外へ*/
+    z-index: 80;
+    background-color: #ffe4e1;
+    transition: all 0.5s;/*アニメーション設定*/
+}
+#menu-btn-check:checked ~ .menu-content {
+    right: 0;/*メニューを画面内へ*/
+}
+
+.list{
+  margin-top: 80px;
+}
+
+.list .worksarea{
+  width: 500px;
+  margin: 20px 20px;
+  padding: 5px;
+  background: #ffe4e1;
+  border-radius: 10px;
+  display = inline-block;
+}
+.list .worksarea .subjectarea{
+  margin-top: 5px;
+  margin-left: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #404040;
+  display = inline-block;
+  width: 400px;
+}
+.list .worksarea .durationame{
+  margin-left: 10px;
+  font-size: 12px;
+  display = inline-block;
+}
+.list .worksarea .durationame .durationarea{
+  margin-left: 10px;
+  font-size: 15px;
+  display = inline-block;
+}
+.list .tagarea{
+  position: relative;
+  left: 5px;
+  display: inline-block;
+  height: 32px;
+  margin-left: 20px;
+  padding: 0.4em 0.5em;
+  color: #f5f5f5;
+  font-size: 13px;
+  text-decoration: none;
+  text-align: center;
+  background: #deb887;
+}
+.list .tagarea:before {
+  position: absolute;
+  top: 0;
+  left: -15px;
+  content: '';
+  border-width: 16px 15px 16px 0;
+  border-style: solid;
+  border-color: transparent #deb887 transparent transparent;
+}
+.list .tagarea:after {
+  position: absolute;
+  top: calc(50% - 3.5px);
+  left: -5px;
+  width: 7px;
+  height: 7px;
+  content: '';
+  border-radius: 50%;
+  background: #ffe4e1;
+}
+
+.list .commentbox {
+    margin: 10px;
+    min-height: 10px;
+    height: auto;
+    border: 2px solid #808080;
+    border-radius: 8px;
+    position:relative;
+}
+.list .commentbox::before {
+    background-color: #ffe4e1;
+    color: #404040;
+    content: "Comment";
+    font-size: 12px;
+    position: absolute;
+    padding: 0 10px;
+    left: 10px;
+    top: -10px;
+}
+.list .commentbox p{
+  font-size: 15px;
+  margin-left: 15px;
+}
+
+/*追加ボタン*/
+.addbutton {
+  position:fixed;
+  top:120px;
+	right:20px;	
+  width: 80px;/* 円の大きさ */
+  height:80px;/* 円の大きさ */
+  line-height:80px;/* 円の大きさ */
+  border-radius: 50%;/* 角丸サイズ */
+  display: inline-block;
+  box-shadow: 0 0 0 5px #db7093, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 2px dashed #fff;/* 点線の色・サイズ */
+  background: #db7093;/*ボタン色*/
+  text-decoration: none;
+  text-align: center;
+  font-size: 20px;
+  color: #fff;
+}
+.addbutton:hover {
+  /*カーソルを載せたとき*/
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+}
+.addbutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+#pop-up {
+	display: none; /* label でコントロールするので input は非表示に */
+}
+.overlay {
+	display: none; /* input にチェックが入るまでは非表示に */
+}
+#pop-up:checked + .overlay {
+	display: block;
+	z-index: 9999;
+	background-color: #00000070;
+	position: fixed;
+	width: 100%;
+	height: 100vh;
+	top: 0;
+	left: 0;
+}
+.window {
+	width: auto;
+	height: auto;
+	background-color: #ffffff;
+	border-radius: 10px;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+  padding: 10px 20px;
+}
+.holder{
+	z-index: -1;
+	font-size: 15px;
+	margin: 0;
+}
+.content{
+  font-size: 20px;
+	margin: 0;
+}
+.close {
+	cursor:pointer;
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	font-size: 20px;
+}
+/*データ送信ボタン*/
+.submitbutton {
+  overflow: hidden;
+  outline: 0;
+  width: 240px;
+  display: inline-block;
+  margin : 10px ;
+  padding: 0.5em 1em;
+  box-shadow: 0 0 0 5px #db7093, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 2px dashed #fff;/* 点線の色・サイズ */
+  border-radius: 15px;
+  background: #db7093;/*ボタン色*/
+  text-decoration: none;
+  text-align: center;
+  font-size: 20px;
+  color: #fff;
+}
+.submitbutton:hover {
+  /*カーソルを載せたとき*/
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+}
+.submitbutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+
+/*タグ追加*/
+.tag-addbutton {
+  overflow: hidden;
+  outline: 0;
+  width: 70px;
+  display: inline-block;
+  margin-top: 10px;
+  margin-left: 430px;
+  padding: 0.3em;
+  box-shadow: 0 0 0 5px #ffc0cb, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 1px dashed #fff;/* 点線の色・サイズ */
+  border-radius: 7px;
+  background: #ffc0cb;/*ボタン色*/
+  text-decoration: none;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+}
+.tag-addbutton:hover {
+  /*カーソルを載せたとき*/
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+}
+.tag-addbutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+#tag-pop-up {
+	display: none; /* label でコントロールするので input は非表示に */
+}
+.tag-overlay {
+	display: none; /* input にチェックが入るまでは非表示に */
+}
+#tag-pop-up:checked + .tag-overlay {
+	display: block;
+	z-index: 9999;
+	background-color: #00000070;
+	position: fixed;
+	width: 100%;
+	height: 100vh;
+	top: 0;
+	left: 0;
+}
+.tag-window {
+	width: auto;
+	height: auto;
+	background-color: #ffffff;
+	border-radius: 10px;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+  padding: 10px 20px;
+}
+.tag-holder{
+	z-index: -1;
+	font-size: 15px;
+	margin: 0;
+}
+.tag-content{
+  font-size: 20px;
+	margin: 0;
+}
+.tag-close {
+	cursor:pointer;
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	font-size: 20px;
+}
+/*追加タグデータ送信ボタン*/
+.tag-submitbutton {
+  overflow: hidden;
+  outline: 0;
+  width: 100px;
+  display: inline-block;
+  margin : 10px ;
+  padding: 0.25em 0.5em;
+  box-shadow: 0 0 0 5px #db7093, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 2px dashed #fff;/* 点線の色・サイズ */
+  border-radius: 10px;
+  background: #db7093;/*ボタン色*/
+  text-decoration: none;
+  text-align: center;
+  font-size: 15px;
+  color: #fff;
+}
+.tag-submitbutton:hover {
+  /*カーソルを載せたとき*/
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+}
+.tag-submitbutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+
+/* 編集画面 */
+#edit-pop-up {
+	display: none; /* label でコントロールするので input は非表示に */
+}
+.edit-overlay {
+	display: none; /* input にチェックが入るまでは非表示に */
+}
+#edit-pop-up:checked + .edit-overlay {
+	display: block;
+	z-index: 9999;
+	background-color: #00000070;
+	position: fixed;
+	width: 100%;
+	height: 100vh;
+	top: 0;
+	left: 0;
+}
+.edit-window {
+	width: auto;
+	height: auto;
+	background-color: #ffffff;
+	border-radius: 10px;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+  padding: 10px 20px;
+}
+.edit-holder{
+	z-index: -1;
+	font-size: 15px;
+	margin: 0;
+}
+.edit-content{
+  font-size: 20px;
+	margin: 0;
+}
+.edit-close {
+	cursor:pointer;
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	font-size: 20px;
+}
+
+
+
+/* ログイン画面 */
+.login-page {
+  width: 360px;
+  padding: 8% 0 0;
+  margin: auto;
+}
+.login-form {
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
+  max-width: 360px;
+  margin: 0 auto 100px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+.form-title {
+    text-align: center;
+    font-family:"edwardian script itc";
+    font-size: 30px;
+    color: #ffc0cb;
+}
+.login-form .message a{
+  margin: 0px 15px 0px 15px;
+  font-size: 12px;
+  color: #808080;
+  text-decoration: none;
+}
+.user{
+  color: #ffc0cb ;
+  margin-right: 2px; 
+}
+
+/* サインアップ画面 */
+.form-title-signup{
+    text-align: center;
+    font-size: 15px;
+    color: #db7093;
+}
+.form-title-signup span{
+    text-align: center;
+    font-family:"edwardian script itc";
+    font-size: 30px;
+    color: #db7093;  
+}
