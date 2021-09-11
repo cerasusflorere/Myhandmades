@@ -54,6 +54,11 @@ app.get('/failed', (req, res) => {
   res.sendFile(__dirname + '/views/failed.html');
 });
 
+// ホーム画面へ
+app.get('/home', (req, res) => {
+  res.sendFile(__dirname + '/views/home.html')
+})
+
 // ログアウト機能
 app.get('/logout', (req, res) => {
   res.clearCookie('user'); // クッキーをクリア
@@ -270,5 +275,23 @@ app.post('/savetag', function(req, res){
   });
 });
 
+/// ホーム画面
+// 表示機能findAllDatas
+app.get('/findAllDatas', function(req, res){
+  MongoClient.connect(mongouri, function(error, client) {
+    const db = client.db(process.env.DB); // 対象 DB
+    const colWork = db.collection('work'); // 対象コレクション
+    const opencode = '1';
+
+    // 検索条件（公開かどうかが1）
+    // 条件の作り方： https://docs.mongodb.com/manual/reference/operator/query/
+    const condition = {open:{$eq:opencode}};
+
+    colWork.find(condition).toArray(function(err, datas) {
+       res.json(datas); // レスポンスとしてユーザを JSON 形式で返却
+       client.close(); // DB を閉じる
+    });
+  });
+});
 
 const listener = app.listen(process.env.PORT);
