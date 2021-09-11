@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A cool thing made with Glitch">
-    <title>メイン画面</title>
+    <title>Private</title>
     <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
@@ -16,7 +16,7 @@
         <h1>Myhandmades</h1>
         <nav>
           <ul>
-              <li><a href="#">Home</a></li>
+              <li><a href="/home">Home</a></li>
               <li><a href="#">Favorite</a></li>
               <li><a href="/">Private</a></li>
           </ul>
@@ -42,6 +42,14 @@
 	    <div class="window">
 		    <label class="close" for="pop-up">×</label>
 		      <p class="text">
+            <div class="open-choose">
+              <div class="open-button" id="open-button">
+                <input type="checkbox" class="open-checkbox">
+                  <div class="open-knobs"></div>
+                  <div class="open-layer"></div>
+              </div>
+              <div class="open-message">公開しますか？</div>
+            </div>
             <p class="holder">題名</p>
               <input type="text" class="content" id="subject" placeholder="subject" value=""/>
             <p class="holder">製作期間</p>
@@ -86,8 +94,12 @@
       const editArea = document.getElementById('editlist');
       
       let flag = 1;
+      let editflag = 1;
       let number = 1;
       const listAreaTag = document.getElementById('taglabel'); // リスト表示部
+      let editlistAreaTag;
+      let tagname;
+      
       
       // 全データの取得
       function findDatas() {
@@ -106,7 +118,8 @@
               const duration = data.duration;
               const tag = data.tag;
               const comment = data.comment;
-              addToList(id, subject, duration, tag, comment);
+              const open = data.open;
+              addToList(id, subject, duration, tag, comment, open);
             }
           }
         }
@@ -115,10 +128,20 @@
       }
       
       // 表示
-      function addToList(id, subject, duration, tag, comment) {
+      function addToList(id, subject, duration, tag, comment, open) {
         const workDiv = document.createElement('div'); // 追加する本の div 要素
         workDiv.className = "worksarea";
         workDiv.id = id; // レスポンスから得た ID を付与する
+        
+        let openDiv = "";
+        let openI = "";
+        if(open == '1'){
+          openDiv = document.createElement('div');
+          openDiv.className = 'openarea';
+          
+          openI = document.createElement('i');
+          openI.className = 'fas fa-book-reader worksicon';
+        }
 
         const subjectDiv = document.createElement('div');
         subjectDiv.className = "subjectarea";
@@ -159,6 +182,7 @@
         editInput.onclick = function() {
           editData(id);
         }
+        
         editInput.type = "checkbox";
         editInput.id = 'edit-pop-up';
         
@@ -173,12 +197,16 @@
         editDiv.className = 'editdiv';
         editDiv.innerText = 'Edit';
 
+        if(open == "1"){
+          openDiv.appendChild(openI);
+          workDiv.appendChild(openDiv);
+        }
         workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
         durationDiv.appendChild(durationSpan);
         workDiv.appendChild(durationDiv); // workDiv に値段を追加
         workDiv.appendChild(tagDiv); // workDiv に感想を追加
         commentDiv.appendChild(commentP);
-        workDiv.appendChild(commentDiv);// workDiv に削除ボタンを追加
+        workDiv.appendChild(commentDiv);// workDiv にコメントを追加
         delButton.appendChild(delI);
         delButton.appendChild(delDiv);
         workDiv.appendChild(delButton);// workDiv に削除ボタンを追加
@@ -253,8 +281,7 @@
        }
       
        // 編集
-      function editData(id){
-        console.log(id);
+      function editData(id){        
         const url = '/findWork'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         const data = {id:id};
@@ -264,30 +291,73 @@
             const datas = JSON.parse(req.response);
             
             for(let i in datas){
-              console.log(id);
-              console.log(datas);
               const dataset = datas[i];
               
               const workid = dataset._id;
               const userid = dataset.userid;
               const subject = dataset.subject;
               const duration = dataset.duration;
-              const tag = dataset.tag;
+              tagname = dataset.tag;
               const comment = dataset.comment;
-              showedit(workid, userid, subject, duration, tag, comment);
+              const open = dataset.open;
+              showedit(workid, userid, subject, duration, tagname, comment, open);
             }            
           }
         }
         req.open('POST', url, true);
         req.setRequestHeader('Content-Type', 'application/json');
         req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
+        
+        if(flag == 1){
+          const url = '/findTags'; // 通信先
+          const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+          req.onreadystatechange = function() {
+            if(req.readyState == 4 && req.status == 200) {
+              const tags = JSON.parse(req.response);
+              for(let i in tags) {
+                const tag = tags[i];
+                editaddToListTag(tagname, tag.tag, tag._id);
+                number++;
+              }
+            }
+          }
+          req.open('GET', url, true);
+          req.send();
+          flag = 2;
+        }
       }
       
-      function showedit(id, userid, subject, duration, tag, comment){
+      function showedit(id, userid, subject, duration, tag, comment, open){
         const workP = document.createElement('p'); // 追加する本の div 要素
         workP.className = "edit-text";
         workP.id = id; // レスポンスから得た ID を付与する
-
+  
+        const openchooseDiv = document.createElement('div');
+        openchooseDiv.className = "open-choose"
+        
+        const openbuttonDiv = document.createElement('div');
+        openbuttonDiv.className = "open-button";
+        openbuttonDiv.id = "open-button";
+        
+        const opencheckboxInput = document.createElement('input');
+        opencheckboxInput.type = "checkbox";
+        opencheckboxInput.className = "open-checkbox";
+        
+        if(open == '1'){
+          opencheckboxInput.checked = true;
+        }
+        
+        const openknobsDiv = document.createElement('div');
+        openknobsDiv.className = "open-knobs";
+        
+        const openlayerDiv = document.createElement('div');
+        openlayerDiv.className = "open-layer";
+        
+        const openmessageDiv = document.createElement('div');
+        openmessageDiv.className = "open-message";
+        openmessageDiv.innerText = "公開しますか？";
+        
         const subjectP = document.createElement('p');
         subjectP.className = 'holder';
         subjectP.innerText = '題名';
@@ -309,7 +379,7 @@
         durationInput.value = duration;
         
         const tagForm = document.createElement('form');
-        tagForm.id = "taglabel";
+        tagForm.id = "edit-taglabel";
         
         const tagLabel  = document.createElement('label');
         tagLabel.className = 'tag-addbutton';
@@ -333,9 +403,21 @@
         buttonInput.className = 'submitbutton';
         buttonInput.value = 'Edit';
         buttonInput.onclick = function(){
-          editadd();
+          let editopen = '0';
+          const editsubject = subjectInput.value;
+          if(opencheckboxInput.checked == true){
+            editopen = '1';
+          }
+          
+          editadd(id);
         }
         
+        openbuttonDiv.appendChild(opencheckboxInput);
+        openbuttonDiv.appendChild(openknobsDiv);
+        openbuttonDiv.appendChild(openlayerDiv);
+        openchooseDiv.appendChild(openbuttonDiv);
+        openchooseDiv.appendChild(openmessageDiv); 
+        workP.appendChild(openchooseDiv); // workP に公開オンオフボタンを追加
         workP.appendChild(subjectP); // workP にタイトルを追加 
         workP.appendChild(subjectInput); 
         workP.appendChild(durationP); // workPに製作期間を追加
@@ -347,17 +429,44 @@
         workP.appendChild(buttonP); // workPに送信ボタンを追加
         workP.appendChild(buttonInput);//ここまで、クラス設定してない
         editArea.appendChild(workP); // リストに workDiv を追加
+        
+        editlistAreaTag = document.getElementById('edit-taglabel');
       }
       
-       // データの保存
-      function add() {
+      // タグデータ取得
+      function editaddToListTag(tagname, tag, tagid) {
+         const tagInput = document.createElement('input');
+         tagInput.type = "checkbox";
+         tagInput.id = "tag" + number; // ID を付与する
+         tagInput.value = tag;
+         tagInput.name = tag;
+        
+        if(tagname == tag){
+          tagInput.checked = true;
+        }
+        
+         const tagLavel = document.createElement('label');
+         tagLavel.innerText = tag;
+ 
+         editlistAreaTag.appendChild(tagInput); // リストに tagLavel を追加
+         editlistAreaTag.appendChild(tagLavel);
+       }
+      
+      // 編集データの保存
+      function editadd(id){
         const urladd = '/savework'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
+        const openid = document.getElementById('open-button');
+        let open = '0';
         const subject = document.getElementById('subject').value;
         const duration = document.getElementById('duration').value;
         let tag = "";
         const comment = document.getElementById('comment').value;
+        
+        if(openid.checked = true){
+          open = '1';
+        }
         
         if (tag1.checked){
           tag = document.getElementById('tag1').value;
@@ -376,7 +485,58 @@
         }
         
         // 取得した情報をもとにオブジェクトを作る
-        const data = {subject:subject, duration:duration, tag:tag, comment:comment};
+        const data = {subject:subject, duration:duration, tag:tag, comment:comment, open:open};
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            // 追加が成功したらフォームを空にする
+            document.getElementById('subject').value = '';
+            document.getElementById('duration').value = '';
+            document.getElementById('comment').value = '';
+            location.href = '/';
+          }else if(req.readyState == 4 && req.status != 200) {
+            alert(req.response);
+          }
+        }
+        req.open('POST', urladd, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信        
+      }
+      
+       // データの保存
+      function add() {
+        const urladd = '/savework'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        const openid = document.getElementById('open-button');
+        let open = '0';
+        const subject = document.getElementById('subject').value;
+        const duration = document.getElementById('duration').value;
+        let tag = "";
+        const comment = document.getElementById('comment').value;
+        
+        if(openid.checked = true){
+          open = '1';
+        }
+        
+        if (tag1.checked){
+          tag = document.getElementById('tag1').value;
+        }
+        if(tag2.checked) {
+          tag = document.getElementById('tag2').value;
+        }
+        if(tag3.checked){
+          tag = document.getElementById('tag3').value;
+        }
+        if(tag4.checked){
+          tag = document.getElementById('tag4').value;
+        }
+        if(tag5.checked){
+          tag = document.getElementById('tag5').value;
+        }
+        
+        // 取得した情報をもとにオブジェクトを作る
+        const data = {subject:subject, duration:duration, tag:tag, comment:comment, open:open};
         
         req.onreadystatechange = function() {
           if(req.readyState == 4 && req.status == 200) {
