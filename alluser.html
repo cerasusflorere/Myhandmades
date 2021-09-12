@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A cool thing made with Glitch">
+    <title>Home</title>
+    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
+  </head>
+  <body style="margin: 0px">
+    <div class="headerbg">
+      <div class="site-header">
+        <h1>Myhandmades</h1>
+        <div class="hamburger-menu">
+          <input type="checkbox" id="menu-btn-check"/>
+          <label for="menu-btn-check" class="menu-btn"><span></span></label>
+          <!--ここからメニュー-->
+          <div class="menu-content">
+            <ul>
+                <li><a href="/signup">Sign up</a></li>
+                <li><a href="/">Login</a></li>
+            </ul>
+          </div>
+          <!--ここまでメニュー-->
+        </div>
+      </div>
+　　</div>
+    
+    <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
+    <div id="list" class="list"></div><!-- リスト表示部 -->
+    
+    <script>
+      window.onload = findAllDatas; // 画面ロード時に実行
+      const listArea = document.getElementById('list'); // リスト表示部
+      
+      // 全データの取得
+      function findAllDatas() {
+        const url = '/findAllDatas'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            const datas = JSON.parse(req.response);
+            datas.reverse();
+            for(let i in datas) {
+              const data = datas[i];
+              
+              const id = data._id;
+              const userid = data.userid;
+              const subject = data.subject;
+              const duration = data.duration;
+              const tag = data.tag;
+              const comment = data.comment;
+              addToList(id, subject, duration, tag, comment);
+            }
+          }
+        }
+        req.open('GET', url, true);
+        req.send();
+      }
+      
+      // 表示
+      function addToList(id, subject, duration, tag, comment) {
+        const workDiv = document.createElement('div'); // 追加する本の div 要素
+        workDiv.className = "worksarea";
+        workDiv.id = id; // レスポンスから得た ID を付与する
+
+        const subjectDiv = document.createElement('div');
+        subjectDiv.className = "subjectarea";
+        subjectDiv.innerText = subject;
+        
+        const durationDiv = document.createElement('div');
+        durationDiv.className = 'durationame';
+        durationDiv.innerText = 'Duration: ';
+
+        const durationSpan = document.createElement('span');
+        durationSpan.className = 'durationarea';
+        durationSpan.innerText = duration;
+
+        const tagDiv = document.createElement('div');
+        tagDiv.className = 'tagarea';
+        tagDiv.innerText = tag;
+        
+        const commentDiv = document.createElement('div');
+        commentDiv.className = 'commentbox';
+        
+        const commentP = document.createElement('p');
+        commentP.innerText = comment;
+
+        workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
+        if(duration != ''){
+          durationDiv.appendChild(durationSpan);
+          workDiv.appendChild(durationDiv); // workDiv に製作期間を追加          
+        }
+        if(tag != ''){
+          workDiv.appendChild(tagDiv); // workDiv にタグを追加
+        }
+        if(comment != ''){
+          commentDiv.appendChild(commentP);
+          workDiv.appendChild(commentDiv); // workDiv にコメントを追加            
+        }  
+        listArea.appendChild(workDiv); // リストに workDiv を追加
+      }
+
+      // リロード
+      function home(){
+         scrollTo(0, 0);
+      }
+    </script>
+  </body>
+</html>
