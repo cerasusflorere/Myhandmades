@@ -10,15 +10,16 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
   </head>
+  
   <body style="margin: 0px">
     <div class="headerbg">
       <div class="site-header">
         <h1>Myhandmades</h1>
         <nav>
           <ul>
-              <li><a href="/home">Home</a></li>
+              <li><a href="/">Home</a></li>
               <li><a href="#">Favorite</a></li>
-              <li><a href="/">Private</a></li>
+              <li><a href="/private">Private</a></li>
           </ul>
         </nav>
         <div class="hamburger-menu">
@@ -91,14 +92,16 @@
     <script>
       window.onload = findDatas; // 画面ロード時に実行
       const listArea = document.getElementById('list'); // リスト表示部
-      const editArea = document.getElementById('editlist');
+      const editArea = document.getElementById('editlist'); // 編集するものを表示
       
-      let flag = 1;
+      let flag = 1; // タグを複数出すことのないように
       let editflag = 1;
-      let number = 1;
-      const listAreaTag = document.getElementById('taglabel'); // リスト表示部
+      let number = 1; // タグにIDを振るため
+      let tagnumber; // タグの数を管理
+      let edittagnumber;
+      const listAreaTag = document.getElementById('taglabel'); // タグリスト表示部
       let editlistAreaTag;
-      let tagname;
+      let tagname; // タグの名前を渡すため
       
       
       // 全データの取得
@@ -133,14 +136,18 @@
         workDiv.className = "worksarea";
         workDiv.id = id; // レスポンスから得た ID を付与する
         
-        let openDiv = "";
-        let openI = "";
+        let openDiv;
+        let openI;
         if(open == '1'){
           openDiv = document.createElement('div');
           openDiv.className = 'openarea';
           
           openI = document.createElement('i');
           openI.className = 'fas fa-book-reader worksicon';
+          
+          nowopenmessageDiv = document.createElement('div');
+          nowopenmessageDiv.className = 'nowopenmessage';
+          nowopenmessageDiv.innerText = '公開！';
         }
 
         const subjectDiv = document.createElement('div');
@@ -178,11 +185,11 @@
         delDiv.className = 'deletediv';
         delDiv.innerText = 'Delete';
         
+        
         const editInput = document.createElement("input");
         editInput.onclick = function() {
           editData(id);
         }
-        
         editInput.type = "checkbox";
         editInput.id = 'edit-pop-up';
         
@@ -199,14 +206,21 @@
 
         if(open == "1"){
           openDiv.appendChild(openI);
+          openDiv.appendChild(nowopenmessageDiv);
           workDiv.appendChild(openDiv);
         }
         workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
-        durationDiv.appendChild(durationSpan);
-        workDiv.appendChild(durationDiv); // workDiv に値段を追加
-        workDiv.appendChild(tagDiv); // workDiv に感想を追加
-        commentDiv.appendChild(commentP);
-        workDiv.appendChild(commentDiv);// workDiv にコメントを追加
+        if(duration != ''){
+          durationDiv.appendChild(durationSpan);
+          workDiv.appendChild(durationDiv); // workDiv に値段を追加
+        }
+        if(tag != ''){
+          workDiv.appendChild(tagDiv); // workDiv にタグを追加
+        }
+        if(comment != ''){
+          commentDiv.appendChild(commentP);
+          workDiv.appendChild(commentDiv);// workDiv にコメントを追加
+        }
         delButton.appendChild(delI);
         delButton.appendChild(delDiv);
         workDiv.appendChild(delButton);// workDiv に削除ボタンを追加
@@ -232,6 +246,7 @@
                 addToListTag(tag.tag, tag._id);
                 number++;
               }
+              tagnumber = number-1;
             }
           }
           req.open('GET', url, true);
@@ -244,7 +259,7 @@
       function addToListTag(tag, id) {
          const tagInput = document.createElement('input');
          tagInput.type = "checkbox";
-         tagInput.id = "tag" + number; // ID を付与する
+         tagInput.id = 'tag[' + number + ']'; // ID を付与する
          tagInput.value = tag;
         
          const tagLavel = document.createElement('label');
@@ -252,13 +267,76 @@
  
          listAreaTag.appendChild(tagInput); // リストに tagLavel を追加
          listAreaTag.appendChild(tagLavel);
-       }
+       }     
+      
+      // タグを追加する
+      function tagadd(){
+        const url = '/savetag';
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        const tag = document.getElementById('tag-add').value;
+        const data = {tag:tag};
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            // 追加が成功したらフォームを空にする
+            document.getElementById('tag').value = '';
+          }else if(req.readyState == 4 && req.status != 200) {
+            alert(req.response);
+          }
+        }
+        req.open('POST', url, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
+      }
+      
+      // データの保存
+      function add() {
+        const urladd = '/savework'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        const openid = document.getElementById('open-button');
+        let open = '0';
+        const subject = document.getElementById('subject').value;
+        const duration = document.getElementById('duration').value;
+        let tag = "";
+        const comment = document.getElementById('comment').value;
+        
+        if(openid.checked == true){
+          open = '1';
+        }
+        
+        for(let i=1; i<=tagnumber; i++){
+          let element = document.getElementById('tag['+i+']');
+          if(element.checked){
+            tag = element.value;
+          }
+        }
+        
+        // 取得した情報をもとにオブジェクトを作る
+        const data = {subject:subject, duration:duration, tag:tag, comment:comment, open:open};
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            // 追加が成功したらフォームを空にする
+            document.getElementById('subject').value = '';
+            document.getElementById('duration').value = '';
+            document.getElementById('comment').value = '';
+            location.href = '/private';
+          }else if(req.readyState == 4 && req.status != 200) {
+            alert(req.response);
+          }
+        }
+        req.open('POST', urladd, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
+      }            
+
       
       // 削除機能
       function disp(id){
-        console.log(id);
 	       // 「OK」時の処理開始 ＋ 確認ダイアログの表示
-	      if(window.confirm('本当にいいんですね？')){
+	      if(window.confirm('本当に削除しますか？')){
           const url = '/deleteData'; // 通信先
           const req = new XMLHttpRequest(); // 通信用オブジェクト
           const data = {id:id};
@@ -320,6 +398,7 @@
                 editaddToListTag(tagname, tag.tag, tag._id);
                 number++;
               }
+              edittagnumber = number-1;
             }
           }
           req.open('GET', url, true);
@@ -392,7 +471,7 @@
         
         const commentTextarea = document.createElement('textarea');
         commentTextarea.className = 'edit-content';
-        commentTextarea.id = "comment";
+        commentTextarea.id = "edit-comment";
         commentTextarea.value = comment;
         
         const buttonP = document.createElement('p');
@@ -408,7 +487,6 @@
           if(opencheckboxInput.checked == true){
             editopen = '1';
           }
-          
           editadd(id);
         }
         
@@ -437,7 +515,7 @@
       function editaddToListTag(tagname, tag, tagid) {
          const tagInput = document.createElement('input');
          tagInput.type = "checkbox";
-         tagInput.id = "tag" + number; // ID を付与する
+         tagInput.id = 'tag[' + number + ']'; // ID を付与する
          tagInput.value = tag;
          tagInput.name = tag;
         
@@ -454,126 +532,54 @@
       
       // 編集データの保存
       function editadd(id){
-        const urladd = '/savework'; // 通信先
-        const req = new XMLHttpRequest(); // 通信用オブジェクト
+	       // 「OK」時の処理開始 ＋ 確認ダイアログの表示
+	      if(window.confirm('本当に編集しますか？')){
+          const urladd = '/editwork'; // 通信先
+          const req = new XMLHttpRequest(); // 通信用オブジェクト
+         
+          const openid = document.getElementById('open-button');
+          let open = '0';
+          const subject = document.getElementById('edit-subject').value;
+          const duration = document.getElementById('edit-duration').value;
+          let tag = "";
+          const comment = document.getElementById('edit-comment').value;
         
-        const openid = document.getElementById('open-button');
-        let open = '0';
-        const subject = document.getElementById('subject').value;
-        const duration = document.getElementById('duration').value;
-        let tag = "";
-        const comment = document.getElementById('comment').value;
-        
-        if(openid.checked = true){
-          open = '1';
-        }
-        
-        if (tag1.checked){
-          tag = document.getElementById('tag1').value;
-        }
-        if(tag2.checked) {
-          tag = document.getElementById('tag2').value;
-        }
-        if(tag3.checked){
-          tag = document.getElementById('tag3').value;
-        }
-        if(tag4.checked){
-          tag = document.getElementById('tag4').value;
-        }
-        if(tag5.checked){
-          tag = document.getElementById('tag5').value;
-        }
-        
-        // 取得した情報をもとにオブジェクトを作る
-        const data = {subject:subject, duration:duration, tag:tag, comment:comment, open:open};
-        
-        req.onreadystatechange = function() {
-          if(req.readyState == 4 && req.status == 200) {
-            // 追加が成功したらフォームを空にする
-            document.getElementById('subject').value = '';
-            document.getElementById('duration').value = '';
-            document.getElementById('comment').value = '';
-            location.href = '/';
-          }else if(req.readyState == 4 && req.status != 200) {
-            alert(req.response);
+          if(openid.checked = true){
+            open = '1';
+          }
+          
+        for(let i=1; i<=edittagnumber; i++){
+          let element = document.getElementById('tag['+i+']');
+          if(element.checked){
+            tag = element.value;
           }
         }
-        req.open('POST', urladd, true);
-        req.setRequestHeader('Content-Type', 'application/json');
-        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信        
-      }
-      
-       // データの保存
-      function add() {
-        const urladd = '/savework'; // 通信先
-        const req = new XMLHttpRequest(); // 通信用オブジェクト
         
-        const openid = document.getElementById('open-button');
-        let open = '0';
-        const subject = document.getElementById('subject').value;
-        const duration = document.getElementById('duration').value;
-        let tag = "";
-        const comment = document.getElementById('comment').value;
+          // 取得した情報をもとにオブジェクトを作る
+          const data = {id:id, subject:subject, duration:duration, tag:tag, comment:comment, open:open};
         
-        if(openid.checked = true){
-          open = '1';
-        }
-        
-        if (tag1.checked){
-          tag = document.getElementById('tag1').value;
-        }
-        if(tag2.checked) {
-          tag = document.getElementById('tag2').value;
-        }
-        if(tag3.checked){
-          tag = document.getElementById('tag3').value;
-        }
-        if(tag4.checked){
-          tag = document.getElementById('tag4').value;
-        }
-        if(tag5.checked){
-          tag = document.getElementById('tag5').value;
-        }
-        
-        // 取得した情報をもとにオブジェクトを作る
-        const data = {subject:subject, duration:duration, tag:tag, comment:comment, open:open};
-        
-        req.onreadystatechange = function() {
-          if(req.readyState == 4 && req.status == 200) {
-            // 追加が成功したらフォームを空にする
-            document.getElementById('subject').value = '';
-            document.getElementById('duration').value = '';
-            document.getElementById('comment').value = '';
-            location.href = '/';
-          }else if(req.readyState == 4 && req.status != 200) {
-            alert(req.response);
+          req.onreadystatechange = function() {
+            if(req.readyState == 4 && req.status == 200) {
+              // 追加が成功したらフォームを空にする
+              document.getElementById('edit-subject').value = '';
+              document.getElementById('edit-duration').value = '';
+              document.getElementById('edit-comment').value = '';
+              location.href = '/private';
+            }else if(req.readyState == 4 && req.status != 200) {
+              alert(req.response);
+            }
           }
-        }
-        req.open('POST', urladd, true);
-        req.setRequestHeader('Content-Type', 'application/json');
-        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
+          req.open('POST', urladd, true);
+          req.setRequestHeader('Content-Type', 'application/json');
+          req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信 
+      	      // 「OK」時の処理終了
+          }else{
+            // 「キャンセル」時の処理開始
+		        window.alert('キャンセルされました'); // 警告ダイアログを表示
+            // 「キャンセル」時の処理終了
+       	  }               
       }
-      
-      function tagadd(){
-        const url = '/savetag';
-        const req = new XMLHttpRequest(); // 通信用オブジェクト
-        
-        const tag = document.getElementById('tag-add').value;
-        const data = {tag:tag};
-        
-        req.onreadystatechange = function() {
-          if(req.readyState == 4 && req.status == 200) {
-            // 追加が成功したらフォームを空にする
-            document.getElementById('tag').value = '';
-          }else if(req.readyState == 4 && req.status != 200) {
-            alert(req.response);
-          }
-        }
-        req.open('POST', url, true);
-        req.setRequestHeader('Content-Type', 'application/json');
-        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
-      }
-      
+         
       // リロード
       function home(){
          scrollTo(0, 0);
