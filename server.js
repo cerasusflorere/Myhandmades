@@ -17,12 +17,17 @@ const mongouri = 'mongodb+srv://'+process.env.USER+':'+process.env.PASS+'@'+proc
 // トップ画面
 app.get('/', (req, res) => {
   if(req.cookies.user) {
-    res.sendFile(__dirname + '/views/main.html');
+    res.sendFile(__dirname + '/views/home.html');
     return;
   }
 
   res.sendFile(__dirname + '/views/index.html');
 });
+
+// ホーム画面へ
+app.get('/home', (req, res) => {
+  res.sendFile(__dirname + '/views/home.html');
+})
 
 
 // 登録画面
@@ -54,9 +59,18 @@ app.get('/failed', (req, res) => {
   res.sendFile(__dirname + '/views/failed.html');
 });
 
-// ホーム画面へ
-app.get('/home', (req, res) => {
-  res.sendFile(__dirname + '/views/home.html')
+// Private画面へ
+app.get('/private', (req, res) => {
+  if(req.cookies.user) {
+    res.sendFile(__dirname + '/views/private.html');
+    return;
+  }
+  res.sendFile(__dirname + '/views/index.html');
+})
+
+// ログインせずに投稿を見るページへ
+app.get('/alluser', (req, res) =>{
+  res.sendFile(__dirname + '/views/alluser.html');
 })
 
 // ログアウト機能
@@ -67,41 +81,84 @@ app.get('/logout', (req, res) => {
 
 //サインアップ機能
 app.post('/signup', function(req, res){
-  const userName = req.body.userName;
-  const password = req.body.password;
-  MongoClient.connect(mongouri, function(error, client) {
-    const db = client.db(process.env.DB); // 対象 DB
-    const col = db.collection('users'); // 対象コレクション
-    const userid = Math.random(500);
-    const user = {name: userName, password:hashed(password), userid: userid}; // 保存対象
-    
-    col.insertOne(user, function(err, result) {
-       res.redirect('/'); // リダイレクト
-       client.close(); // DB を閉じる
+  let received = '';
+  req.setEncoding('utf8');
+  req.on('data', function(chunk) {
+    received += chunk;
+  });
+  req.on('end', function() {
+    MongoClient.connect(mongouri, function(error, client) {
+      const db = client.db(process.env.DB); // 対象 DB
+      const col = db.collection('users'); // 対象コレクション
+      const user = JSON.parse(received); // 保存対象
+
+      if(!user.name) {
+        res.status(400);
+        res.send('ユーザー名が入力されてないので登録できません…');
+        return;
+      }else if(!user.password){
+        res.status(400);
+        res.send('パスワードの入力をお願いします');
+        return;        
+      }else if(!user.repassword){
+        res.status(400);
+        res.send('パスワードの再確認ができません');
+        return;             
+      }else if(user.password != user.repassword){
+        res.status(400);
+        res.send('パスワードが一致しませんねぇ…');
+        return;          
+      }
+      
+      // パスワードをハッシュ化する (この手の情報は平文で保存するべきではない)
+      const userinfo = {name: user.name, password:hashed(user.password)}; // 保存対象
+
+      const condition = {name:{$eq:user.name}}; // ユーザ名で検索する
+      col.findOne(condition, function(err, users){
+        if(users) {
+          res.status(400);
+          res.send('既にそのユーザー名は登録されているので、別の名前で登録して欲しいです…');
+          return;
+        }else{
+          col.insertOne(userinfo, function(err, result) {
+            client.close(); // DB を閉じる
+            res.status(200);
+            res.send('Success');        
+          });
+        }
+        client.close();
+      });
     });
   });
 });
 
 //ログイン機能
 app.post('/login', function(req, res){
-  const userName = req.body.userName;
-  const password = req.body.password;
-  MongoClient.connect(mongouri, function(error, client) {
-    const db = client.db(process.env.DB); // 対象 DB
-    const col = db.collection('users'); // 対象コレクション
-    // 登録時にパスワードをハッシュ化しているならば
-    // ここで password をハッシュ化して検索する
-    // ハッシュ化した値同士で比較する
-    const condition = {name:{$eq:userName}, password:{$eq:hashed(password)}}; // ユーザ名とパスワードで検索する
-    col.findOne(condition, function(err, user){
-      if(user) {
-        res.cookie('user', user); // ヒットしたらクッキーに保存
-        //userid = user.userid;
-        res.redirect('/'); // リダイレクト
-      }else{
-        res.redirect('/failed'); // リダイレクト
-      }
-      client.close();
+  let received = '';
+  req.setEncoding('utf8');
+  req.on('data', function(chunk) {
+    received += chunk;
+  });
+  
+  req.on('end', function() {
+    MongoClient.connect(mongouri, function(error, client) {
+      const db = client.db(process.env.DB); // 対象 DB
+      const col = db.collection('users'); // 対象コレクション
+      const users = JSON.parse(received); // 保存対象
+      
+      // 登録時にパスワードをハッシュ化しているならば
+      // ここで password をハッシュ化して検索する
+      // ハッシュ化した値同士で比較する
+      const condition = {name:{$eq:users.name}, password:{$eq:hashed(users.password)}}; // ユーザ名とパスワードで検索する
+      col.findOne(condition, function(err, user){
+        if(user) {
+          res.cookie('user', user); // ヒットしたらクッキーに保存
+          res.redirect('/'); // リダイレクト
+        }else{
+          res.redirect('/failed'); // リダイレクト
+        }
+        client.close();
+      });
     });
   });
 });
@@ -127,7 +184,7 @@ app.get('/findDatas', function(req, res){
 
     // 検索条件（ユーザーIDがuserId）
     // 条件の作り方： https://docs.mongodb.com/manual/reference/operator/query/
-    const userId = ""+req.cookies.user.userid;
+    const userId = req.cookies.user._id;
     const condition = {userid:{$eq:userId}};
 
     colWork.find(condition).toArray(function(err, datas) {
@@ -170,7 +227,6 @@ app.post('/findWork', (req, res) => {
   req.on('data', function(chunk) {
     received = chunk;
   });
-  console.log(received);
   
   req.on('end', function() {
 　  MongoClient.connect(mongouri, function(error, client) {
@@ -188,20 +244,46 @@ app.post('/findWork', (req, res) => {
   });
 });
 
-//追加画面へaddform
-app.post('/addform', (req, res) => {
-  res.sendFile(__dirname + '/views/add.html');
+// 編集機能editwork
+app.post('/editwork', function(req, res){
+  let received = '';
+  req.setEncoding('utf8');
+  req.on('data', function(chunk) {
+    received += chunk;
+  });
+  
+  req.on('end', function() {
+    MongoClient.connect(mongouri, function(error, client) {
+      const db = client.db(process.env.DB); // 対象 DB
+      const colWork = db.collection('work'); // 対象コレクション
+      const data = JSON.parse(received); // 保存対象
+      const oid = new ObjectID(data.id);
+      delete data.id;
+
+      if(!data.subject) {
+        res.status(400);
+        res.send('題名ないと登録できないんです…');
+        return;
+      }
+      
+      colWork.updateOne({_id:oid}, {$set:data}, function(err, result) {
+          //res.send(decodeURIComponent(result.insertedId)); // 追加したデータの ID を返す
+          client.close(); // DB を閉じる
+          res.status(200);
+          res.send('Success');
+      });
+    });
+  });
 });
 
 /// 追加画面
 
 // 追加機能fileadd
 app.post('/savework', function(req, res){
-  const userid = ""+req.cookies.user.userid;
+  const userid = req.cookies.user._id;
   let received = '';
   req.setEncoding('utf8');
   req.on('data', function(chunk) {
-    chunk["userid"] = userid;
     received += chunk;
   });
   req.on('end', function() {
@@ -235,7 +317,7 @@ app.get('/findTags', function(req, res){
 
     // 検索条件（名前が「エクサくん」ではない）
     // 条件の作り方： https://docs.mongodb.com/manual/reference/operator/query/
-    const condition = {tag:{$ne:'エクサくん'}};
+    const condition = {};
 
     colTag.find(condition).toArray(function(err, tags) {
       res.json(tags); // レスポンスとしてユーザを JSON 形式で返却
