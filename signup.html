@@ -5,19 +5,60 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A cool thing made with Glitch">
-    <title>サインアップ</title>
+    <title>Sign up</title>
     <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
+    <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
   </head>
+  
   <body>
     <div class="login-page">
-      <form class="login-form" method="post" action="/signup">
+      <div class="login-form">
         <p class="form-title-signup">Welcome to <span>Myhandmades</span></p>
-        <p><input type="text" name="userName" placeholder="username"/></p>
-        <p><input type="password" name="password" placeholder="password"/></p>
-        <input type="submit" class="signupbutton" value="Sign up"/>
+        <p><i class="fas fa-user-circle usersignup fa-fw"></i><input type="text" name="userName" id='userName' placeholder="username"/></p>
+        <p><i class="fas fa-lock usersignup fa-fw"></i><input type="password" name="password" id='password' placeholder="password"/></p>
+        <p><i class="fas fa-lock usersignup fa-fw"></i><input type="password" name="repassword" id='repassword' placeholder="re-password"/></p>
+        <input type="button" class="signupbutton" value="Sign up" onclick="signup()"/>
         <p class="message"><a href="/index">Let's login!</a></p>
-      </form>
+      </div>
     </div>
   </body>
 </html>
+
+<script>
+  function signup(){
+    const userName = document.getElementById('userName').value;
+    const password = document.getElementById('password').value;
+    const repassword = document.getElementById('repassword').value;
+    if(userName != '' && password != '' && repassword != '' && password == repassword){
+      const urladd = '/signup'; // 通信先
+      const req = new XMLHttpRequest(); // 通信用オブジェクト
+      
+      // 取得した情報をもとにオブジェクトを作る
+      const user = {name: userName, password: password, repassword: repassword};
+        
+      req.onreadystatechange = function() {
+        if(req.readyState == 4 && req.status == 200) {
+          // 追加が成功したらフォームを空にする
+          document.getElementById('userName').value = '';
+          document.getElementById('password').value = '';
+          document.getElementById('repassword').value = '';
+          location.href = '/';
+        }else if(req.readyState == 4 && req.status != 200) {
+          alert(req.response);
+        }
+      }
+      req.open('POST', urladd, true);
+      req.setRequestHeader('Content-Type', 'application/json');
+      req.send(JSON.stringify(user)); // オブジェクトを文字列化して送信
+    }else if(userName == ''){
+      alert("ユーザー名が入力されてないので登録できません…");
+    }else if(password == ''){
+      alert("パスワードの入力をお願いします");
+    }else if(repassword == ''){
+      alert("パスワードの再確認ができません");
+    }else{
+      alert("パスワードが一致しませんねぇ…");
+    }
+  }
+</script>
