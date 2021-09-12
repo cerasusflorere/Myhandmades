@@ -16,9 +16,9 @@
         <h1>Myhandmades</h1>
         <nav>
           <ul>
-              <li><a href="#">Home</a></li>
+              <li><a href="/">Home</a></li>
               <li><a href="#">Favorite</a></li>
-              <li><a href="/">Private</a></li>
+              <li><a href="/private">Private</a></li>
           </ul>
         </nav>
         <div class="hamburger-menu">
@@ -51,6 +51,7 @@
         req.onreadystatechange = function() {
           if(req.readyState == 4 && req.status == 200) {
             const datas = JSON.parse(req.response);
+            datas.reverse();
             for(let i in datas) {
               const data = datas[i];
               
@@ -97,11 +98,17 @@
         commentP.innerText = comment;
 
         workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
-        durationDiv.appendChild(durationSpan);
-        workDiv.appendChild(durationDiv); // workDiv に値段を追加
-        workDiv.appendChild(tagDiv); // workDiv に感想を追加
-        commentDiv.appendChild(commentP);
-        workDiv.appendChild(commentDiv);    
+        if(duration != ''){
+          durationDiv.appendChild(durationSpan);
+          workDiv.appendChild(durationDiv); // workDiv に製作期間を追加
+        }
+        if(tag != ''){
+          workDiv.appendChild(tagDiv); // workDiv にタグを追加
+        }
+        if(comment != ''){
+          commentDiv.appendChild(commentP);
+          workDiv.appendChild(commentDiv);  // workDivにコメントを追加  
+        }  
         listArea.appendChild(workDiv); // リストに workDiv を追加
       }
 
