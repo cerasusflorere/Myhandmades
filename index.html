@@ -5,45 +5,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A cool thing made with Glitch">
-    <title>ログイン</title>
-    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
+    <title>Login</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
   </head>
   <body>
-    <div class="login-page">
-      <div class="login-form">
-        <p class="form-title">Myhandmades</p>
-        <p><i class="fas fa-user-circle user fa-fw"></i><input type="text" name="userName" id='userName' placeholder="username"/></p>
-        <p><i class="fas fa-lock user fa-fw"></i><input type="password" name="password" id='password' placeholder="password"/></p>
-        <input type="button" class="loginbutton" value="Login" onclick='login()'/>
-        <p class="message"><a href="/signup">Create an account</a></p>
-        <p class="message"><a href="#">Forget username?</a></p>
-        <p class="message"><a href="#">Forget password?</a></p>
-        <p class="message"><a href="/alluser">Just look?</a></p>
+    <div class='login-area'>
+      <div class="login-page">
+        <form class="login-form" method="post" action="/login">
+          <p class="form-title">Myhandmades</p>
+          <p><i class="fas fa-user-circle user fa-fw"></i><input type="text" name="userName" id='userName' placeholder="username"/></p>
+          <p><i class="fas fa-lock user fa-fw"></i><input type="password" name="password" id='password' placeholder="password"/></p>
+          <input type="submit" class="loginbutton" value="Login"/>
+          <p class="message"><a href="/signup">Create an account</a></p>
+          <p class="message"><a href="#">Forget username?</a></p>
+          <p class="message"><a href="#">Forget password?</a></p>
+          <p class="message"><a href="/alluser">Just look?</a></p>
+        </form>
       </div>
     </div>
   </body>
 </html>
-
-<script>
-    function login(){
-    const userName = document.getElementById('userName').value;
-    const password = document.getElementById('password').value;
-    if(userName != '' && password != ''){
-      const urladd = '/login'; // 通信先
-      const req = new XMLHttpRequest(); // 通信用オブジェクト
-      
-      // 取得した情報をもとにオブジェクトを作る
-      const user = {name: userName, password: password};
-        
-      req.open('POST', urladd, true);
-      req.setRequestHeader('Content-Type', 'application/json');
-      req.send(JSON.stringify(user)); // オブジェクトを文字列化して送信
-    }else if(userName == ''){
-      alert("ユーザー名を入力してくださいな");
-    }else if(password == ''){
-      alert("パスワードの入力をお願いします");
-    }
-  }
-</script>
