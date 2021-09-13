@@ -8,17 +8,19 @@
   font-family:"Bell MT";
 }
 
-body {
-    background-color: #fdf5e6;
+html, body {
+  background-color: #fdf5e6;
+  width: 100%;
+  height: 100%;
+  margin: 0;
 }
 
 h1 {
-  padding: 0px 270px 0px 150px;
+  padding-left: 12%;
   font-family:"edwardian script itc";
   font-weight: lighter;
-  font-size: 50px;
+  font-size: 3.125em;
   color: #ffb6c1;
-  max-width: calc(100% - 5rem);
   line-height: 0.2;
 }
 /*
@@ -63,52 +65,212 @@ footer {
   border-top: 1px solid lightgrey;
 }
 
-/*　ボタン　*/
-/*サインアップボタン*/
-.signupbutton {
+/* 共通要素 */
+/*ヘッダー*/
+.headerbg {
+  width: 100%;
+}
+.site-header{
+  z-index: 1000;
+  display: flex;
+  position: fixed;
+  width: 100%;
+  height: 5em;
+  background: #fff;  
+  text-align: center;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 0 1.25em 0 rgba(0, 0, 0, 0.2), 0 0.3125em 0.3125em 0 rgba(0, 0, 0, 0.24);
   overflow: hidden;
-  outline: 0;
-  width: 240px;
+}
+/*メニュー1*/
+nav ul{
+  padding: 0;
+  height: 100%;
+  margin: 0;
+  list-style: none;  
+} 
+nav li{
   display: inline-block;
-  margin : 10px ;
-  padding: 0.5em 1em;
-  box-shadow: 0 0 0 5px #db7093, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
-  border: 2px dashed #fff;/* 点線の色・サイズ */
-  border-radius: 15px;
-  background: #db7093;/*ボタン色*/
+  height: 100%;
+}
+nav a{
+  display: inline-block;
+  width: 5.5em;
+  padding: 0.5em;
+  border-radius: 0.8em;
+  margin : 1.25em 2.5em;  
+  box-shadow: 0 0 0  0.3em #ffc0cb, 0 0.175em 0.2375em 0.3em rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 0.175em dashed #fff;/* 点線の色・サイズ */
+  background: #ffc0cb;/*ボタン色*/
+  overflow: hidden;
   text-decoration: none;
   text-align: center;
-  font-size: 20px;
+  font-size: 0.8125em;
   color: #fff;
 }
-.signupbutton:hover {
+nav a:hover{
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+} 
+nav a:active{
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+/*ハンバーガーメニュー*/
+.menu-btn {
+  z-index: 90;
+  display: flex;
+  position: fixed;
+  top: 2.5em;
+  right: 3.125em;  
+  justify-content: center;
+  align-items: center;  
+}
+.menu-btn:hover{
+  cursor: hand; 
+  cursor: pointer
+} 
+.menu-btn span,
+.menu-btn span:before,
+.menu-btn span:after {
+  display: block;
+  position: absolute;
+  content: '';
+  height: 0.1875em;/*線の太さ*/
+  width: 1.5625em;/*長さ*/
+  border-radius: 0.1875em;
+  background-color: #ffc0cb;
+  cursor: pointer;
+}
+.menu-btn span:before {
+  bottom: 0.5em;
+}
+.menu-btn span:after {
+  top: 0.5em;
+}
+#menu-btn-check:checked ~ .menu-btn span {
+  background-color: rgba(255, 255, 255, 0);/*メニューオープン時は真ん中の線を透明にする*/
+}
+#menu-btn-check:checked ~ .menu-btn span::before {
+  bottom: 0;
+  transform: rotate(45deg);
+}
+#menu-btn-check:checked ~ .menu-btn span::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+#menu-btn-check {
+  display: none;
+}
+.menu-content {
+  z-index: 80;
+  position: fixed;
+  top: 0;
+  right: -120%;/*rightの値を変更してメニューを画面外へ*/
+  width: 15%;
+  height: 100%;
+  background-color: #ffe4e1;
+  transition: all 0.5s;/*アニメーション設定*/
+}
+.menu-content ul {
+  padding: 4.375em 0.625em 0;
+}
+.menu-content ul li {
+  border-bottom: solid 0.125em #c0c0c0;
+  list-style: none;
+}
+.menu-content ul li a {
+  display: block;
+  width: 100%;
+  padding: 0.5625em 1em 0.625em 0.5625em;
+  font-size: 1em; 
+  font-weight: bold;
+  color: #c0c0c0;
+  text-decoration: none;  
+}
+#menu-btn-check:checked ~ .menu-content {
+  right: 0;/*メニューを画面内へ*/
+}
+/*リロードボタン*/
+.topbutton {
+  z-index: 1;
+  position:fixed;
+  width: 1.7em;/* 円の大きさ */
+  height: 1.7em;/* 円の大きさ */
+  right: 1.3em;
+  bottom: 1.3em;
+  line-height: 1.7em;/* 円の大きさ */
+  border-radius: 50%;/* 角丸サイズ */
+  box-shadow: 0 0 0 0.2em #ffc0cb, 0 0.08em 0.15em 0.2em rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 0.08em dashed #fff;/* 点線の色・サイズ */
+  background: #ffc0cb;/*ボタン色*/
+  color: #fff;
+  font-size: 1.563em;
+}
+.topbutton:hover {
   /*カーソルを載せたとき*/
   border-style: solid;
   cursor: hand; 
   cursor:pointer
 }
-.signupbutton:active {
+.topbutton:active {
   /*ボタンを押したとき*/
-  -webkit-transform: translateY(4px);
-  transform: translateY(4px);/*下に動く*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
   border-bottom: none;/*線を消す*/
 }
 
-/*ログインボタン*/
-.loginbutton {
-  overflow: hidden;
-  outline: 0;
-  width: 240px;
-  display: inline-block;
-  margin : 10px ;
-  padding: 0.5em 1em;
-  box-shadow: 0 0 0 5px #ffc0cb, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
-  border: 2px dashed #fff;/* 点線の色・サイズ */
-  border-radius: 15px;
-  background: #ffc0cb;/*ボタン色*/
-  text-decoration: none;
+
+/* ログイン画面 */
+.login-area{
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  align-items: center
+}
+.login-page {
+  position: relative;
+  width: 22.5em;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;  
+}
+.login-form {
+  z-index: 1;
+  position: relative;
+  max-width: 22.5em;
+  padding: 1.5625em;
   text-align: center;
-  font-size: 20px;
+  background: #FFFFFF;  
+  box-shadow: 0 0 1.25em 0 rgba(0, 0, 0, 0.2), 0 0.3125em 0.3125em 0 rgba(0, 0, 0, 0.24);
+}
+/* Myhandmades */
+.form-title {
+  text-align: center;
+  font-family:"edwardian script itc";
+  font-size: 1.875em;
+  color: #ffc0cb;
+}
+/* アイコン */
+.user{
+  margin-right: 0.125em; 
+  color: #ffc0cb;  
+}
+/* ログインボタン */
+.loginbutton {
+  width: 12em;
+  border-radius: 0.7em;
+  padding: 0.5em 1em;
+  margin : 0.625em ;
+  overflow: hidden;
+  background: #ffc0cb;/*ボタン色*/  
+  box-shadow: 0 0 0  0.25em #ffc0cb, 0 0.125em 0.1875em 0.25em rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 0.1em dashed #fff;/* 点線の色・サイズ */
+  font-size: 1.25em;
   color: #fff;
 }
 .loginbutton:hover {
@@ -119,432 +281,316 @@ footer {
 }
 .loginbutton:active {
   /*ボタンを押したとき*/
-  -webkit-transform: translateY(4px);
-  transform: translateY(4px);/*下に動く*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
   border-bottom: none;/*線を消す*/
 }
-
-/*リロードボタン*/
-.topbutton {
-  position:fixed;
-  right: 25px;
-  bottom:25px;
-  width: 40px;/* 円の大きさ */
-  height:40px;/* 円の大きさ */
-  line-height:40px;/* 円の大きさ */
-  border-radius: 50%;/* 角丸サイズ */
-  display: inline-block;
-  box-shadow: 0 0 0 5px #ffc0cb, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
-  border: 1.5px dashed #fff;/* 点線の色・サイズ */
-  background: #ffc0cb;/*ボタン色*/
-  text-align: center;
+.message a{
+  margin: auto;
+  font-size: 0.75em;
+  color: #808080;
   text-decoration: none;
-  outline: 0;
-  overflow: hidden;
-  color: #fff;
-  font-size: 25px;
+  /* サインアップ画面でも使用 */
 }
-.topbutton:hover {
+
+
+/* サインアップ画面 */
+/* Welcom to Myhandmades */
+.form-title-signup{
+  margin: 1.875em 0;
+  text-align: center;
+  font-size: 0.9375em;
+  color: #db7093;
+}
+.form-title-signup span{
+  text-align: center;
+  font-family:"edwardian script itc";
+  font-size: 1.875em;
+  color: #db7093;  
+}
+/* アイコン */
+.usersignup{
+  margin-right: 0.125em;   
+  color: #db7093;  
+}
+/*サインアップボタン*/
+.signupbutton {
+  width: 12em;
+  border-radius: 0.7em;
+  padding: 0.5em 1em;
+  margin : 0.625em ;
+  overflow: hidden;
+  background: #db7093;/*ボタン色*/  
+  box-shadow: 0 0 0  0.25em #db7093, 0 0.125em 0.1875em 0.25em rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 0.1em dashed #fff;/* 点線の色・サイズ */
+  font-size: 1.25em;
+  color: #fff;
+}
+.signupbutton:hover {
   /*カーソルを載せたとき*/
   border-style: solid;
   cursor: hand; 
   cursor:pointer
 }
-.topbutton:active {
+.signupbutton:active {
   /*ボタンを押したとき*/
-  -webkit-transform: translateY(4px);
-  transform: translateY(4px);/*下に動く*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
   border-bottom: none;/*線を消す*/
 }
 
 
-/*削除ボタン*/
-.deletebutton {
-  overflow: hidden;
-  outline: 0;
-  background: none;
-  border: none;
-  display: inline-block;
-  cursor: hand; 
-  cursor:pointer;
-}
-.deletediv{
-    display: none;
-    position: absolute;
-    margin-top: -2px;
-    left: 57px;
-    padding: 5px;
-    font-size: 12px;
-    line-height: 1em;
-    color: #808080;
-    border-radius: 10px;
-    background: #fdf5e6;
-    width: 60px;
-    text-align: center;
-    text-decoration: none;
-}
-.deletediv:before {
-    content: "";
-    position: absolute;
-    top: 0%;
-    right: 95%;
-    border: 7.5px solid transparent;
-    border-top: 15px solid #fdf5e6;
-    margin-left: -15px;
-    transform: rotateZ(90deg);
-}
-.deletebutton:hover .deletediv{
-  /*カーソルを載せたとき*/
-  display: inline-block;
-}
-.deletebutton:active {
-  /*ボタンを押したとき*/
-  -webkit-transform: translateY(4px);
-  transform: translateY(4px);/*下に動く*/
-  border-bottom: none;/*線を消す*/
-}
-.worksicon{
-  color: #808080;
-  margin-bottom: 10px;
-}
-
-/*編集ボタン*/
-.list .editbutton {
-  overflow: hidden;
-  outline: 0;
-  display: inline-block;
-  margin-left: 375px;
-  background: none;
-  border: none;
-  cursor: hand; 
-  cursor:pointer;
-}
-.editdiv{
-    display: none;
-    position: absolute;
-    margin-top: -2px;
-    left: 460px;
-    padding: 5px;
-    font-size: 12px;
-    line-height: 1em;
-    color: #808080;
-    border-radius: 10px;
-    background: #fdf5e6;
-    width: 45px;
-    text-align: center;
-    text-decoration: none;
-}
-.editdiv:before {
-    content: "";
-    position: absolute;
-    top: 0%;
-    right: 95%;
-    border: 7.5px solid transparent;
-    border-top: 15px solid #fdf5e6;
-    margin-left: -15px;
-    transform: rotateZ(90deg);
-}
-.list .editbutton:hover .editdiv{
-  /*カーソルを載せたとき*/
-  display: inline-block;
-}
-.list .editbutton:active {
-  /*ボタンを押したとき*/
-  -webkit-transform: translateY(4px);
-  transform: translateY(4px);/*下に動く*/
-  border-bottom: none;/*線を消す*/
-}
-
-
-
-/* main.html */
-/*ヘッダー*/
-.headerbg {
-  width:100%;
-  min-width:1000px;
-}
-
-.site-header{
-    z-index: 1000;
-    width: 100%;
-    height: 80px;
-    margin-right: auto;
-    margin-left: auto;
-    background: #fff;
-    display: flex;
-    position: fixed;
-    text-align: center;
-    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
-}
-/*メニュー1*/
-nav ul{
-        padding: 0;
-        margin: 0;
-        list-style: none;
-} 
-nav li{
-        float: left;
-}
-nav a{
-  overflow: hidden;
-  outline: 0;
-  width: 70px;
-  display: inline-block;
-  margin : 20px 40px;
-  padding: 0.5em;
-  box-shadow: 0 0 0 5px #ffc0cb, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
-  border: 2px dashed #fff;/* 点線の色・サイズ */
-  border-radius: 10px;
-  background: #ffc0cb;/*ボタン色*/
-  text-decoration: none;
-  text-align: center;
-  font-size: 13px;
-  color: #fff;
-}
-nav a:hover{
-    border-style: solid;
-    cursor: hand; 
-    cursor:pointer
-} 
-nav a:active{
-    -webkit-transform: translateY(4px);
-    transform: translateY(4px);/*下に動く*/
-    border-bottom: none;/*線を消す*/
-}
-/*ハンバーガーメニュー*/
-.menu-btn {
-    position: fixed;
-    top: 40px;
-    right: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 90;
-}
-.menu-btn:hover{
-    cursor: hand; 
-    cursor: pointer
-} 
-.menu-btn span,
-.menu-btn span:before,
-.menu-btn span:after {
-    position: absolute;
-    height: 3px;/*線の太さ*/
-    width: 25px;/*長さ*/
-    border-radius: 3px;
-    background-color: #ffc0cb;
-    display: block;
-    content: '';
-    cursor: pointer;
-}
-.menu-btn span:before {
-    bottom: 8px;
-}
-.menu-btn span:after {
-    top: 8px;
-}
-#menu-btn-check:checked ~ .menu-btn span {
-    background-color: rgba(255, 255, 255, 0);/*メニューオープン時は真ん中の線を透明にする*/
-}
-#menu-btn-check:checked ~ .menu-btn span::before {
-    bottom: 0;
-    transform: rotate(45deg);
-}
-#menu-btn-check:checked ~ .menu-btn span::after {
-    top: 0;
-    transform: rotate(-45deg);
-}
-#menu-btn-check {
-    display: none;
-}
-.menu-content {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 80;
-    background-color: #ffe4e1;
-}
-.menu-content ul {
-    padding: 70px 10px 0;
-}
-.menu-content ul li {
-    border-bottom: solid 2px #c0c0c0;
-    list-style: none;
-}
-.menu-content ul li a {
-    display: block;
-    width: 100%;
-    font-size: 15px; 
-    font-weight: bold;
-    color: #c0c0c0;
-    text-decoration: none;
-    padding: 9px 15px 10px 0;
-    position: relative;
-}
-.menu-content ul li a::before {
-    content: "";
-    width: 7px;
-    height: 7px;
-    transform: rotate(45deg);
-    position: absolute;
-    right: 11px;
-    top: 16px;
-}
-.menu-content {
-    width: 25%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    right: -120%;/*rightの値を変更してメニューを画面外へ*/
-    z-index: 80;
-    background-color: #ffe4e1;
-    transition: all 0.5s;/*アニメーション設定*/
-}
-#menu-btn-check:checked ~ .menu-content {
-    right: 0;/*メニューを画面内へ*/
-}
-
+/* リスト */
 .list{
-  margin-top: 80px;
+  margin-top: 5em;
+  padding-bottom: 0.2em;
 }
 .list .worksarea{
-  width: 500px;
-  margin: 20px 20px;
-  padding: 5px;
+  display: block;
+  width: 31.25em;
+  padding: 0.625em 0.9375em;
+  margin: 1.25em;
+  margin-right: 0;
+  border-radius: 0.625em;
   background: #ffe4e1;
-  border-radius: 10px;
-  display = inline-block;
 }
-.openarea{
-  display:inline-block;
-  positon: relative;
-  float: right;
-  margin-top: 5px;
-  margin-right: 15px;
-}
-.openarea:hover .nowopenmessage{
-  display: inline-block;
-  margin-top: 27px;
-  margin-left: -33px;
-}
-.openarea .nowopenmessage{
-    display: none;
-    position: absolute;
-    font-size: 12px;
-    padding: 5px;
-    padding-left: 8px;
-    color: #808080;
-    border-radius: 10px;
-    background: #fdf5e6;
-    width: auto;
-    text-align: center;
-    text-decoration: none;
-    line-height: 1;
-}
-.openarea .nowopenmessage:before {
-  content: "";
-  position: absolute;
-  top: -12px;
-  right: 40%;
-  border: 5px solid transparent;
-  border-top: 8px solid #fdf5e6;
-  margin-left: -15px;
-  transform: rotateZ(180deg);
-}
-
 .list .worksarea .subjectarea{
-  margin-top: 5px;
-  margin-left: 10px;
-  font-size: 20px;
+  display: block;
+  width: auto;
+  overflow-wrap: break-word;
+  font-size: 1.25em;
   font-weight: bold;
   color: #404040;
-  display: inline-block;
-  width: 400px;
 }
 .list .worksarea .durationame{
-  margin-left: 10px;
-  font-size: 12px;
-  display = inline-block;
+  display: block;
+  margin: 0.2em 0;
+  font-size: 0.75em;
 }
 .list .worksarea .durationame .durationarea{
-  margin-left: 10px;
-  font-size: 15px;
-  display = inline-block;
+  display: inline-block;
+  margin-left: 0.2em;
+  font-size: 1.3em;
+}
+.list .tagarea1{
+  display: block;
+  position: relative;
+  width: 100%;
+  height: auto;
+  margin: 0.3em 0;
 }
 .list .tagarea{
-  position: relative;
-  left: 5px;
   display: inline-block;
-  height: 32px;
-  margin-left: 20px;
+  position: relative;
+  left: 0.9325em;
+  height: 2.5em;
+  width: auto;
   padding: 0.4em 0.5em;
-  color: #f5f5f5;
-  font-size: 13px;
-  text-decoration: none;
-  text-align: center;
   background: #deb887;
+  color: #f5f5f5;
+  font-size: 0.8125em;
+  text-align: center;  
 }
 .list .tagarea:before {
   position: absolute;
   top: 0;
-  left: -15px;
+  left: -1.16em;
   content: '';
-  border-width: 16px 15px 16px 0;
+  border-width: 1.29em 1.16em 1.29em 0;
   border-style: solid;
   border-color: transparent #deb887 transparent transparent;
 }
 .list .tagarea:after {
   position: absolute;
-  top: calc(50% - 3.5px);
-  left: -5px;
-  width: 7px;
-  height: 7px;
+  top: calc(50% - 0.21875em);
+  left: -0.3125em;
+  width: 0.5em;
+  height: 0.45em;
   content: '';
   border-radius: 50%;
   background: #ffe4e1;
 }
-
 .list .commentbox {
-    margin: 10px;
-    min-height: 10px;
-    height: auto;
-    border: 2px solid #808080;
-    border-radius: 8px;
-    position:relative;
+  display: block;
+  position: relative;
+  height: auto;
+  margin-top: 0.8em;
+  border: 0.125em solid #808080;
+  border-radius: 0.5em;
 }
 .list .commentbox::before {
-    background-color: #ffe4e1;
-    color: #404040;
-    content: "Comment";
-    font-size: 12px;
-    position: absolute;
-    padding: 0 10px;
-    left: 10px;
-    top: -10px;
+  position: absolute;
+  top: -0.625em;
+  left: 0.625em;
+  padding: 0 0.625em;
+  content: "Comment";
+  background-color: #ffe4e1;
+  color: #404040;
+  font-size: 0.75em;
 }
 .list .commentbox p{
-  font-size: 15px;
-  margin-left: 15px;
+  margin-left: 0.9375em;
+  font-size: 0.9375em;
+}
+/* private workarea */
+.worksarea_private{
+  display: block;
+  width: 31.25em;
+  padding: 0.625em 0.9375em 1.8em;
+  margin: 1.25em;
+  margin-right: 0;
+  border-radius: 0.625em;
+  background: #ffe4e1;
+}
+/* 公開しているかアイコン */
+.worksicon{
+  color: #808080;
+  /*削除ボタンと編集ボタンにも使用*/
+}
+.openarea{
+  float: right;
+  margin: 0.3125em;
+}
+.openarea .nowopenmessage{
+  display: none;
+  position: absolute;
+  font-size: 0.75em;
+  padding: 0.3125em;
+  padding-top: 0.4em;
+  padding-left: 0.5em;
+  color: #808080;
+  border-radius: 0.8em;
+  background: #fdf5e6;
+  width: auto;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1;
+}
+.openarea .nowopenmessage:before {
+  content: '';
+  position: absolute;
+  top: -0.9em;
+  right: 35%;
+  border: 0.3125em solid transparent;
+  border-top: 0.8em solid #fdf5e6;
+  margin-left: -1em;
+  transform: rotateZ(180deg);
+}
+.openarea:hover .nowopenmessage{
+  display: inline-block;
+  margin-top: 2.3em;
+  margin-left: -2.8em;
+}
+/*削除ボタン*/
+.deletebutton {
+  display: inline-block;
+  margin: 0.5em;
+  overflow: hidden;
+  outline: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.deletediv{
+  display: none;
+  position: absolute;
+  padding: 0.3125em 0.5em;
+  color: #808080;
+  border-radius: 0.8em;
+  background: #fdf5e6;
+  width: auto;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1;
+}
+.deletediv:before {
+  content: '';
+  position: absolute;
+  top: -0.9em;
+  right: 35%;
+  border: 0.3125em solid transparent;
+  border-top: 0.8em solid #fdf5e6;
+  margin-left: -1em;
+  transform: rotateZ(180deg);
+}
+.deletebutton:hover .deletediv{
+  /*カーソルを載せたとき*/
+  display: inline-block;
+  margin-top: 1.8em;
+  margin-left: -2.7em;
+}
+.deletebutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+/*編集ボタン*/
+.list .editbutton {
+  float: right;
+  display: inline-block;  
+  margin: 0.3em 0.5em 0.5em 0.5em;
+  overflow: hidden;
+  outline: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.editdiv{
+  display: none;
+  position: absolute;
+  padding: 0.3125em 0.5em;
+  color: #808080;
+  border-radius: 0.8em;
+  font-size: 0.8em;
+  background: #fdf5e6;
+  width: auto;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1;
+}
+.editdiv:before {
+  content: "";
+  position: absolute;
+  top: -0.9em;
+  right: 35%;
+  border: 0.3125em solid transparent;
+  border-top: 0.8em solid #fdf5e6;
+  margin-left: -1em;
+  transform: rotateZ(180deg);
+}
+.list .editbutton:hover .editdiv{
+  /*カーソルを載せたとき*/
+  display: inline-block;
+  margin-top: 2.2em;
+  margin-left: -2.5em;
+}
+.list .editbutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
+  border-bottom: none;/*線を消す*/
 }
 
+
+
+
+/* Private画面 */
 /*追加ボタン*/
 .addbutton {
-  position:fixed;
-  top:120px;
-	right:20px;	
-  width: 80px;/* 円の大きさ */
-  height:80px;/* 円の大きさ */
-  line-height:80px;/* 円の大きさ */
-  border-radius: 50%;/* 角丸サイズ */
   display: inline-block;
-  box-shadow: 0 0 0 5px #db7093, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
-  border: 2px dashed #fff;/* 点線の色・サイズ */
-  background: #db7093;/*ボタン色*/
-  text-decoration: none;
+  position: fixed;
+  top: 7.5em;
+  right: 1.25em;
+  width: 4em;
+  height: 4em;
+  line-height: 4em;
+  border-radius: 50%;  
+  box-shadow: 0 0 0  0.25em #db7093, 0 0.125em 0.1875em 0.25em rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 0.1em dashed #fff;
+  background: #db7093;
   text-align: center;
-  font-size: 20px;
+  font-size: 1.25em;
   color: #fff;
 }
 .addbutton:hover {
@@ -555,8 +601,8 @@ nav a:active{
 }
 .addbutton:active {
   /*ボタンを押したとき*/
-  -webkit-transform: translateY(4px);
-  transform: translateY(4px);/*下に動く*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
   border-bottom: none;/*線を消す*/
 }
 #pop-up {
@@ -882,56 +928,4 @@ nav a:active{
 	top: 10px;
 	right: 20px;
 	font-size: 20px;
-}
-
-
-
-/* ログイン画面 */
-.login-page {
-  width: 360px;
-  padding: 8% 0 0;
-  margin: auto;
-}
-.login-form {
-  position: relative;
-  z-index: 1;
-  background: #FFFFFF;
-  max-width: 360px;
-  margin: 0 auto 100px;
-  padding: 25px;
-  text-align: center;
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
-}
-.form-title {
-    text-align: center;
-    font-family:"edwardian script itc";
-    font-size: 30px;
-    color: #ffc0cb;
-}
-.login-form .message a{
-  margin: 0px 15px 0px 15px;
-  font-size: 12px;
-  color: #808080;
-  text-decoration: none;
-}
-.user{
-  color: #ffc0cb;
-  margin-right: 2px; 
-}
-
-/* サインアップ画面 */
-.usersignup{
-  color: #db7093;
-  margin-right: 2px;   
-}
-.form-title-signup{
-    text-align: center;
-    font-size: 15px;
-    color: #db7093;
-}
-.form-title-signup span{
-    text-align: center;
-    font-family:"edwardian script itc";
-    font-size: 30px;
-    color: #db7093;  
 }
