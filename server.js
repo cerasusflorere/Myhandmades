@@ -134,31 +134,21 @@ app.post('/signup', function(req, res){
 
 //ログイン機能
 app.post('/login', function(req, res){
-  let received = '';
-  req.setEncoding('utf8');
-  req.on('data', function(chunk) {
-    received += chunk;
-  });
-  
-  req.on('end', function() {
-    MongoClient.connect(mongouri, function(error, client) {
-      const db = client.db(process.env.DB); // 対象 DB
-      const col = db.collection('users'); // 対象コレクション
-      const users = JSON.parse(received); // 保存対象
-      
-      // 登録時にパスワードをハッシュ化しているならば
-      // ここで password をハッシュ化して検索する
-      // ハッシュ化した値同士で比較する
-      const condition = {name:{$eq:users.name}, password:{$eq:hashed(users.password)}}; // ユーザ名とパスワードで検索する
-      col.findOne(condition, function(err, user){
-        if(user) {
-          res.cookie('user', user); // ヒットしたらクッキーに保存
-          res.redirect('/'); // リダイレクト
-        }else{
-          res.redirect('/failed'); // リダイレクト
-        }
-        client.close();
-      });
+  const userName = req.body.userName;
+  const password = req.body.password;
+  MongoClient.connect(mongouri, function(error, client) {
+    const db = client.db(process.env.DB); // 対象 DB
+    const col = db.collection('users'); // 対象コレクション
+    // ユーザ名、ハッシュ化したパスワード値で検索する
+    const condition = {name:{$eq:userName}, password:{$eq:hashed(password)}};
+    col.findOne(condition, function(err, user){
+      client.close();
+      if(user) {
+        res.cookie('user', user); // ヒットしたらクッキーに保存
+        res.redirect('/'); // リダイレクト
+      }else{
+        res.redirect('/failed'); // リダイレクト
+      }
     });
   });
 });
