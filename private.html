@@ -12,6 +12,7 @@
   </head>
   
   <body style="margin: 0px">
+    <!--　ヘッダー -->
     <div class="headerbg">
       <div class="site-header">
         <h1>Myhandmades</h1>
@@ -37,6 +38,10 @@
       </div>
 　　</div>
     
+    <!-- リスト表示部 -->
+    <div id="list" class="list"></div>
+    
+    <!-- 追加画面 -->
     <label class="addbutton" for="pop-up">+Add</label>
     <input type="checkbox" id="pop-up" onclick="findTags()"/>
     <div class="overlay">
@@ -64,6 +69,7 @@
        </div>
     </div>
    
+  <!-- タグ追加画面 -->
    <input type="checkbox" id="tag-pop-up"/>
     <div class="tag-overlay">
 	    <div class="tag-window">
@@ -76,7 +82,7 @@
       </div>
     </div>
 
-  
+    <!-- 編集画面 --> 
     <div class="edit-overlay">
 	    <div class="edit-window">
 		    <label class="edit-close" for="edit-pop-up">×</label>
@@ -87,7 +93,6 @@
     </div>
     
     <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
-    <div id="list" class="list"></div><!-- リスト表示部 -->
     
     <script>
       window.onload = findDatas; // 画面ロード時に実行
@@ -133,7 +138,7 @@
       // 表示
       function addToList(id, subject, duration, tag, comment, open) {
         const workDiv = document.createElement('div'); // 追加する本の div 要素
-        workDiv.className = "worksarea";
+        workDiv.className = "worksarea_private";
         workDiv.id = id; // レスポンスから得た ID を付与する
         
         let openDiv;
