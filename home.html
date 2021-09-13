@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
   </head>
-  <body style="margin: 0px">
+  <body>
+    <!-- ヘッダー -->
     <div class="headerbg">
       <div class="site-header">
         <h1>Myhandmades</h1>
@@ -36,8 +37,9 @@
       </div>
 　　</div>
     
+    <!-- リスト表示部 -->
+    <div id="list" class="list"></div>
     <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
-    <div id="list" class="list"></div><!-- リスト表示部 -->
     
     <script>
       window.onload = findAllDatas; // 画面ロード時に実行
@@ -86,6 +88,9 @@
         const durationSpan = document.createElement('span');
         durationSpan.className = 'durationarea';
         durationSpan.innerText = duration;
+        
+        const tag1Div = document.createElement('div');
+        tag1Div.className = 'tagarea1';
 
         const tagDiv = document.createElement('div');
         tagDiv.className = 'tagarea';
@@ -103,7 +108,8 @@
           workDiv.appendChild(durationDiv); // workDiv に製作期間を追加
         }
         if(tag != ''){
-          workDiv.appendChild(tagDiv); // workDiv にタグを追加
+          tag1Div.appendChild(tagDiv);
+          workDiv.appendChild(tag1Div); // workDiv にタグを追加
         }
         if(comment != ''){
           commentDiv.appendChild(commentP);
