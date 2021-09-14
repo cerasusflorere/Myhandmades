@@ -354,7 +354,7 @@ nav a:active{
   border-radius: 0.625em;
   background: #ffe4e1;
 }
-.list .worksarea .subjectarea{
+.subjectarea{
   display: block;
   width: auto;
   overflow-wrap: break-word;
@@ -362,12 +362,12 @@ nav a:active{
   font-weight: bold;
   color: #404040;
 }
-.list .worksarea .durationame{
+.durationame{
   display: block;
   margin: 0.2em 0;
   font-size: 0.75em;
 }
-.list .worksarea .durationame .durationarea{
+.durationarea{
   display: inline-block;
   margin-left: 0.2em;
   font-size: 1.3em;
