@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A cool thing made with Glitch">
+    <title>Home</title>
+    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
+  </head>
+  <body>
+    <!-- ヘッダー -->
+    <div class="headerbg">
+      <div class="site-header">
+        <h1>Myhandmades</h1>
+        <nav>
+          <ul>
+              <li><a href="/">Home</a></li>
+              <li><a href="#">Favorite</a></li>
+              <li><a href="/private">Private</a></li>
+          </ul>
+        </nav>
+        <div class="hamburger-menu">
+          <input type="checkbox" id="menu-btn-check"/>
+          <label for="menu-btn-check" class="menu-btn"><span></span></label>
+          <!--ここからメニュー-->
+          <div class="menu-content">
+            <ul>
+                <li><a href="#">Profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+          </div>
+          <!--ここまでメニュー-->
+        </div>
+      </div>
+　　</div>
+    
+    <!-- プロフィールリスト表示部 -->
+    <div class='profile-list'>
+      <label>Username: </label><span id='profile-username'></span>
+      <label>Create Date: </label><span id='profile-create-date'></span>
+      <label>Final Login Date: </label><span id='profile-final-login-date'></span>
+      <label>Number of Posts [All]: </label><span id='profile-number-all'></span>
+      <!-- <div>Number of Potst [Tag]<br>
+        <div id='profile-number-tag'></div>
+      </div> -->
+    </div>
+    
+    <!-- パスワードリセット -->
+    <div>
+      <label>Password Reset</label><br>
+      <p><input type="password" name="password" id='now-password' placeholder="now password"/></p>
+      <p><input type="password" name="repassword" id='new-password' placeholder="new password"/></p>
+      <p><input type="password" name="repassword" id='re-new-password' placeholder="re new password"/></p>
+      <input type='button' class='password-reset-button' value="Reset" onclick="reset()"/>
+    </div>
+    
+    <!-- 退会 -->
+    <div>
+      <label>Cancel</label><br>
+      <p><input type="text" name="username" id='username' placeholder="username"/></p>
+      <p><input type="password" name="password" id='password' placeholder="password"/></p>
+      <input type='button' class='cancel-button' value="Cancel" onclick="cancel()"/>
+    </div>
+    
+    <!-- トップに戻るボタン -->
+    <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
+    
+    <script>
+      window.onload = findUserDatas; // 画面ロード時に実行
+      //const taglistArea = document.getElementById('profile-number-tag'); // リスト表示部
+      
+      let flag = 0;
+      let username;
+      let createdate;
+      let updatedate;
+      let postnumbers;
+      
+      // 全データの取得
+      function findUserDatas() {
+        console.log('★');
+        const url = '/findUserDatas'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            const datas = JSON.parse(req.response);
+            for(let i in datas) {
+              const data = datas[i];
+              
+              if(flag == 0){
+                username = data.name;
+                createdate = data.create_date;
+                updatedate = data.update_date;
+                flag = 1;
+              }              
+              postnumbers = i;
+            }
+            console.log(username, postnumbers);
+            addToList(username, createdate, updatedate, postnumbers);
+          }
+        }
+        req.open('GET', url, true);
+        req.send();
+      }
+      
+      // 表示
+      function addToList(username, createdate, updatedate, postnumbers) {
+        
+      }
+
+      // リロード
+      function home(){
+         scrollTo(0, 0);
+      }
+    </script>
+  </body>
+</html>
