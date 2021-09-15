@@ -70,7 +70,7 @@ app.get('/private', (req, res) => {
 
 // ログインせずに投稿を見るページへ
 app.get('/alluser', (req, res) =>{
-  res.sendFile(__dirname + './alluser.html');
+  res.sendFile(__dirname + '/views/alluser.html');
 })
 
 // ログアウト機能
