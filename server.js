@@ -24,12 +24,6 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-// ホーム画面へ
-app.get('/home', (req, res) => {
-  res.sendFile(__dirname + '/views/home.html');
-})
-
-
 // 登録画面
 app.get('/signup', (req, res) => {
   res.sendFile(__dirname + '/views/signup.html');
@@ -39,7 +33,6 @@ app.get('/signup', (req, res) => {
 app.get('/index', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
-
 
 app.get('/my_account', function(req, res){
   if(!req.cookies.user) {
@@ -59,6 +52,16 @@ app.get('/failed', (req, res) => {
   res.sendFile(__dirname + '/views/failed.html');
 });
 
+// ログインせずに投稿を見るページへ
+app.get('/alluser', (req, res) =>{
+  res.sendFile(__dirname + '/views/alluser.html');
+})
+
+// ホーム画面へ
+app.get('/home', (req, res) => {
+  res.sendFile(__dirname + '/views/home.html');
+})
+
 // Private画面へ
 app.get('/private', (req, res) => {
   if(req.cookies.user) {
@@ -68,9 +71,13 @@ app.get('/private', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 })
 
-// ログインせずに投稿を見るページへ
-app.get('/alluser', (req, res) =>{
-  res.sendFile(__dirname + '/views/alluser.html');
+// Profile画面へ
+app.get('/profile', (req, res) => {
+  if(req.cookies.user) {
+    res.sendFile(__dirname + '/views/profile.html');
+    return;
+  }
+  res.sendFile(__dirname + '/views/index.html');
 })
 
 // ログアウト機能
@@ -139,6 +146,7 @@ app.post('/login', function(req, res){
   MongoClient.connect(mongouri, function(error, client) {
     const db = client.db(process.env.DB); // 対象 DB
     const col = db.collection('users'); // 対象コレクション
+    
     // ユーザ名、ハッシュ化したパスワード値で検索する
     const condition = {name:{$eq:userName}, password:{$eq:hashed(password)}};
     col.findOne(condition, function(err, user){
@@ -165,7 +173,6 @@ function hashed(password) {
 
 
 ///メイン画面
-
 //表示機能findDatas
 app.get('/findDatas', function(req, res){
   MongoClient.connect(mongouri, function(error, client) {
@@ -266,8 +273,8 @@ app.post('/editwork', function(req, res){
   });
 });
 
-/// 追加画面
 
+/// 追加画面
 // 追加機能fileadd
 app.post('/savework', function(req, res){
   const userid = req.cookies.user._id;
@@ -347,6 +354,7 @@ app.post('/savetag', function(req, res){
   });
 });
 
+
 /// ホーム画面
 // 表示機能findAllDatas
 app.get('/findAllDatas', function(req, res){
@@ -362,6 +370,35 @@ app.get('/findAllDatas', function(req, res){
     colWork.find(condition).toArray(function(err, datas) {
        res.json(datas); // レスポンスとしてユーザを JSON 形式で返却
        client.close(); // DB を閉じる
+    });
+  });
+});
+
+
+/// Profile画面
+//プロフィール表示機能findUserDatas
+app.get('/findUserDatas', function(req, res){
+  MongoClient.connect(mongouri, function(error, client) {
+    const db = client.db(process.env.DB); // 対象 DB
+    const colUsers = db.collection('users'); // 対象コレクション1
+    const colWork = db.collection('work'); // 対象コレクショ2
+
+    // 検索条件（ユーザーIDがuserId）
+    // 条件の作り方： https://docs.mongodb.com/manual/reference/operator/query/
+    const userId = req.cookies.user._id;
+    const oid = new ObjectID(userId);
+    const conditionusers = {_id:{$eq:oid}};
+    const conditionworks = {userid:{$eq:userId}};
+
+    colUsers.find(conditionusers).toArray(function(err, datausers) {
+      colWork.find(conditionworks).toArray(function(err, dataworks) {
+        console.log(datausers);
+        console.log(dataworks);
+        let data = datausers.concat(dataworks);
+        console.log(data);
+        res.json(data); // レスポンスとしてユーザを JSON 形式で返却
+        client.close(); // DB を閉じる
+      })
     });
   });
 });
