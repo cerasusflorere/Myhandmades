@@ -1,4 +1,4 @@
-Myhandmadesアプリ
+#Myhandmadesアプリ
 
 <<アプリ概要>>
 Myhandmandesアプリは手芸作品投稿SNSです。
