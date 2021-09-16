@@ -20,13 +20,12 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/views/home.html');
     return;
   }
-
   res.sendFile(__dirname + '/views/index.html');
 });
 
 // 登録画面
 app.get('/signup', (req, res) => {
-  res.sendFile(__dirname + '/Myhandmades/signup.html');
+  res.sendFile(__dirname + '/views/signup.html');
 });
 
 // ログイン画面へ
@@ -248,7 +247,7 @@ app.post('/editwork', function(req, res){
   req.on('data', function(chunk) {
     received += chunk;
   });
-  
+  console.log(received);
   req.on('end', function() {
     MongoClient.connect(mongouri, function(error, client) {
       const db = client.db(process.env.DB); // 対象 DB
@@ -256,7 +255,7 @@ app.post('/editwork', function(req, res){
       const data = JSON.parse(received); // 保存対象
       const oid = new ObjectID(data.id);
       delete data.id;
-
+      console.log(data);
       if(!data.subject) {
         res.status(400);
         res.send('題名ないと登録できないんです…');
@@ -312,7 +311,7 @@ app.get('/findTags', function(req, res){
     const db = client.db(process.env.DB); // 対象 DB
     const colTag = db.collection('tag'); // 対象コレクション
 
-    // 検索条件（名前が「エクサくん」ではない）
+    // 検索条件（なし）
     // 条件の作り方： https://docs.mongodb.com/manual/reference/operator/query/
     const condition = {};
 
@@ -325,7 +324,7 @@ app.get('/findTags', function(req, res){
 
 // タグ追加tagadd
 app.post('/savetag', function(req, res){
-  const userid = ""+req.cookies.user.userid;
+  const userid = req.cookies.user._id;
   let received = '';
   req.setEncoding('utf8');
   req.on('data', function(chunk) {
@@ -337,7 +336,7 @@ app.post('/savetag', function(req, res){
       const db = client.db(process.env.DB); // 対象 DB
       const colWork = db.collection('tag'); // 対象コレクション
       const data = JSON.parse(received); // 保存対象
-      data["userid"] = userid;
+      data['userid'] = userid;
 
       if(!data.tag) {
         res.status(400);
@@ -392,15 +391,89 @@ app.get('/findUserDatas', function(req, res){
 
     colUsers.find(conditionusers).toArray(function(err, datausers) {
       colWork.find(conditionworks).toArray(function(err, dataworks) {
-        console.log(datausers);
-        console.log(dataworks);
         let data = datausers.concat(dataworks);
-        console.log(data);
         res.json(data); // レスポンスとしてユーザを JSON 形式で返却
         client.close(); // DB を閉じる
       })
     });
   });
 });
+
+// ユーザーが追加したタグ取得
+app.get('/findUserTag', function(req, res){
+  MongoClient.connect(mongouri, function(error, client) {
+    const db = client.db(process.env.DB); // 対象 DB
+    const colTag = db.collection('tag'); // 対象コレクション
+
+    // 検索条件（useridが一致）
+    // 条件の作り方： https://docs.mongodb.com/manual/reference/operator/query/
+    const userId = req.cookies.user._id;
+    const condition = {userid:{$eq:userId}};
+
+    colTag.find(condition).toArray(function(err, tags) {
+      res.json(tags); // レスポンスとしてユーザを JSON 形式で返却
+      client.close(); // DB を閉じる
+    });
+  });
+});
+
+// タグ編集機能edittag
+app.post('/edittag', function(req, res){
+  let received = '';
+  req.setEncoding('utf8');
+  req.on('data', function(chunk) {
+    received += chunk;
+  });
+  
+  req.on('end', function() {
+    MongoClient.connect(mongouri, function(error, client) {
+      const db = client.db(process.env.DB); // 対象 DB
+      const colWork = db.collection('tag'); // 対象コレクション
+      const data = JSON.parse(received); // 保存対象
+      const oid = new ObjectID(data.id);
+      delete data.id;
+
+      if(!data.tag) {
+        res.status(400);
+        res.send('tag名を編集するんだよね…？空欄…？');
+        return;
+      }
+      
+      colWork.updateOne({_id:oid}, {$set:data}, function(err, result) {
+          //res.send(decodeURIComponent(result.insertedId)); // 追加したデータの ID を返す
+          client.close(); // DB を閉じる
+          res.status(200);
+          res.send('Success');
+      });
+    });
+  });
+});
+
+//タグ削除機能deletTag
+app.post('/deleteTag', function(req, res){
+  let received = '';
+  req.setEncoding('utf8');
+  req.on('data', function(chunk) {
+    received += chunk;
+  });
+  req.on('end', function() {
+    MongoClient.connect(mongouri, function(error, client) {
+      const db = client.db(process.env.DB); // 対象 DB
+      const colWork = db.collection('tag'); // 対象コレクション
+      const target = JSON.parse(received); // 保存対象
+      const oid = new ObjectID(target.id);
+
+      colWork.deleteOne({_id:{$eq:oid}}, function(err, result) {
+        if(result.deletedCount) {
+          res.sendStatus(200); // OK を返す
+        }else{
+          res.sendStatus(404); // 該当する本が見つからなかった意味で 404 を返す
+        }
+        client.close(); // DB を閉じる
+      });
+    });
+  });
+});
+
 
 const listener = app.listen(process.env.PORT);
