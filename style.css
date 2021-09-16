@@ -526,7 +526,11 @@ nav a:active{
   border-bottom: none;/*線を消す*/
 }
 /*編集ボタン*/
-.list .editbutton {
+.worksarea_private form{
+  float: right;
+  width: 0;  
+}
+.editbutton {
   float: right;
   display: inline-block;  
   margin: 0.3em 0.5em 0.5em 0.5em;
@@ -559,13 +563,13 @@ nav a:active{
   margin-left: -1em;
   transform: rotateZ(180deg);
 }
-.list .editbutton:hover .editdiv{
+.editbutton:hover .editdiv{
   /*カーソルを載せたとき*/
   display: inline-block;
   margin-top: 2.2em;
   margin-left: -2.5em;
 }
-.list .editbutton:active {
+.editbutton:active {
   /*ボタンを押したとき*/
   -webkit-transform: translateY(0.25em);
   transform: translateY(0.25em);/*下に動く*/
@@ -884,15 +888,51 @@ nav a:active{
 }
 
 /* 編集画面 */
-#edit-pop-up {
-	display: none; /* label でコントロールするので input は非表示に */
+.edit-modal-wrapper {
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 60px 10px;
+}
+.edit-modal-wrapper:not(:target) {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s, visibility .3s;
+}
+.edit-modal-wrapper:target {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .4s, visibility .4s;
+}
+.edit-modal-wrapper::after {
+  display: inline-block;
+  height: 100%;
+  margin-left: -.05em;
+  vertical-align: middle;
+  content: ""
+}
+.edit-modal-wrapper .edit-close {
+  z-index: 20;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 35px;
+  color: #95979c!important;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 35px;
+  text-align: center;
+  text-decoration: none;
+  text-indent: 0
+}
+.edit-modal-wrapper .edit-close:hover {
+  color: #2b2e38!important
 }
 .edit-overlay {
-	display: none; /* input にチェックが入るまでは非表示に */
-}
-#edit-pop-up:checked + .edit-overlay {
 	display: block;
-	z-index: 9999;
 	background-color: #00000070;
 	position: fixed;
 	width: 100%;
@@ -922,10 +962,11 @@ nav a:active{
   font-size: 20px;
 	margin: 0;
 }
-.edit-close {
-	cursor:pointer;
-	position: absolute;
-	top: 10px;
-	right: 20px;
-	font-size: 20px;
+
+
+/* Profile.html */
+/* プロフィール表示部 */
+.all-area{
+  margin-top: 5em;
+  padding-bottom: 0.2em;
 }
