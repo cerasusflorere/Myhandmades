@@ -44,7 +44,7 @@
     <!-- 追加画面 -->
     <label class="addbutton" for="pop-up">+Add</label>
     <input type="checkbox" id="pop-up" onclick="findTags()"/>
-    <div class="overlay">
+    <label class="overlay" for="pop-up">
 	    <div class="window">
 		    <label class="close" for="pop-up">×</label>
 		      <p class="text">
@@ -67,31 +67,34 @@
             <p style="text-align:center";><input type="button" class="submitbutton" value="Submit" onclick="add()"/></p>
           </p>
        </div>
-    </div>
+    </label>
    
   <!-- タグ追加画面 -->
    <input type="checkbox" id="tag-pop-up"/>
-    <div class="tag-overlay">
+    <label class="tag-overlay" for="tag-pop-up">
 	    <div class="tag-window">
 		    <label class="tag-close" for="tag-pop-up">×</label>
 		      <div class="tag-text">
-          <p class="tag-add-name">追加するタグ名</p>
-            <input type="text" class="tag-content" id="tag-add" placeholder="tag" value=""/>
-            <p style="text-align:center";><input type="button" class="tag-submitbutton" value="Add" onclick="tagadd()"/></p>
+            <p class="tag-add-name">追加するタグ名</p>
+              <input type="text" class="tag-content" id="tag-add" placeholder="tag" value=""/>
+              <p style="text-align:center";><input type="button" class="tag-submitbutton" value="Add" onclick="tagadd()"/></p>
           </div>
       </div>
-    </div>
+    </label>
 
-    <!-- 編集画面 --> 
-    <div class="edit-overlay">
-	    <div class="edit-window">
-		    <label class="edit-close" for="edit-pop-up">×</label>
-		      <div class="edit-text" id="editlist">
-            <!-- 編集画面 -->
-          </div>
+    <!-- 編集画面 -->
+    <div class='edit-modal-wrapper' id='edit-modal'>
+      <a href='#!' class='edit-overlay'></a>      
+      <div class='edit-window'>
+        <div class='edit-text' id='editlist'>
+          <!-- 編集情報 -->
+        </div>
       </div>
+      <a href="#!" class="edit-close">×</a>
     </div>
-    
+  
+        
+    <!-- トップに戻るボタン -->
     <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
     
     <script>
@@ -190,17 +193,21 @@
         delDiv.className = 'deletediv';
         delDiv.innerText = 'Delete';
         
+        const editForm = document.createElement('form');
+        editForm.action = '#edit-modal'
+        editForm.method = 'post';
         
-        const editInput = document.createElement("input");
-        editInput.onclick = function() {
+        const editA = document.createElement('a');
+        editA.href = "#edit-modal";
+        editA.className = 'editbutton';
+        editA.onclick = function() {
           editData(id);
         }
-        editInput.type = "checkbox";
-        editInput.id = 'edit-pop-up';
         
-        const editLabel = document.createElement('label');
-        editLabel.className = 'editbutton';
-        editLabel.htmlFor = 'edit-pop-up';
+        const editInput = document.createElement('input');
+        editInput.type = 'hidden';
+        editInput.value = id;
+        editInput.id = 'edit';
         
         const editI = document.createElement('i');
         editI.className = 'fas fa-edit worksicon fa-fw';
@@ -230,10 +237,11 @@
         delButton.appendChild(delDiv);
         workDiv.appendChild(delButton);// workDiv に削除ボタンを追加
         
-        workDiv.insertBefore(editInput, editLabel.nextSibling);
-        editLabel.appendChild(editI);
-        editLabel.appendChild(editDiv);
-        workDiv.appendChild(editLabel); // workDiv に編集ボタン追加        
+        editA.appendChild(editI);
+        editA.appendChild(editDiv);
+        editForm.appendChild(editA);
+        editForm.appendChild(editInput);
+        workDiv.appendChild(editForm); // workDiv に編集ボタン追加        
         listArea.appendChild(workDiv); // リストに workDiv を追加
       }
             
@@ -285,7 +293,7 @@
         req.onreadystatechange = function() {
           if(req.readyState == 4 && req.status == 200) {
             // 追加が成功したらフォームを空にする
-            document.getElementById('tag').value = '';
+            document.getElementById('tag-add').value = '';
           }else if(req.readyState == 4 && req.status != 200) {
             alert(req.response);
           }
@@ -364,7 +372,8 @@
        }
       
        // 編集
-      function editData(id){        
+      function editData(id){
+        editArea.innerHTML = '';
         const url = '/findWork'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         const data = {id:id};
@@ -408,7 +417,6 @@
           }
           req.open('GET', url, true);
           req.send();
-          flag = 2;
         }
       }
       
@@ -427,6 +435,7 @@
         const opencheckboxInput = document.createElement('input');
         opencheckboxInput.type = "checkbox";
         opencheckboxInput.className = "open-checkbox";
+        opencheckboxInput.id = "open-checkbox";
         
         if(open == '1'){
           opencheckboxInput.checked = true;
@@ -511,7 +520,7 @@
         workP.appendChild(commentTextarea);
         workP.appendChild(buttonP); // workPに送信ボタンを追加
         workP.appendChild(buttonInput);//ここまで、クラス設定してない
-        editArea.appendChild(workP); // リストに workDiv を追加
+        editArea.appendChild(workP); // リストに workP を追加
         
         editlistAreaTag = document.getElementById('edit-taglabel');
       }
@@ -542,20 +551,20 @@
           const urladd = '/editwork'; // 通信先
           const req = new XMLHttpRequest(); // 通信用オブジェクト
          
-          const openid = document.getElementById('open-button');
+          const openid = document.getElementById('open-checkbox');
           let open = '0';
           const subject = document.getElementById('edit-subject').value;
           const duration = document.getElementById('edit-duration').value;
           let tag = "";
           const comment = document.getElementById('edit-comment').value;
-        
-          if(openid.checked = true){
+       
+          if(openid.checked){
             open = '1';
           }
           
         for(let i=1; i<=edittagnumber; i++){
           let element = document.getElementById('tag['+i+']');
-          if(element.checked){
+          if(element.checked == true){
             tag = element.value;
           }
         }
