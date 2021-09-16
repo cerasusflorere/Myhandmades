@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 
 // 登録画面
 app.get('/signup', (req, res) => {
-  res.sendFile(__dirname + 'https://cerasusflorere.github.io/Myhandmades/signup.html');
+  res.sendFile(__dirname + '/Myhandmades/signup.html');
 });
 
 // ログイン画面へ
