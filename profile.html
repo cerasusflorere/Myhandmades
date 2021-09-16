@@ -37,50 +37,111 @@
       </div>
 　　</div>
     
-    <!-- プロフィールリスト表示部 -->
-    <div class='profile-list'>
-      <label>Username: </label><span id='profile-username'></span>
-      <label>Create Date: </label><span id='profile-create-date'></span>
-      <label>Final Login Date: </label><span id='profile-final-login-date'></span>
-      <label>Number of Posts [All]: </label><span id='profile-number-all'></span>
-      <!-- <div>Number of Potst [Tag]<br>
-        <div id='profile-number-tag'></div>
-      </div> -->
-    </div>
+    <!-- 表示エリア -->
+    <div id='all-area' class='all-area'>
+      <!-- プロフィールリスト表示部 -->
+      <div class='profile-list'>
+        <span>Your profile</span>
+        <div>
+          <label>Username: </label><span id='profile-username'></span>
+        </div>
+        <div>
+          <label>Create Date: </label><span id='profile-create-date'></span>
+        </div>
+        <div>
+          <label>Final Login Date: </label><span id='profile-final-login-date'></span>
+        </div>
+      </div>
+      
+      <!-- 投稿数表示部 -->
+      <div class='post-number-list'>
+        <span>How many did you post?</span>
+        <div>
+          <label>Number of Posts [All]: </label><span id='profile-number-all'></span>
+        </div>
+        <div>Number of Posts [Tag]<br>
+          <div id='profile-number-tag'><!--タグ名：投稿数 --></div>
+        </div>
+      </div>
+      
+      <!-- ユーザが投稿したタグ -->
+      <div class='post-tag-area'>
+        <span>Tags you added</span>
+        <div id='post-tag' class='post-tag'><!--追加したタグ--></div>
+        <span>Thanks to you, this app is easier to use!</span>
+      </div>
+      
     
-    <!-- パスワードリセット -->
-    <div>
-      <label>Password Reset</label><br>
-      <p><input type="password" name="password" id='now-password' placeholder="now password"/></p>
-      <p><input type="password" name="repassword" id='new-password' placeholder="new password"/></p>
-      <p><input type="password" name="repassword" id='re-new-password' placeholder="re new password"/></p>
-      <input type='button' class='password-reset-button' value="Reset" onclick="reset()"/>
-    </div>
+      <!-- パスワードリセット -->
+      <div>
+        <label>Password Reset</label><br>
+        <p><input type="password" name="password" id='now-password' placeholder="now password"/></p>
+        <p><input type="password" name="repassword" id='new-password' placeholder="new password"/></p>
+        <p><input type="password" name="repassword" id='re-new-password' placeholder="re new password"/></p>
+        <input type='button' class='password-reset-button' value="Reset" onclick="reset()"/>
+      </div>
     
-    <!-- 退会 -->
-    <div>
-      <label>Cancel</label><br>
-      <p><input type="text" name="username" id='username' placeholder="username"/></p>
-      <p><input type="password" name="password" id='password' placeholder="password"/></p>
-      <input type='button' class='cancel-button' value="Cancel" onclick="cancel()"/>
+      <!-- 退会 -->
+      <div>
+        <label>Cancel</label><br>
+        <p><input type="text" name="username" id='username' placeholder="username"/></p>
+        <p><input type="password" name="password" id='password' placeholder="password"/></p>
+        <input type='button' class='cancel-button' value="Cancel" onclick="cancel()"/>
+      </div>
+      
     </div>
+
+    <!-- タグ編集画面 -->
+    <div class='edit-modal-wrapper' id='edit-tag-modal'>
+      <a href='#!' class='edit-overlay'></a>      
+      <div class='edit-window'>
+        <div class='edit-text' id='editlist'>
+          <p class="tag-add-name">編集するタグ名</p>
+              <input type="text" class="tag-content" id="tag-edit"/>
+              <p style="text-align:center";><input type="button" class="tag-submitbutton" value="TagEdit" onclick="tagedit()"/></p>
+        </div>
+      </div>
+      <a href="#!" class="edit-close">×</a>
+    </div>    
     
     <!-- トップに戻るボタン -->
     <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
     
     <script>
-      window.onload = findUserDatas; // 画面ロード時に実行
-      //const taglistArea = document.getElementById('profile-number-tag'); // リスト表示部
+      window.onload = findTags; // 画面ロード時に実行
+      const taglistArea = document.getElementById('profile-number-tag'); // タグ別投稿数表示部
+      const usertagList = document.getElementById('post-tag') // ユーザが追加したタグについて
       
-      let flag = 0;
       let username;
       let createdate;
-      let updatedate;
+      let final_login_date; // 変数に-はだめ
       let postnumbers;
+      let taginfo = [,]; // タグについて｛'tagname', 'tagpost'}
+      let tagnumber; // タグの数を把握
       
-      // 全データの取得
-      function findUserDatas() {
-        console.log('★');
+      // タグデータ取得
+      function findTags() {
+        const url = '/findTags'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            const tags = JSON.parse(req.response);
+            for(let i in tags) {
+              const tag = tags[i];
+              taginfo[i] = [];
+              taginfo[i][0] = tag.tag;
+              taginfo[i][1] = 0;
+              tagnumber = i;
+            }
+            findUserDatas(tagnumber, taginfo);
+          }
+        }
+        req.open('GET', url, true);
+        req.send();
+      }
+      
+      // プロフィールデータの取得
+      function findUserDatas(tagnumber, taginfo) {
         const url = '/findUserDatas'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
@@ -90,25 +151,206 @@
             for(let i in datas) {
               const data = datas[i];
               
-              if(flag == 0){
+              if(data.name){
                 username = data.name;
                 createdate = data.create_date;
-                updatedate = data.update_date;
-                flag = 1;
-              }              
+                final_login_date = data.update_date;
+              }
+              if(data.tag){
+                for(let i=0; i<=tagnumber; i++){
+                  if(data.tag == taginfo[i][0]){
+                    taginfo[i][1]++;
+                  }                
+                }
+              }
               postnumbers = i;
             }
-            console.log(username, postnumbers);
-            addToList(username, createdate, updatedate, postnumbers);
+            addToListProfile(username, createdate, final_login_date, postnumbers, tagnumber, taginfo);
           }
         }
         req.open('GET', url, true);
         req.send();
       }
       
-      // 表示
-      function addToList(username, createdate, updatedate, postnumbers) {
+      // プロフィール、投稿数表示
+      function addToListProfile(username, createdate, final_login_date, postnumbers, tagnumber, taginfo) {
+        const profile_username = document.getElementById('profile-username');
+        profile_username.innerText = username;
         
+        if(typeof createadate !== 'undefined'){
+          const profile_createdate = document.getElementById('profile-createdate');
+          profile_createdate.innerText = createdate;          
+        }
+
+        if(typeof profile_final_login_date !== 'undefined'){
+          const profile_final_login_date = document.getElementById('final-login-date');
+          profile_final_login_date.innerText = final_login_date;
+        }
+
+        
+        const profile_number_all = document.getElementById('profile-number-all');
+        profile_number_all.innerText = postnumbers;
+        
+        if(tagnumber > 0){
+          for(i=0; i <= tagnumber; i++){
+            if(taginfo[i][1] > 0){
+              const tag_post_area = document.createElement('div');
+              tag_post_area.className = 'tag-post-area';
+              tag_post_area.id = 'tag['+i+']';
+            
+              const tag_post_name = document.createElement('label');
+              tag_post_name.className = 'tag-post-name';
+              tag_post_name.innerText = taginfo[i][0]+': ';
+              
+              const tag_post_number = document.createElement('span');
+              tag_post_number.className = 'tag_post_number';
+              tag_post_number.innerText = taginfo[i][1];
+              
+              
+              tag_post_area.appendChild(tag_post_name);
+              tag_post_area.appendChild(tag_post_number);
+              taglistArea.appendChild(tag_post_area);
+            }
+          }
+        }
+        findUserTag();
+      }
+      
+      // ユーザーが追加したタグデータを取得
+      function findUserTag(){
+        const url = '/findUserTag'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            const tags = JSON.parse(req.response);
+            for(let i in tags) {
+              const tag = tags[i];
+              if(tag.tag !== 'undefined'){
+                addToListTag(tag.tag, tag._id);
+              }              
+            }
+          }
+        }
+        req.open('GET', url, true);
+        req.send();        
+      }
+      
+      // ユーザが追加したタグデータを表示
+      function addToListTag(tag, id){
+        const tag_user_area = document.createElement('div');
+        tag_user_area.className = 'tag-user-area'
+        tag_user_area.id = id;
+         
+        const tag_user_name = document.createElement('label');
+        tag_user_name.className = 'tag-user-name';
+        tag_user_name.innerText = tag;
+        
+        const delButton = document.createElement('button');
+        delButton.className = 'deletebutton';
+        delButton.onclick = function() {
+          disptag(id);
+        }
+        
+        const delI = document.createElement('i');
+        delI.className = 'fas fa-trash worksicon fa-fw';
+        
+        const delDiv = document.createElement('div');
+        delDiv.className = 'deletediv';
+        delDiv.innerText = 'Delete';
+        
+        const editForm = document.createElement('form');
+        editForm.action = '#edit-tag-modal'
+        editForm.method = 'post';
+        
+        const editA = document.createElement('a');
+        editA.href = "#edit-tag-modal";
+        editA.className = 'editbutton';
+        editA.onclick = function() {
+          editTag(tag, id);
+        }
+        
+        const editI = document.createElement('i');
+        editI.className = 'fas fa-edit worksicon fa-fw';
+                        
+        const editDiv = document.createElement('div');
+        editDiv.className = 'editdiv';
+        editDiv.innerText = 'Edit';
+          
+        tag_user_area.appendChild(tag_user_name);
+        delButton.appendChild(delI);
+        delButton.appendChild(delDiv);
+        tag_user_area.appendChild(delButton);// tag_user_area に削除ボタンを追加
+        
+        editA.appendChild(editI);
+        editA.appendChild(editDiv);
+        editForm.appendChild(editA);
+        tag_user_area.appendChild(editForm); // tag_user_area に編集ボタン追加
+        usertagList.appendChild(tag_user_area); // リストに tag_user_area を追加
+      }
+      
+      // タグ削除機能
+      function disptag(id){
+	       // 「OK」時の処理開始 ＋ 確認ダイアログの表示
+	      if(window.confirm('本当に削除しますか？')){
+          const url = '/deleteTag'; // 通信先
+          const req = new XMLHttpRequest(); // 通信用オブジェクト
+          const data = {id:id};
+
+          req.onreadystatechange = function() {
+            if(req.readyState == 4 && req.status == 200) {
+              const target = document.getElementById(id); // ID で要素を特定
+              target.parentNode.removeChild(target); // 親要素に自分を削除させる
+            }
+          }
+          req.open('POST', url, true);
+          req.setRequestHeader('Content-Type', 'application/json');
+          req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
+      	    // 「OK」時の処理終了
+        }else{
+          // 「キャンセル」時の処理開始
+		      window.alert('キャンセルされました'); // 警告ダイアログを表示
+          // 「キャンセル」時の処理終了
+       	}
+      }
+      
+      // ユーザーが追加したタグの編集するタグを表示する
+      function editTag(tag, id){
+        const tagName = document.getElementById('tag-edit');
+        tagName.value = tag;
+        tagName.name = id;
+      }
+      
+      // ユーザーが追加したタグを編集する
+      function tagedit(){
+        if(window.confirm('本当に編集しますか？')){
+          const urladd = '/edittag'; // 通信先
+          const req = new XMLHttpRequest(); // 通信用オブジェクト
+         
+          const tag = document.getElementById('tag-edit').value;
+          const id = document.getElementById('tag-edit').name;
+          
+          // 取得した情報をもとにオブジェクトを作る
+          const data = {id:id, tag:tag};
+        
+          req.onreadystatechange = function() {
+            if(req.readyState == 4 && req.status == 200) {
+              // 追加が成功したらフォームを空にする
+              document.getElementById('tag-edit').value = '';
+              document.getElementById('tag-edit').name = '';
+              location.href = '/profile';
+            }else if(req.readyState == 4 && req.status != 200) {
+              alert(req.response);
+            }
+          }
+          req.open('POST', urladd, true);
+          req.setRequestHeader('Content-Type', 'application/json');
+          req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信 
+      	      // 「OK」時の処理終了
+          }else{
+            // 「キャンセル」時の処理開始
+		        window.alert('キャンセルされました'); // 警告ダイアログを表示
+            // 「キャンセル」時の処理終了
+       	  }                       
       }
 
       // リロード
