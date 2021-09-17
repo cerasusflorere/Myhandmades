@@ -151,7 +151,7 @@ app.post('/login', function(req, res){
     col.findOne(condition, function(err, user){
       client.close();
       if(user) {
-        res.cookie('user', user); // ヒットしたらクッキーに保存
+        res.cookie('user', user._id); // ヒットしたらクッキーに保存
         res.redirect('/'); // リダイレクト
       }else{
         res.redirect('/failed'); // リダイレクト
@@ -180,7 +180,7 @@ app.get('/findDatas', function(req, res){
 
     // 検索条件（ユーザーIDがuserId）
     // 条件の作り方： https://docs.mongodb.com/manual/reference/operator/query/
-    const userId = req.cookies.user._id;
+    const userId = req.cookies.user;
     const condition = {userid:{$eq:userId}};
 
     colWork.find(condition).toArray(function(err, datas) {
@@ -255,7 +255,7 @@ app.post('/editwork', function(req, res){
       const data = JSON.parse(received); // 保存対象
       const oid = new ObjectID(data.id);
       delete data.id;
-      console.log(data);
+      
       if(!data.subject) {
         res.status(400);
         res.send('題名ないと登録できないんです…');
@@ -276,7 +276,7 @@ app.post('/editwork', function(req, res){
 /// 追加画面
 // 追加機能fileadd
 app.post('/savework', function(req, res){
-  const userid = req.cookies.user._id;
+  const userid = req.cookies.user;
   let received = '';
   req.setEncoding('utf8');
   req.on('data', function(chunk) {
@@ -324,11 +324,10 @@ app.get('/findTags', function(req, res){
 
 // タグ追加tagadd
 app.post('/savetag', function(req, res){
-  const userid = req.cookies.user._id;
+  const userid = req.cookies.user;
   let received = '';
   req.setEncoding('utf8');
   req.on('data', function(chunk) {
-    chunk["userid"] = userid;
     received += chunk;
   });
   req.on('end', function() {
@@ -384,7 +383,7 @@ app.get('/findUserDatas', function(req, res){
 
     // 検索条件（ユーザーIDがuserId）
     // 条件の作り方： https://docs.mongodb.com/manual/reference/operator/query/
-    const userId = req.cookies.user._id;
+    const userId = req.cookies.user;
     const oid = new ObjectID(userId);
     const conditionusers = {_id:{$eq:oid}};
     const conditionworks = {userid:{$eq:userId}};
@@ -407,7 +406,7 @@ app.get('/findUserTag', function(req, res){
 
     // 検索条件（useridが一致）
     // 条件の作り方： https://docs.mongodb.com/manual/reference/operator/query/
-    const userId = req.cookies.user._id;
+    const userId = req.cookies.user;
     const condition = {userid:{$eq:userId}};
 
     colTag.find(condition).toArray(function(err, tags) {
@@ -473,6 +472,52 @@ app.post('/deleteTag', function(req, res){
       });
     });
   });
+});
+
+// パスワードリセット
+app.post('/reset', function(req, res){
+  const password = req.body.resetpassword;
+  const newpassword = req.body.newpassword;
+  const renewpassword = req.body.renewpassword;
+  
+  if(password == 'a'){
+    alert("そのアカウントではパスワードリセットは無効です！");
+    return;
+  }else if(password == ''){
+    alert("今のパスワードがないとリセットできませんので…");
+    return;
+  }else if(newpassword == ''){
+    alert("新しいパスワードを教えてください！");
+    return;
+  }else if(renewpassword == ''){
+    alert("ユーザー名が入力されてないので登録できません…");
+    return;
+  }else if(newpassword != renewpassword){
+    alert("大変言いずらいのですが、新しいパスワードが一致しないですねぇ…");
+    return;
+  }else if(password == newpassword){
+    alert("違うパスワードにして欲しかったりなんかします");
+    return;
+  }else{
+    MongoClient.connect(mongouri, function(error, client) {
+      const db = client.db(process.env.DB); // 対象 DB
+      const col = db.collection('users'); // 対象コレクション
+      const redata = {password:newpassword};
+      const data = JSON.parse(JSON.stringify(redata)); // 保存対象
+      const afterdata = {password:hashed(data.password)};
+    
+      const userId = req.cookies.user;
+      const oid = new ObjectID(userId);
+      const condition = {_id:{$eq:oid}, password:{$eq:hashed(password)}};
+    
+      // ユーザ名、ハッシュ化したパスワード値で検索する
+      col.updateOne({_id:oid}, {$set:afterdata}, function(err, result) {
+        client.close(); // DB を閉じる
+        res.status(200);
+        res.redirect('/profile'); // リダイレクト
+      });
+    });  
+  }
 });
 
 
