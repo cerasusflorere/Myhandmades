@@ -75,18 +75,22 @@
       <!-- パスワードリセット -->
       <div>
         <label>Password Reset</label><br>
-        <p><input type="password" name="password" id='now-password' placeholder="now password"/></p>
-        <p><input type="password" name="repassword" id='new-password' placeholder="new password"/></p>
-        <p><input type="password" name="repassword" id='re-new-password' placeholder="re new password"/></p>
-        <input type='button' class='password-reset-button' value="Reset" onclick="reset()"/>
+        <form method="post" action="/reset" class="reset-form" name='reset_form'>
+          <p><input type="password" name="resetpassword" id='now-password' placeholder="now password"/></p>
+          <p><input type="password" name="newpassword" id='new-password' placeholder="new password"/></p>
+          <p><input type="password" name="renewpassword" id='re-new-password' placeholder="re new password"/></p>
+        </form> 
+        <input type='submit' class='password-reset-button' value="Reset" onclick="reset()"/>
       </div>
     
       <!-- 退会 -->
       <div>
         <label>Cancel</label><br>
-        <p><input type="text" name="username" id='username' placeholder="username"/></p>
-        <p><input type="password" name="password" id='password' placeholder="password"/></p>
-        <input type='button' class='cancel-button' value="Cancel" onclick="cancel()"/>
+        <form method="post" action="/login" class="cancel-form" name='cancel_form'>
+          <p><input type="text" name="username" id='username' placeholder="username"/></p>
+          <p><input type="password" name="password" id='password' placeholder="password"/></p>
+          <input type='button' class='cancel-button' value="Cancel" onclick="cancel()"/>
+        </form>
       </div>
       
     </div>
@@ -351,6 +355,37 @@
 		        window.alert('キャンセルされました'); // 警告ダイアログを表示
             // 「キャンセル」時の処理終了
        	  }                       
+      }
+      
+      function reset(){
+        if(document.reset_form.resetpassword.value == 'a'){
+          alert("そのアカウントではパスワードリセットは無効です！");
+          return;
+        }else if(window.confirm('本当にパスワードをリセットしますか？')){
+          //クライアント側の入力チェック
+          if(document.reset_form.resetpassword.value == ''){
+            alert("今のパスワードがないとリセットできませんので…");
+            return;
+          }else if(document.reset_form.newpassword.value == ''){
+            alert("新しいパスワードを教えてください！");
+            return;
+          }else if(document.reset_form.renewpassword.value == ''){
+            alert("ユーザー名が入力されてないので登録できません…");
+            return;
+          }else if(document.reset_form.newpassword.value != document.reset_form.renewpassword.value){
+            alert("大変言いずらいのですが、新しいパスワードが一致しないですねぇ…");
+            return;
+          }else if(document.reset_form.resetpassword.value == document.reset_form.newpassword.value){
+            alert("違うパスワードにして欲しかったりなんかします");
+            return;
+          }
+          document.reset_form.submit();
+      	  // 「OK」時の処理終了
+        }else{
+            // 「キャンセル」時の処理開始
+		      window.alert('キャンセルされました'); // 警告ダイアログを表示
+            // 「キャンセル」時の処理終了
+       	}                         
       }
 
       // リロード
