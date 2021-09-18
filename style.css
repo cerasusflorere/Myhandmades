@@ -345,7 +345,7 @@ nav a:active{
   margin-top: 5em;
   padding-bottom: 0.2em;
 }
-.list .worksarea{
+.worksarea{
   display: block;
   width: 31.25em;
   padding: 0.625em 0.9375em;
@@ -687,8 +687,7 @@ nav a:active{
 .open-button, .open-button .open-layer{
     border-radius: 100px;
 }
-.open-checkbox
-{
+.open-checkbox{
     position: relative;
     width: 100%;
     height: 100%;
@@ -698,12 +697,10 @@ nav a:active{
     cursor: pointer;
     z-index: 3;
 }
-.open-knobs
-{
+.open-knobs{
     z-index: 2;
 }
-.open-layer
-{
+.open-layer{
     width: 100%;
     background-color: #efefef;
     transition: 0.3s ease all;
@@ -965,8 +962,178 @@ nav a:active{
 
 
 /* Profile.html */
-/* プロフィール表示部 */
+/* ページ全体 */
 .all-area{
   margin-top: 5em;
   padding-bottom: 0.2em;
+}
+/* 各エリア */
+.profile-area{
+  display: block;
+  width: 31.25em;
+  padding: 0.625em 0.9375em;
+  margin: 1.25em;
+  margin-right: 0;
+  border-radius: 0.625em;
+  background: #ffe4e1;
+}
+/* 各タイトル */
+.profile-title{
+  display: block;
+  width: auto;
+  margin-bottom: 0.4em;
+  font-size: 1.25em;
+  font-weight: bold;
+  color: #404040;
+}
+/* 各エリア内の文字 */
+.profile-area div{
+  letter-spacing: 0.01em;
+}
+.profile-area div label{
+  font-size: 0.75em;
+}
+/* 各エリア重要な文字は大きく */
+.profile-area div span{
+  font-size: 1.3em;
+}
+/* ユーザーが追加したタグについて */
+.tag-user-area{
+  display: flex;
+  align-items: center;
+  margin: 0.2em 0 0.5em 0;
+}
+.tag-user-area .tag-user-name{
+  font-size: 1em;  
+}
+.profile-area .tag-user-button-area{
+  display: flex;
+  align-items: center;
+  float: right;
+  font-size: initial;
+}
+/*タグ削除ボタン*/
+.profile-deletebutton {
+  display: flex; 
+  align-items: center;
+  margin-left: 2em;
+  margin-right: 5em;
+  overflow: hidden;
+  outline: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.profile-deletediv{
+  display: none;
+  position: absolute;
+  width: auto;
+  padding: 0.3125em 0.5em;
+  color: #808080;
+  border-radius: 0.8em;
+  background: #fdf5e6;  
+  text-align: center;
+  text-decoration: none;
+  line-height: 1;
+}
+.profile-deletediv:before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  border: 0.3125em solid transparent;
+  border-top: 0.8em solid #fdf5e6;
+  margin-left: -1em;
+  transform: rotateZ(90deg);
+}
+.profile-deletebutton:hover .profile-deletediv{
+  /*カーソルを載せたとき*/
+  display: inline-block;
+  margin-left: 1.8em;
+}
+.profile-deletebutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+/*タグ編集ボタン*/
+.profile-editbutton {
+  display: flex; 
+  align-items: center;
+  margin-right: 4.5em;
+  overflow: hidden;
+  outline: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.profile-editdiv{
+  display: none;
+  position: absolute;
+  padding: 0.3125em 0.5em;
+  color: #808080;
+  border-radius: 0.8em;
+  font-size: 0.8em;
+  background: #fdf5e6;
+  width: auto;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1;
+}
+.profile-editdiv:before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  border: 0.3125em solid transparent;
+  border-top: 0.8em solid #fdf5e6;
+  margin-left: -1em;
+  transform: rotateZ(90deg);
+}
+.profile-editbutton:hover .profile-editdiv{
+  /*カーソルを載せたとき*/
+  display: inline-block;
+  margin-left: 2em;
+}
+.profile-editbutton:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+.change-form p{
+  display: flex;
+  align-items: center;
+}
+.cancel-form p{
+  display: flex;
+  align-items: center;
+}
+.profile-icon{
+  color: #808080;
+  letter-spacing: 0.1em;
+}
+/*ボタン*/
+.profile-button {
+  width: auto;
+  border-radius: 0.5em;
+  padding: 0.25em 0.5em;
+  margin: 0 0.5em 0.5em 10em;
+  overflow: hidden;
+  background: #db7093;/*ボタン色*/  
+  box-shadow: 0 0 0  0.25em #db7093, 0 0.125em 0.1875em 0.25em rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 0.1em dashed #fff;/* 点線の色・サイズ */
+  font-size: 0.9em;
+  color: #fff;
+}
+.profile-button:hover {
+  /*カーソルを載せたとき*/
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+}
+.profile-button:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
+  border-bottom: none;/*線を消す*/
 }
