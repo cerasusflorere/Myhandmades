@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A cool thing made with Glitch">
-    <title>Home</title>
+    <title>Profile</title>
     <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
@@ -40,8 +40,8 @@
     <!-- 表示エリア -->
     <div id='all-area' class='all-area'>
       <!-- プロフィールリスト表示部 -->
-      <div class='profile-list'>
-        <span>Your profile</span>
+      <div class='profile-area'>
+        <span class='profile-title'>Your profile</span>
         <div>
           <label>Username: </label><span id='profile-username'></span>
         </div>
@@ -54,43 +54,44 @@
       </div>
       
       <!-- 投稿数表示部 -->
-      <div class='post-number-list'>
-        <span>How many did you post?</span>
+      <div class='profile-area'>
+        <span class='profile-title'>How many did you post?</span>
         <div>
           <label>Number of Posts [All]: </label><span id='profile-number-all'></span>
         </div>
-        <div>Number of Posts [Tag]<br>
+        <div><label>Number of Posts [Tag]</label><span></span><br>
           <div id='profile-number-tag'><!--タグ名：投稿数 --></div>
         </div>
       </div>
       
       <!-- ユーザが投稿したタグ -->
-      <div class='post-tag-area'>
-        <span>Tags you added</span>
+      <div class='profile-area'>
+        <span class='profile-title'>Tags you added</span>
         <div id='post-tag' class='post-tag'><!--追加したタグ--></div>
-        <span>Thanks to you, this app is easier to use!</span>
+        <span id='post-message'></span>
       </div>
       
     
-      <!-- パスワードリセット -->
-      <div>
-        <label>Password Reset</label><br>
-        <form method="post" action="/reset" class="reset-form" name='reset_form'>
-          <p><input type="password" name="resetpassword" id='now-password' placeholder="now password"/></p>
-          <p><input type="password" name="newpassword" id='new-password' placeholder="new password"/></p>
-          <p><input type="password" name="renewpassword" id='re-new-password' placeholder="re new password"/></p>
+      <!-- パスワード変更 -->
+      <div class='profile-area'>
+        <span class='profile-title'>Password Reset</span>
+        <form method="post" action="/change" class="change-form" name='change_form'>
+          <p><i class="fas fa-user-circle profile-icon fa-fw"></i><input type="text" name="change_username" id='change-username' placeholder="username"/></p>
+          <p><i class="fas fa-lock profile-icon fa-fw"></i><input type="password" name="nowpassword" id='now-password' placeholder="now password"/></p>
+          <p><i class="fas fa-lock profile-icon fa-fw"></i><input type="password" name="newpassword" id='new-password' placeholder="new password"/></p>
+          <p><i class="fas fa-lock profile-icon fa-fw"></i><input type="password" name="renewpassword" id='re-new-password' placeholder="re new password"/></p>
         </form> 
-        <input type='submit' class='password-reset-button' value="Reset" onclick="reset()"/>
+        <input type='submit' class='profile-button' value="Change" onclick="change()"/>
       </div>
     
       <!-- 退会 -->
-      <div>
-        <label>Cancel</label><br>
-        <form method="post" action="/login" class="cancel-form" name='cancel_form'>
-          <p><input type="text" name="username" id='username' placeholder="username"/></p>
-          <p><input type="password" name="password" id='password' placeholder="password"/></p>
-          <input type='button' class='cancel-button' value="Cancel" onclick="cancel()"/>
+      <div class='profile-area'>
+        <span class='profile-title'>Cancel</span>
+        <form method="post" action="/cancel" class="cancel-form" name='cancel_form'>
+          <p><i class="fas fa-user-circle profile-icon fa-fw"></i><input type="text" name="username" id='username' placeholder="username"/></p>
+          <p><i class="fas fa-lock profile-icon fa-fw"></i><input type="password" name="password" id='password' placeholder="password"/></p>
         </form>
+        <input type='submit' class='profile-button' value="Cancel" onclick="cancel()"/>
       </div>
       
     </div>
@@ -249,17 +250,20 @@
         tag_user_name.className = 'tag-user-name';
         tag_user_name.innerText = tag;
         
+        const tag_user_button_area = document.createElement('span');
+        tag_user_button_area.className = 'tag-user-button-area';
+        
         const delButton = document.createElement('button');
-        delButton.className = 'deletebutton';
+        delButton.className = 'profile-deletebutton';
         delButton.onclick = function() {
           disptag(id);
         }
         
         const delI = document.createElement('i');
-        delI.className = 'fas fa-trash worksicon fa-fw';
+        delI.className = 'fas fa-trash worksicon';
         
         const delDiv = document.createElement('div');
-        delDiv.className = 'deletediv';
+        delDiv.className = 'profile-deletediv';
         delDiv.innerText = 'Delete';
         
         const editForm = document.createElement('form');
@@ -268,28 +272,32 @@
         
         const editA = document.createElement('a');
         editA.href = "#edit-tag-modal";
-        editA.className = 'editbutton';
+        editA.className = 'profile-editbutton';
         editA.onclick = function() {
           editTag(tag, id);
         }
         
         const editI = document.createElement('i');
-        editI.className = 'fas fa-edit worksicon fa-fw';
+        editI.className = 'fas fa-edit worksicon';
                         
         const editDiv = document.createElement('div');
-        editDiv.className = 'editdiv';
+        editDiv.className = 'profile-editdiv';
         editDiv.innerText = 'Edit';
           
         tag_user_area.appendChild(tag_user_name);
         delButton.appendChild(delI);
         delButton.appendChild(delDiv);
-        tag_user_area.appendChild(delButton);// tag_user_area に削除ボタンを追加
+        tag_user_button_area.appendChild(delButton);// tag_user_button_area に削除ボタンを追加
         
         editA.appendChild(editI);
         editA.appendChild(editDiv);
         editForm.appendChild(editA);
-        tag_user_area.appendChild(editForm); // tag_user_area に編集ボタン追加
+        tag_user_button_area.appendChild(editForm); // tag_user_button_area に編集ボタン追加
+        tag_user_area.appendChild(tag_user_button_area);
         usertagList.appendChild(tag_user_area); // リストに tag_user_area を追加
+        
+        const message = document.getElementById('post-message');
+        message.innerText = 'Thanks to you, this app is easier to use!'; 
       }
       
       // タグ削除機能
@@ -357,29 +365,37 @@
        	  }                       
       }
       
-      function reset(){
-        if(document.reset_form.resetpassword.value == 'a'){
-          alert("そのアカウントではパスワードリセットは無効です！");
+      //パスワード変更
+      function change(){
+        if(document.change_form.change_username.value == 'a' || document.change_form.nowpassword.value == 'a'){
+          alert("そのアカウントではパスワード変更は無効です！");
+          document.change_form.change_username.value == '';
+          document.change_form.nowpassword.value == '';
+          document.change_form.newpassword.value == '';
+          document.change_form.renewpassword.value == '';
           return;
-        }else if(window.confirm('本当にパスワードをリセットしますか？')){
+        }else if(window.confirm('本当にパスワードを変更しますか？')){
           //クライアント側の入力チェック
-          if(document.reset_form.resetpassword.value == ''){
-            alert("今のパスワードがないとリセットできませんので…");
+          if(document.change_form.change_username.value == ''){
+            alert("usernameを教えてほしいです");
             return;
-          }else if(document.reset_form.newpassword.value == ''){
+          }else if(document.change_form.nowpassword.value == ''){
+            alert("現在のパスワードがないと変更できませんので…");
+            return;
+          }else if(document.change_form.newpassword.value == ''){
             alert("新しいパスワードを教えてください！");
             return;
-          }else if(document.reset_form.renewpassword.value == ''){
+          }else if(document.change_form.renewpassword.value == ''){
             alert("ユーザー名が入力されてないので登録できません…");
             return;
-          }else if(document.reset_form.newpassword.value != document.reset_form.renewpassword.value){
+          }else if(document.change_form.newpassword.value !== document.change_form.renewpassword.value){
             alert("大変言いずらいのですが、新しいパスワードが一致しないですねぇ…");
             return;
-          }else if(document.reset_form.resetpassword.value == document.reset_form.newpassword.value){
+          }else if(document.change_form.nowpassword.value === document.change_form.newpassword.value){
             alert("違うパスワードにして欲しかったりなんかします");
             return;
           }
-          document.reset_form.submit();
+          document.change_form.submit();
       	  // 「OK」時の処理終了
         }else{
             // 「キャンセル」時の処理開始
@@ -387,6 +403,29 @@
             // 「キャンセル」時の処理終了
        	}                         
       }
+      
+      //退会
+      function cancel(){
+        if(document.cancel_form.username.value == 'a'|| document.cancel_form.password.value == 'a'){
+          alert("そのアカウントの退会は禁ず！");
+          return;
+        }else if(window.confirm('本当に退会しますか？')){
+          //クライアント側の入力チェック
+          if(document.cancel_form.username.value == ''){
+            alert("usernameを教えてくださいな");
+            return;
+          }else if(document.cancel_form.password.value == ''){
+            alert("passwordを教えてほしいな");
+            return;
+          }
+          document.cancel_form.submit();
+      	  // 「OK」時の処理終了
+        }else{
+            // 「キャンセル」時の処理開始
+		      window.alert('キャンセルされました'); // 警告ダイアログを表示
+            // 「キャンセル」時の処理終了
+       	}                         
+      }      
 
       // リロード
       function home(){
