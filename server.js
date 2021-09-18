@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 
 // 登録画面
 app.get('/signup', (req, res) => {
-  res.sendFile(__dirname + '/views/signup.html');
+  res.sendFile(__dirname + '/Myhandmades/signup.html');
 });
 
 // ログイン画面へ
