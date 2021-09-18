@@ -79,6 +79,12 @@ app.get('/profile', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 })
 
+// Cancel画面へ
+app.get('/cancel', (req, res) => {
+  res.clearCookie('user'); // クッキーをクリア
+  res.sendFile(__dirname + '/views/cancel.html');
+})
+
 // ログアウト機能
 app.get('/logout', (req, res) => {
   res.clearCookie('user'); // クッキーをクリア
@@ -466,7 +472,7 @@ app.post('/deleteTag', function(req, res){
         if(result.deletedCount) {
           res.sendStatus(200); // OK を返す
         }else{
-          res.sendStatus(404); // 該当する本が見つからなかった意味で 404 を返す
+          res.sendStatus(404); // 該当するタグが見つからなかった意味で 404 を返す
         }
         client.close(); // DB を閉じる
       });
@@ -474,30 +480,27 @@ app.post('/deleteTag', function(req, res){
   });
 });
 
-// パスワードリセット
-app.post('/reset', function(req, res){
-  const password = req.body.resetpassword;
+// パスワード変更
+app.post('/change', function(req, res){
+  const userName = req.body.change_username;
+  const password = req.body.nowpassword;
   const newpassword = req.body.newpassword;
   const renewpassword = req.body.renewpassword;
   
-  if(password == 'a'){
-    alert("そのアカウントではパスワードリセットは無効です！");
-    return;
+  if(userName == 'a' || password == 'a'){
+    res.redirect('/profile'); // リダイレクト
+  }else if(userName == ''){
+    res.redirect('/profile');
   }else if(password == ''){
-    alert("今のパスワードがないとリセットできませんので…");
-    return;
+    res.redirect('/profile'); // リダイレクト
   }else if(newpassword == ''){
-    alert("新しいパスワードを教えてください！");
-    return;
+    res.redirect('/profile'); // リダイレクト
   }else if(renewpassword == ''){
-    alert("ユーザー名が入力されてないので登録できません…");
-    return;
-  }else if(newpassword != renewpassword){
-    alert("大変言いずらいのですが、新しいパスワードが一致しないですねぇ…");
-    return;
-  }else if(password == newpassword){
-    alert("違うパスワードにして欲しかったりなんかします");
-    return;
+    res.redirect('/profile'); // リダイレクト
+  }else if(newpassword !== renewpassword){
+    res.redirect('/profile'); // リダイレクト
+  }else if(password === newpassword){
+    res.redirect('/profile'); // リダイレクト
   }else{
     MongoClient.connect(mongouri, function(error, client) {
       const db = client.db(process.env.DB); // 対象 DB
@@ -508,17 +511,58 @@ app.post('/reset', function(req, res){
     
       const userId = req.cookies.user;
       const oid = new ObjectID(userId);
-      const condition = {_id:{$eq:oid}, password:{$eq:hashed(password)}};
-    
-      // ユーザ名、ハッシュ化したパスワード値で検索する
-      col.updateOne({_id:oid}, {$set:afterdata}, function(err, result) {
-        client.close(); // DB を閉じる
-        res.status(200);
-        res.redirect('/profile'); // リダイレクト
+      const condition = {_id:{$eq:oid}, name:{$eq:userName}, password:{$eq:hashed(password)}};
+      
+      col.findOne(condition, function(err, users){
+        if(users) {
+          // ユーザ名、ハッシュ化したパスワード値で検索する
+          col.updateOne({_id:oid}, {$set:afterdata}, function(err, result) {
+          client.close(); // DB を閉じる
+          res.status(200);
+          res.redirect('/profile'); // リダイレクト
+          });
+        }else{
+          res.redirect('/profile'); // リダイレクト
+        }
+        client.close();
       });
-    });  
+    });
   }
 });
 
+//退会機能
+app.post('/cancel', function(req, res){
+  const userName = req.body.username;
+  const password = req.body.password;
+  
+  if(userName == 'a' || password == 'a'){
+    res.redirect('/profile'); // リダイレクト
+  }else if(userName == ''){
+    res.redirect('/profile');
+  }else if(password == ''){
+    res.redirect('/profile'); // リダイレクト
+  }else{
+    MongoClient.connect(mongouri, function(error, client) {
+      const db = client.db(process.env.DB); // 対象 DB
+      const col = db.collection('users'); // 対象コレクション（users）
+      const colWork = db.collection('work'); // 対象コレクション（work）
+    
+      const userId = req.cookies.user;
+      const oid = new ObjectID(userId);
+      const condition = {_id:{$eq:oid}, name:{$eq:userName}, password:{$eq:hashed(password)}};
+      
+      col.deleteOne(condition, function(err, result) {
+        if(result.deletedCount) {
+          colWork.deleteMany({userid:{$eq:userId}}, function(errs, results) {
+          });
+          res.redirect('/cancel');
+        }else{
+          res.redirect('/profile'); // リダイレクト
+        }
+        client.close(); // DB を閉じる
+      });
+    });
+  }
+});
 
 const listener = app.listen(process.env.PORT);
