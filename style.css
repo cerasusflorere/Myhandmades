@@ -84,7 +84,7 @@ footer {
   overflow: hidden;
 }
 /*メニュー1*/
-nav ul{
+nav ul{ 
   padding: 0;
   height: 100%;
   margin: 0;
@@ -448,6 +448,9 @@ nav a:active{
   /*削除ボタンと編集ボタンにも使用*/
 }
 .openarea{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
   float: right;
   margin: 0.3125em;
 }
@@ -470,7 +473,7 @@ nav a:active{
   content: '';
   position: absolute;
   top: -0.9em;
-  right: 35%;
+  right: 43%;
   border: 0.3125em solid transparent;
   border-top: 0.8em solid #fdf5e6;
   margin-left: -1em;
@@ -479,7 +482,6 @@ nav a:active{
 .openarea:hover .nowopenmessage{
   display: inline-block;
   margin-top: 2.3em;
-  margin-left: -2.8em;
 }
 /*削除ボタン*/
 .deletebutton {
@@ -624,24 +626,25 @@ nav a:active{
 	height: 100vh;
 	top: 0;
 	left: 0;
+  cursor: pointer; 
 }
 .window {
 	width: auto;
 	height: auto;
 	background-color: #ffffff;
-	border-radius: 10px;
+	border-radius: 0.625em;
 	justify-content: center;
 	align-items: center;
 	position: fixed;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-  padding: 10px 20px;
+  padding: 0.625em 1.25em;
 }
 /*公開オンオフボタン*/
 .open-choose{
   display:inline-block;
-  margin-top: 10px;
+  margin-top: 0.625em;
   float: right;
 }
 .open-knobs, .open-layer{
@@ -653,39 +656,39 @@ nav a:active{
 }
 .open-button{
   position: relative;
-  width: 40px;
-  height: 23px;
+  width: 2.5em;
+  height: 1.4em;
   overflow: hidden;
 }
 .open-choose:hover .open-message{
-    display: inline-block;
+  display: inline-block;
 }
 .open-message {
-    top: 70px;
-    display: none;
-    position: absolute;
-    font-size: 12px;
-    padding: 5px;
-    color: #808080;
-    border-radius: 10px;
-    background: #fdf5e6;
-    width: 105px;
-    text-align: center;
-    text-decoration: none;
-    line-height: 1;
+  top: 5.8em;
+  display: none;
+  position: absolute;
+  font-size: 0.75em;
+  padding: 0.31em;
+  color: #808080;
+  border-radius: 0.625em;
+  background: #fdf5e6;
+  width: 8.5em;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1;
 }
 .open-message:before {
-    content: "";
-    position: absolute;
-    top: -15px;
-    left: 26%;
-    border: 8px solid transparent;
-    border-top: 8px solid #fdf5e6;
-    margin-left: -15px;
-    transform: rotateZ(180deg);
+  content: "";
+  position: absolute;
+  top: -1.3em;
+  left: 26%;
+  border: 0.65em solid transparent;
+  border-top: 0.65em solid #fdf5e6;
+  margin-left: -15px;
+  transform: rotateZ(180deg);
 }
 .open-button, .open-button .open-layer{
-    border-radius: 100px;
+    border-radius: 6.25em;
 }
 .open-checkbox{
     position: relative;
@@ -707,23 +710,23 @@ nav a:active{
     z-index: 1;
 }
 #open-button .open-knobs:before{
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 10px;
-    height: 0.5px;
-    color: #fff;
-    text-align: center;
-    line-height: 0.8;
-    padding: 9px 4px;
-    background-color: #ffffff;
-    border-radius: 50%;
-    transition: 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15) all;
+  content: '';
+  position: absolute;
+  top: 0.125em;
+  left: 0.125em;
+  width: 0.625em;
+  height: 0.03em;
+  color: #fff;
+  text-align: center;
+  line-height: 0.8;
+  padding: 0.56em 0.25em;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15) all;
 }
 #open-button .open-checkbox:checked + .open-knobs:before{
     content: '';
-    left: 20px;
+    left: 1.25em;
     background-color: #db7093;
 }
 #open-button .open-checkbox:checked ~ .open-layer{
@@ -735,35 +738,35 @@ nav a:active{
 
 .holder{
 	z-index: -1;
-	font-size: 15px;
+	font-size: 1em;
 	margin: 0;
 }
 .content{
-  font-size: 20px;
+  font-size: 1.25em;
 	margin: 0;
 }
 .close {
 	cursor:pointer;
 	position: absolute;
-	top: 10px;
-	right: 20px;
-	font-size: 20px;
+  top: 0.5em;
+  right: 1.25em;
+  font-size: 1.25em;
 }
 /*データ送信ボタン*/
 .submitbutton {
   overflow: hidden;
   outline: 0;
-  width: 240px;
+  width: 15em;
   display: inline-block;
-  margin : 10px ;
+  margin : 0.625em;
   padding: 0.5em 1em;
   box-shadow: 0 0 0 5px #db7093, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
   border: 2px dashed #fff;/* 点線の色・サイズ */
-  border-radius: 15px;
+  border-radius: 0.8em;
   background: #db7093;/*ボタン色*/
   text-decoration: none;
   text-align: center;
-  font-size: 20px;
+  font-size: 1.25em;
   color: #fff;
 }
 .submitbutton:hover {
@@ -783,18 +786,18 @@ nav a:active{
 .tag-addbutton {
   overflow: hidden;
   outline: 0;
-  width: 70px;
+  width: 5.5em;
   display: inline-block;
-  margin-top: 10px;
-  margin-left: 430px;
+  margin-top: 0.625em;
+  margin-left: 26.875em;
   padding: 0.3em;
-  box-shadow: 0 0 0 5px #ffc0cb, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
-  border: 1px dashed #fff;/* 点線の色・サイズ */
-  border-radius: 7px;
-  background: #ffc0cb;/*ボタン色*/
+  box-shadow: 0 0 0 0.31em #ffc0cb, 0 0.125em 0.1875em 0.31em rgb(0 0 0 / 50%);
+  border: 1px dashed #fff;
+  border-radius: 0.5em;
+  background: #ffc0cb;
   text-decoration: none;
   text-align: center;
-  font-size: 13px;
+  font-size: 0.8125em;
   color: #fff;
 }
 .tag-addbutton:hover {
@@ -805,8 +808,8 @@ nav a:active{
 }
 .tag-addbutton:active {
   /*ボタンを押したとき*/
-  -webkit-transform: translateY(4px);
-  transform: translateY(4px);/*下に動く*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
   border-bottom: none;/*線を消す*/
 }
 #tag-pop-up {
@@ -824,51 +827,52 @@ nav a:active{
 	height: 100vh;
 	top: 0;
 	left: 0;
+  cursor: pointer;
 }
 .tag-window {
 	width: auto;
 	height: auto;
 	background-color: #ffffff;
-	border-radius: 10px;
+	border-radius: 0.625em;
 	justify-content: center;
 	align-items: center;
 	position: fixed;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-  padding: 10px 20px;
+  padding: 0.625em 1.25em;
 }
 .tag-holder{
 	z-index: -1;
-	font-size: 15px;
+	font-size: 1em;
 	margin: 0;
 }
 .tag-content{
-  font-size: 20px;
+  font-size: 1.25em;
 	margin: 0;
 }
 .tag-close {
 	cursor:pointer;
 	position: absolute;
-	top: 10px;
-	right: 20px;
-	font-size: 20px;
+	top: 0.625em;
+	right: 1.25em;
+	font-size: 1.25em;
 }
 /*追加タグデータ送信ボタン*/
 .tag-submitbutton {
   overflow: hidden;
   outline: 0;
-  width: 100px;
+  width: 6.25em;
   display: inline-block;
-  margin : 10px ;
+  margin: 0.625em;
   padding: 0.25em 0.5em;
-  box-shadow: 0 0 0 5px #db7093, 0 2px 3px 5px rgba(0,0,0,0.5);/* 縁取り・影 */
-  border: 2px dashed #fff;/* 点線の色・サイズ */
-  border-radius: 10px;
-  background: #db7093;/*ボタン色*/
+  box-shadow: 0 0 0 5px #db7093, 0 2px 3px 5px rgb(0 0 0 / 50%);
+  border: 2px dashed #fff;
+  border-radius: 0.625em;
+  background: #db7093;
   text-decoration: none;
   text-align: center;
-  font-size: 15px;
+  font-size: 1.25em;
   color: #fff;
 }
 .tag-submitbutton:hover {
@@ -879,54 +883,32 @@ nav a:active{
 }
 .tag-submitbutton:active {
   /*ボタンを押したとき*/
-  -webkit-transform: translateY(4px);
-  transform: translateY(4px);/*下に動く*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
   border-bottom: none;/*線を消す*/
 }
 
 /* 編集画面 */
 .edit-modal-wrapper {
-  z-index: 999;
+  z-index: 9999;
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  padding: 60px 10px;
 }
 .edit-modal-wrapper:not(:target) {
   opacity: 0;
   visibility: hidden;
-  transition: opacity .3s, visibility .3s;
 }
-.edit-modal-wrapper:target {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity .4s, visibility .4s;
-}
-.edit-modal-wrapper::after {
-  display: inline-block;
-  height: 100%;
-  margin-left: -.05em;
-  vertical-align: middle;
-  content: ""
-}
-.edit-modal-wrapper .edit-close {
-  z-index: 20;
+.edit-close {
+  cursor: pointer;
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 35px;
-  color: #95979c!important;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 35px;
-  text-align: center;
+  top: 0.5em;
+  right: 1.25em;
+  font-size: 1.25em;
+  color: black;
   text-decoration: none;
-  text-indent: 0
-}
-.edit-modal-wrapper .edit-close:hover {
-  color: #2b2e38!important
 }
 .edit-overlay {
 	display: block;
@@ -941,23 +923,26 @@ nav a:active{
 	width: auto;
 	height: auto;
 	background-color: #ffffff;
-	border-radius: 10px;
+	border-radius: 0.625em;
 	justify-content: center;
 	align-items: center;
 	position: fixed;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-  padding: 10px 20px;
+  padding: 0.625em 1.25em;
 }
 .edit-holder{
 	z-index: -1;
-	font-size: 15px;
+	font-size: 1em;
 	margin: 0;
 }
 .edit-content{
-  font-size: 20px;
+  font-size: 1.25em;
 	margin: 0;
+}
+.buttonP{
+  text-align:center;
 }
 
 
