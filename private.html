@@ -50,7 +50,7 @@
 		      <p class="text">
             <div class="open-choose">
               <div class="open-button" id="open-button">
-                <input type="checkbox" class="open-checkbox">
+                <input type="checkbox" class="open-checkbox" id="open-checkbox">
                   <div class="open-knobs"></div>
                   <div class="open-layer"></div>
               </div>
@@ -86,11 +86,11 @@
     <div class='edit-modal-wrapper' id='edit-modal'>
       <a href='#!' class='edit-overlay'></a>      
       <div class='edit-window'>
+        <a href="#!" class="edit-close">×</a>
         <div class='edit-text' id='editlist'>
           <!-- 編集情報 -->
         </div>
-      </div>
-      <a href="#!" class="edit-close">×</a>
+      </div>      
     </div>
   
         
@@ -308,14 +308,14 @@
         const urladd = '/savework'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
-        const openid = document.getElementById('open-button');
+        const openid = document.getElementById('open-checkbox');
         let open = '0';
         const subject = document.getElementById('subject').value;
         const duration = document.getElementById('duration').value;
         let tag = "";
         const comment = document.getElementById('comment').value;
         
-        if(openid.checked == true){
+        if(openid.checked){
           open = '1';
         }
         
@@ -518,8 +518,8 @@
         workP.appendChild(tagLabel);
         workP.appendChild(commentP); // workPにコメントを追加
         workP.appendChild(commentTextarea);
+        buttonP.appendChild(buttonInput);
         workP.appendChild(buttonP); // workPに送信ボタンを追加
-        workP.appendChild(buttonInput);//ここまで、クラス設定してない
         editArea.appendChild(workP); // リストに workP を追加
         
         editlistAreaTag = document.getElementById('edit-taglabel');
