@@ -56,9 +56,14 @@ app.get('/alluser', (req, res) =>{
   res.sendFile(__dirname + '/views/alluser.html');
 })
 
-// ホーム画面へ
+// Home画面へ
 app.get('/home', (req, res) => {
   res.sendFile(__dirname + '/views/home.html');
+})
+
+// Favorite画面へ
+app.get('/favorite', (req, res) => {
+  res.sendFile(__dirname + '/views/favorite.html');
 })
 
 // Private画面へ
@@ -98,6 +103,7 @@ app.post('/signup', function(req, res){
   req.on('data', function(chunk) {
     received += chunk;
   });
+  
   req.on('end', function() {
     MongoClient.connect(mongouri, function(error, client) {
       const db = client.db(process.env.DB); // 対象 DB
@@ -359,7 +365,22 @@ app.post('/savetag', function(req, res){
 });
 
 
-/// ホーム画面
+/// Home画面
+// お気に入り捜索
+app.get('/findFavorites', function(req, res){
+  MongoClient.connect(mongouri, function(error, client){
+    const db = client.db(process.env.DB); // 対象DB
+    const colFavorite = db.collection('favorite'); // 対象コレクション(favorite)
+    const userid = req.cookies.user;
+    
+    const condition = {userid: userid};
+    colFavorite.find(condition).toArray(function(err, datas){
+      res.json(datas); // レスポンスとしてユーザを JSON 形式で返却
+      client.close(); // DB を閉じる
+    });
+  });
+});
+
 // 表示機能findAllDatas
 app.get('/findAllDatas', function(req, res){
   MongoClient.connect(mongouri, function(error, client) {
@@ -372,8 +393,78 @@ app.get('/findAllDatas', function(req, res){
     const condition = {open:{$eq:opencode}};
 
     colWork.find(condition).toArray(function(err, datas) {
-       res.json(datas); // レスポンスとしてユーザを JSON 形式で返却
-       client.close(); // DB を閉じる
+      res.json(datas); // レスポンスとしてユーザを JSON 形式で返却
+      client.close(); // DB を閉じる
+    });
+  });
+});
+
+// お気に入り登録favorite_true
+app.post('/favorite_true', function(req, res){
+  const userid = req.cookies.user;
+  let received = '';
+  req.setEncoding('utf8');
+  req.on('data', function(chunk) {
+    received += chunk;
+  });
+  req.on('end', function() {
+    MongoClient.connect(mongouri, function(error, client) {
+      const db = client.db(process.env.DB); // 対象 DB
+      const colFavorite = db.collection('favorite'); // 対象コレクション
+      const data = JSON.parse(received); // 保存対象
+      data['userid'] = userid;
+
+      if(!data.workid) {
+        res.status(400);
+        res.send('何か間違えちゃったみたいです');
+        return;
+      }
+
+      colFavorite.findOne(data, function(err, work){
+        if(work) {
+          colFavorite.deleteOne(data, function(err, result) {
+            res.status(400);
+            res.send('お気に入り登録を外しました');
+            client.close(); // DB を閉じる
+          });
+          return;
+        }else{
+          colFavorite.insertOne(data, function(err, result) {
+          client.close(); // DB を閉じる
+          res.status(200);
+          res.send('Success');
+          });
+        }
+      });
+    });
+  });
+});
+
+
+/// Favorite画面
+// 表示機能findFavoriteDatas
+app.post('/findFavoriteDatas', function(req, res){
+  let received = '';
+  req.setEncoding('utf8');
+  req.on('data', function(chunk) {
+    received += chunk;
+  });
+  
+  req.on('end', function() {
+    MongoClient.connect(mongouri, function(error, client) {
+      const db = client.db(process.env.DB); // 対象 DB
+      const colWork = db.collection('work'); // 対象コレクション
+      const data = JSON.parse(received); // 保存対象
+      const oid = new ObjectID(data.id);
+
+      // 検索条件（idが一致するか）
+      // 条件の作り方： https://docs.mongodb.com/manual/reference/operator/query/
+      const condition = {_id:{$eq:oid}};
+
+      colWork.find(condition).toArray(function(err, datas) {
+        res.json(datas); // レスポンスとしてユーザを JSON 形式で返却
+        client.close(); // DB を閉じる
+      });
     });
   });
 });
@@ -461,6 +552,7 @@ app.post('/deleteTag', function(req, res){
   req.on('data', function(chunk) {
     received += chunk;
   });
+  
   req.on('end', function() {
     MongoClient.connect(mongouri, function(error, client) {
       const db = client.db(process.env.DB); // 対象 DB
