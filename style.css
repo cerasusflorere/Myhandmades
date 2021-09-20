@@ -354,6 +354,34 @@ nav a:active{
   border-radius: 0.625em;
   background: #ffe4e1;
 }
+/* 星 */
+.favorite_area{
+  float: right;
+  display: flex;
+  position: relative;
+}
+.favorite-button{
+  margin: 0;
+}
+.favorite_area input[type="checkbox"]{
+   -webkit-appearance:none;
+}
+/* お気に入り登録前 */
+.favorite_area input[type="checkbox"]::before {
+  content: '☆';
+  color: #484848;
+  line-height: 1;
+  font-size: 1.8em;
+  top: 0;
+  right: 0;
+  position: absolute;
+  cursor: pointer;
+}
+/* お気に入り登録済 */
+.favorite_area input[type="checkbox"]:checked::before{
+  content: '★';
+  color: #ffffc1;
+}
 .subjectarea{
   display: block;
   width: auto;
@@ -640,6 +668,7 @@ nav a:active{
 	left: 50%;
 	transform: translate(-50%, -50%);
   padding: 0.625em 1.25em;
+  cursor: default;
 }
 /*公開オンオフボタン*/
 .open-choose{
@@ -841,6 +870,7 @@ nav a:active{
 	left: 50%;
 	transform: translate(-50%, -50%);
   padding: 0.625em 1.25em;
+  cursor: default;
 }
 .tag-holder{
 	z-index: -1;
