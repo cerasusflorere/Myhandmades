@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A cool thing made with Glitch">
+    <title>Favorite</title>
+    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
+  </head>
+  <body>
+    <!-- ヘッダー -->
+    <div class="headerbg">
+      <div class="site-header">
+        <h1>Myhandmades</h1>
+        <nav>
+          <ul>
+              <li><a href="/">Home</a></li>
+              <li><a href="/favorite">Favorite</a></li>
+              <li><a href="/private">Private</a></li>
+          </ul>
+        </nav>
+        <div class="hamburger-menu">
+          <input type="checkbox" id="menu-btn-check"/>
+          <label for="menu-btn-check" class="menu-btn"><span></span></label>
+          <!--ここからメニュー-->
+          <div class="menu-content">
+            <ul>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+          </div>
+          <!--ここまでメニュー-->
+        </div>
+      </div>
+　　</div>
+    
+    <!-- リスト表示部 -->
+    <div id="list" class="list"></div>    
+    
+    <!-- トップに戻るボタン -->
+    <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
+    
+    <script>
+      window.onload = Favorites; // 画面ロード時に実行
+      var favorite_datas = [];
+      let favorite_number = 0;
+      const listArea = document.getElementById('list'); // リスト表示部
+      
+      // お気に入りデータのid取得
+      function Favorites() {
+        const url = '/findFavorites'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            const datas = JSON.parse(req.response);
+            for(let i in datas) {
+              const data = datas[i];              
+              favorite_datas[favorite_number] = data.workid;
+              favorite_number++;
+              findFavoriteDatas(data.workid);
+            }
+          }
+        }
+        req.open('GET', url, true);
+        req.send();
+      }
+      
+      // お気に入りデータの取得
+      function findFavoriteDatas(workid) {
+        const url = '/findFavoriteDatas'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+
+        // 取得した情報をもとにオブジェクトを作る
+        const data = {id:workid};
+     
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            const datas = JSON.parse(req.response);
+            for(let i in datas) {
+              const data = datas[i];
+              
+              const id = data._id;
+              const subject = data.subject;
+              const duration = data.duration;
+              const tag = data.tag;
+              const comment = data.comment;
+              addToList(id, subject, duration, tag, comment);
+            }
+          }else{
+            console.log('星');
+          }
+        }
+        req.open('post', url, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
+      }
+      
+      // 表示
+      function addToList(id, subject, duration, tag, comment) {
+        const workDiv = document.createElement('div'); // 追加する本の div 要素
+        workDiv.className = "worksarea";
+        workDiv.id = id; // レスポンスから得た ID を付与する
+        
+        const favoriteDiv = document.createElement('div');
+        favoriteDiv.className = 'favorite_area';
+        
+        const favoriteInput = document.createElement('input');
+        favoriteInput.type = 'checkbox';
+        favoriteInput.className = 'favorite-button';
+        favoriteInput.name = 'favorite_button';
+        favoriteInput.onclick = function(){
+          favorite(id);
+        }
+        
+        for(let i in favorite_datas){
+          if(id == favorite_datas[i]){
+            favoriteInput.checked = true;
+            break;
+          }
+        }
+                
+        const subjectDiv = document.createElement('div');
+        subjectDiv.className = 'subjectarea';
+        subjectDiv.innerText = subject;
+        
+        const durationDiv = document.createElement('div');
+        durationDiv.className = 'durationame';
+        durationDiv.innerText = 'Duration: ';
+
+        const durationSpan = document.createElement('span');
+        durationSpan.className = 'durationarea';
+        durationSpan.innerText = duration;
+        
+        const tag1Div = document.createElement('div');
+        tag1Div.className = 'tagarea1';
+
+        const tagDiv = document.createElement('div');
+        tagDiv.className = 'tagarea';
+        tagDiv.innerText = tag;
+        
+        const commentDiv = document.createElement('div');
+        commentDiv.className = 'commentbox';
+        
+        const commentP = document.createElement('p');
+        commentP.innerText = comment;
+    
+        favoriteDiv.appendChild(favoriteInput);
+        workDiv.appendChild(favoriteDiv); // workDiv にお気に入りボタンを追加
+        workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
+        if(duration != ''){
+          durationDiv.appendChild(durationSpan);
+          workDiv.appendChild(durationDiv); // workDiv に製作期間を追加
+        }
+        if(tag != ''){
+          tag1Div.appendChild(tagDiv);
+          workDiv.appendChild(tag1Div); // workDiv にタグを追加
+        }
+        if(comment != ''){
+          commentDiv.appendChild(commentP);
+          workDiv.appendChild(commentDiv);  // workDivにコメントを追加  
+        }  
+        listArea.appendChild(workDiv); // リストに workDiv を追加
+      }
+      
+      // お気に入り登録
+      function favorite(id){
+        const favorite = document.getElementsByName('favorite_button');
+        const favorite_icon = document.getElementById('favorite_icon');
+        
+        const url = '/favorite_true'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        // 取得した情報をもとにオブジェクトを作る
+        const data = {workid: id};
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status != 200) {
+            // お気に入りを外した
+            alert(req.response);
+            const target = document.getElementById(id); // ID で要素を特定
+            target.parentNode.removeChild(target); // 親要素に自分を削除させる
+          }
+        }
+        req.open('POST', url, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信 
+      }
+
+      // リロード
+      function home(){
+         scrollTo(0, 0);
+      }
+    </script>
+  </body>
+</html>
