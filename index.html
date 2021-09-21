@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=yes">
     <meta name="description" content="A cool thing made with Glitch">
     <title>Login</title>
     <link rel="stylesheet" href="style.css">
@@ -16,7 +16,10 @@
           <p class="form-title">Myhandmades</p>
           <p><i class="fas fa-user-circle user fa-fw"></i><input type="text" name="userName" id='userName' placeholder="username"/></p>
           <p><i class="fas fa-lock user fa-fw"></i><input type="password" name="password" id='password' placeholder="password"/></p>
-          <input type="submit" class="loginbutton" value="Login"/>
+          <div class='login-button-area'>
+            <input type="submit" class="loginbutton" value="Login"/>
+            <a class='loginbutton' href='/gest'>Gest</a>
+          </div>          
           <p class="message"><a href="/signup">Create an account</a></p>
           <p class="message"><a href="/alluser">Just look?</a></p>
         </form>
