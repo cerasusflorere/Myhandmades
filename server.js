@@ -44,11 +44,16 @@ app.get('/my_account', function(req, res){
 // ログイン失敗画面
 app.get('/failed', (req, res) => {
   if(req.cookies.user) {
-    res.sendFile(__dirname + '/views/success.html');
+    res.sendFile(__dirname + '/views/home.html');
     return;
   }
 
   res.sendFile(__dirname + '/views/failed.html');
+});
+
+// サインアップ失敗画面
+app.get('/signup_failed', (req, res) => {
+  res.sendFile(__dirname + '/views/signup_failed.html');
 });
 
 // ログインせずに投稿を見るページへ
@@ -154,6 +159,27 @@ app.post('/signup', function(req, res){
 app.post('/login', function(req, res){
   const userName = req.body.userName;
   const password = req.body.password;
+  MongoClient.connect(mongouri, function(error, client) {
+    const db = client.db(process.env.DB); // 対象 DB
+    const col = db.collection('users'); // 対象コレクション
+    
+    // ユーザ名、ハッシュ化したパスワード値で検索する
+    const condition = {name:{$eq:userName}, password:{$eq:hashed(password)}};
+    col.findOne(condition, function(err, user){
+      client.close();
+      if(user) {
+        res.cookie('user', user._id); // ヒットしたらクッキーに保存
+        res.redirect('/'); // リダイレクト
+      }else{
+        res.redirect('/failed'); // リダイレクト
+      }
+    });
+  });
+});
+
+app.get('/gest', function(req, res){
+  const userName = "a";
+  const password = "a";
   MongoClient.connect(mongouri, function(error, client) {
     const db = client.db(process.env.DB); // 対象 DB
     const col = db.collection('users'); // 対象コレクション
@@ -656,5 +682,6 @@ app.post('/cancel', function(req, res){
     });
   }
 });
+
 
 const listener = app.listen(process.env.PORT);
