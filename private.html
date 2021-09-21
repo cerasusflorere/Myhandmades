@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=yes">
     <meta name="description" content="A cool thing made with Glitch">
     <title>Private</title>
     <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
@@ -19,7 +19,7 @@
         <nav>
           <ul>
               <li><a href="/">Home</a></li>
-              <li><a href="#">Favorite</a></li>
+              <li><a href="/favorite">Favorite</a></li>
               <li><a href="/private">Private</a></li>
           </ul>
         </nav>
@@ -29,8 +29,11 @@
           <!--ここからメニュー-->
           <div class="menu-content">
             <ul>
-                <li><a href="/profile">Profile</a></li>
-                <li><a href="/logout">Logout</a></li>
+              <li class='hidden_menu'><a href="/">Home</a></li>
+              <li class='hidden_menu'><a href="/favorite">Favorite</a></li>
+              <li class='hidden_menu'><a href="/private">Private</a></li>
+              <li><a href="/profile">Profile</a></li>
+              <li><a href="/logout">Logout</a></li>
             </ul>
           </div>
           <!--ここまでメニュー-->
@@ -434,8 +437,8 @@
         
         const opencheckboxInput = document.createElement('input');
         opencheckboxInput.type = "checkbox";
-        opencheckboxInput.className = "open-checkbox";
-        opencheckboxInput.id = "open-checkbox";
+        opencheckboxInput.className = 'open-checkbox';
+        opencheckboxInput.id = 'open-checkbox-edit';
         
         if(open == '1'){
           opencheckboxInput.checked = true;
@@ -551,23 +554,25 @@
           const urladd = '/editwork'; // 通信先
           const req = new XMLHttpRequest(); // 通信用オブジェクト
          
-          const openid = document.getElementById('open-checkbox');
+          const openid = document.getElementById('open-checkbox-edit');
           let open = '0';
           const subject = document.getElementById('edit-subject').value;
           const duration = document.getElementById('edit-duration').value;
           let tag = "";
           const comment = document.getElementById('edit-comment').value;
        
+          console.log(openid);
           if(openid.checked){
             open = '1';
           }
           
-        for(let i=1; i<=edittagnumber; i++){
-          let element = document.getElementById('tag['+i+']');
-          if(element.checked == true){
-            tag = element.value;
+          for(let i=1; i<=edittagnumber; i++){
+            const element = document.getElementById('tag['+i+']');
+            console.log(element.checked);
+            if(element.checked){
+              tag = element.value;
+            }
           }
-        }
         
           // 取得した情報をもとにオブジェクトを作る
           const data = {id:id, subject:subject, duration:duration, tag:tag, comment:comment, open:open};
