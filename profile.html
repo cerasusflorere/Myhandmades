@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=yes">
     <meta name="description" content="A cool thing made with Glitch">
     <title>Profile</title>
     <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
@@ -18,7 +18,7 @@
         <nav>
           <ul>
               <li><a href="/">Home</a></li>
-              <li><a href="#">Favorite</a></li>
+              <li><a href="/favorite">Favorite</a></li>
               <li><a href="/private">Private</a></li>
           </ul>
         </nav>
@@ -28,8 +28,11 @@
           <!--ここからメニュー-->
           <div class="menu-content">
             <ul>
-                <li><a href="/profile">Profile</a></li>
-                <li><a href="/logout">Logout</a></li>
+              <li class='hidden_menu'><a href="/">Home</a></li>
+              <li class='hidden_menu'><a href="/favorite">Favorite</a></li>
+              <li class='hidden_menu'><a href="/private">Private</a></li>
+              <li><a href="/profile">Profile</a></li>
+              <li><a href="/logout">Logout</a></li>
             </ul>
           </div>
           <!--ここまでメニュー-->
@@ -99,7 +102,7 @@
     <!-- タグ編集画面 -->
     <div class='edit-modal-wrapper' id='edit-tag-modal'>
       <a href='#!' class='edit-overlay'></a>      
-      <div class='edit-window'>
+      <div class='tag-window'>
         <div class='edit-text' id='editlist'>
           <p class="tag-add-name">編集するタグ名</p>
               <input type="text" class="tag-content" id="tag-edit"/>
@@ -158,6 +161,9 @@
               
               if(data.name){
                 username = data.name;
+                if(username == 'a'){
+                  username = 'Gest';
+                }
                 createdate = data.create_date;
                 final_login_date = data.update_date;
               }
