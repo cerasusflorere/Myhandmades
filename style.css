@@ -265,6 +265,11 @@ nav a:active{
   color: #ffc0cb;  
 }
 /* ログインボタン */
+.login-button-area{
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+}
 .loginbutton {
   width: 12em;
   border-radius: 0.7em;
@@ -275,6 +280,7 @@ nav a:active{
   box-shadow: 0 0 0  0.25em #ffc0cb, 0 0.125em 0.1875em 0.25em rgba(0,0,0,0.5);/* 縁取り・影 */
   border: 0.1em dashed #fff;/* 点線の色・サイズ */
   font-size: 1.25em;
+  text-decoration: none;
   color: #fff;
 }
 .loginbutton:hover {
@@ -296,6 +302,22 @@ nav a:active{
   text-decoration: none;
   /* サインアップ画面でも使用 */
 }
+
+/* ログイン失敗画面 */
+.failed-message{
+  text-align:center;
+  margin: 1em 0;
+  font-size: 2em;
+  color: #ffb6c1;
+}
+.failed-page{
+  text-align:center;
+  font-size: 1em;
+}
+.failed-page a{
+  text-decoration: none;
+}
+/* サインアップ失敗画面、退会後画面でも使用 */
 
 
 /* サインアップ画面 */
@@ -1161,330 +1183,504 @@ nav a:active{
 
 /* 959px以下に適用されるCSS（タブレット用） */
 @media screen and (max-width: 959px) {
-	
-}
-
-
-
-
-/* 480px以下に適用されるCSS（スマホ用） */
-@media screen and (max-width: 480px) {
-/* ログイン画面 */
-.login-page {
-  max-width: 22.5em;
-  width: 90%;
-}
-.login-form {
-  max-width: 100%;
-}
-/* ログインボタン */
-.loginbutton {
-  width: 35%;
-  min-width: 5em;
-  padding: 0.25em 0.3em;
-  font-size: 1em;
-}
+  /* ログイン画面 */
+  .login-page {
+    max-width: 22.5em;
+    width: 90%;
+  }
+  .login-form {
+    max-width: 100%;
+  }
+  /* ログインボタン */
+  .login-button-area{
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  .loginbutton {
+    width: 35%;
+    min-width: 5em;
+    padding: 0.25em 0.3em;
+    font-size: 1em;
+  }
   
 
-/* サインアップ画面 */
-/*サインアップボタン*/
-.signupbutton {
-  width: 35%;
-  min-width: 5em;
-  padding: 0.25em 0.3em;
-  font-size: 1em;
-}
+  /* サインアップ画面 */
+  /*サインアップボタン*/
+  .signupbutton {
+    width: 35%;
+    min-width: 5em;
+    padding: 0.25em 0.3em;
+    font-size: 1em;
+  }
   
   
-/* 共通要素 */
-h1 {
-  font-size: 2em;
-  line-height: 0.1;
-}
-/* 共通要素 */
-/*ヘッダー*/
-.site-header{
-  display: flex;
-  height: 4em;
-}
-/*メニュー1*/
-nav ul{ 
-  display: none; 
-} 
-/*ハンバーガーメニュー*/
-.menu-btn {
-  top: 2em;
-  right: 2em;
-}
-.menu-btn span,
-.menu-btn span:before,
-.menu-btn span:after {
-  height: 0.12em;/*線の太さ*/
-  width: 1.4em;/*長さ*/
-}
-.menu-content {
-  width: 25%;
-}
-.menu-content ul {
-  padding: 3em 0.625em 0;
-}
-.hidden_menu{
-  display: initial;
-  border-bottom: solid 0.125em #c0c0c0;
-  list-style: none;
-}
-.menu-content ul li{
-  border-bottom: none;
-  list-style: none;
-}
-/*リロードボタン*/
-.topbutton {
-  width: 2.5em;
-  height: 2.5em;
-  line-height: 2.5em;
-  font-size: 0.8em;
-}
+  /* 共通要素 */
+  h1 {
+    font-size: 2em;
+    line-height: 0.1;
+  }
+  /* 共通要素 */
+  /*ヘッダー*/
+  .site-header{
+    display: flex;
+    height: 4em;
+  }
+  /*ハンバーガーメニュー*/
+  .menu-btn {
+    top: 2em;
+    right: 2em; 
+  }
+  /*リロードボタン*/
+  .topbutton {
+    width: 2.5em;
+    height: 2.5em;
+    line-height: 2.5em;
+    font-size: 0.8em;
+  }
 
 
-/* リスト */
-.list{
-  margin-top: 4em;
-}
-.worksarea{
-  width: 92%;
-  margin: 1.25em 4%;
-}
-/* 星 */
-.favorite_area input[type="checkbox"]{
-   -webkit-appearance:none;
-}
-.subjectarea{
-  font-size: 1em;
-}
-.durationame{
-  display: block;
-  margin: 0.2em 0;
-  font-size: 0.6em;
-}
-.durationarea{
-  display: inline-block;
-  margin-left: 0.2em;
-  font-size: 1em;
-}
-.list .tagarea1{
-  display: block;
-  position: relative;
-  width: 100%;
-  height: auto;
-  margin: 0.3em 0;
-}
-.list .tagarea{
-  display: inline-block;
-  position: relative;
-  left: 0.9325em;
-  height: 2.5em;
-  width: auto;
-  padding: 0.4em 0.5em;
-  background: #deb887;
-  color: #f5f5f5;
-  font-size: 0.6em;
-  text-align: center;  
-}
-.list .tagarea:before {
-  position: absolute;
-  top: 0;
-  left: -1.1em;
-  content: '';
-  border-width: 1.29em 1.16em 1.29em 0;
-  border-style: solid;
-  border-color: transparent #deb887 transparent transparent;
-}
-.list .tagarea:after {
-  position: absolute;
-  top: calc(50% - 0.21875em);
-  left: -0.3125em;
-  width: 0.5em;
-  height: 0.45em;
-  content: '';
-  border-radius: 50%;
-  background: #ffe4e1;
-}
-.list .commentbox {
-  display: block;
-  position: relative;
-  height: auto;
-  margin-top: 0.8em;
-  border: 0.125em solid #808080;
-  border-radius: 0.5em;
-}
-.list .commentbox::before {
-  position: absolute;
-  top: -0.625em;
-  left: 0.625em;
-  padding: 0 0.625em;
-  content: "Comment";
-  background-color: #ffe4e1;
-  color: #404040;
-  font-size: 0.6em;
-}
-.list .commentbox p{
-  margin-left: 0.9375em;
-  font-size: 0.8em;
-}
-/* private workarea */
-.worksarea_private{
-  width: 92%;
-  padding: 0.625em 0.9375em;
-  margin: 1.25em 4%;
-}
-/*削除ボタン*/
-.deletebutton {
-  margin: 0;
-  margin-top: 0.3em;
-}
-.deletediv{
-  display: none;
-}
-.deletediv:before {
-  display: none;
-}
-.deletebutton:hover .deletediv{
-  /*カーソルを載せたとき*/
-  display: none;
-}
-/*編集ボタン*/
-.editbutton{
-  margin: 0;
-}
-.editdiv:before {
-  display: none;
-}
-.editbutton:hover .editdiv{
-  /*カーソルを載せたとき*/
-  display: none;
-}
+  /* リスト */
+  .list{
+    margin-top: 4em;
+  }
+  .worksarea{
+    width: 92%;
+    margin: 1.25em 4%;
+  }
+  /* 星 */
+  .favorite_area input[type="checkbox"]{
+    -webkit-appearance:none;
+  }
+  .subjectarea{
+    font-size: 1em;
+  }
+  .durationame{
+    font-size: 0.6em;
+  }
+  .durationarea{
+    font-size: 1em;
+  }
+  .list .tagarea{
+    font-size: 0.6em; 
+  }
+  .list .tagarea:before {
+    left: -1.1em;
+  }
+  .list .commentbox::before {
+    font-size: 0.6em;
+  }
+  .list .commentbox p{ 
+    font-size: 0.8em;
+  }
+  /* private workarea */
+  .worksarea_private{
+    width: 92%;
+    padding: 0.625em 0.9375em;
+    margin: 1.25em 4%;
+  }
+  /*削除ボタン*/
+  .deletebutton {
+    margin: 0;
+    margin-top: 0.3em;
+  }
+  .deletebutton:hover .deletediv{
+    /*カーソルを載せたとき*/
+    display: none;
+  }
+  /*編集ボタン*/
+  .editbutton{
+    margin: 0;
+  }
+  .editbutton:hover .editdiv{
+    /*カーソルを載せたとき*/
+    display: none;
+  }
   
   
-/* Private画面 */
-/*追加ボタン*/
-.addbutton {
-  top: 9.75em;
-  width: 3.5em;
-  height: 3.5em;
-  line-height: 3.5em;
-  font-size: 0.8em;
-}
-.window {
-	width: 95%;
-}
-.open-message {
-  right: 0.5em;
-}
-.open-message:before {
-  left: 70%;
-}
-.holder{
-	font-size: 0.8em;
-}
-.content{
-  font-size: 1em;
-}
-/*データ送信ボタン*/
-.submitbutton {
-  min-width: 5em;
-  width: 25%;
-  padding: 0.4em 0.3em;
-  font-size: 1em;
-}
+  /* Private画面 */
+  /*追加ボタン*/
+  .addbutton {
+    top: 9.75em;
+    width: 3.5em;
+    height: 3.5em;
+    line-height: 3.5em;
+    font-size: 0.8em;
+  }
+  .window {
+	  width: 95%;
+  }
+  .open-message {
+    right: 0.5em;
+  }
+  .open-message:before {
+    left: 70%;
+  }
+  .holder{
+	  font-size: 0.8em;
+  }
+  .content{
+    font-size: 1em;
+  }
+  /*データ送信ボタン*/
+  .submitbutton {
+    min-width: 5em;
+    width: 25%;
+    padding: 0.4em 0.3em;
+    font-size: 1em;
+  }
 
-/*タグ追加*/
-.tag-addbutton {
-  width: 5.5em;
-  font-size: 0.8125em;
-}
-.tag-holder{
-	font-size: 0.8em;
-}
-.tag-content{
-  font-size: 1em;
-}
-/*追加タグデータ送信ボタン*/
-.tag-submitbutton {
-  min-width: 5em;
-  width: 25%;
-  padding: 0.4em 0.3em;
-  font-size: 0.8em;
-}
-
-  
-/* 編集画面 */
-.edit-window {
-	width: 95%;
-}
-.edit-holder{
-	font-size: 0.8em;
-}
-.edit-content{
-  font-size: 1em;
-}
- 
-  
-/* Profile.html */
-/* ページ全体 */
-.all-area{
-  margin-top: 4em;
-}
-/* 各エリア */
-.profile-area{
-  width: 92%;
-  margin: 1.25em 4%;
-}
-/* 各タイトル */
-.profile-title{
-  font-size: 1em;
-}
-.profile-area div label{
-  font-size: 0.6em;
-}
-/* 各エリア重要な文字は大きく */
-.profile-area div span{
-  font-size: 1em;
-}
-/* ユーザーが追加したタグについて */
-.tag-user-area .tag-user-name{
-  font-size: 0.8em;  
-}
-/*タグ削除ボタン*/
-.profile-deletebutton {
-  margin-right: 3em;
-}
-.profile-deletediv:before {
-  display: none;
-}
-.profile-deletebutton:hover .profile-deletediv{
-  /*カーソルを載せたとき*/
-  display: none;
-}
-/*タグ編集ボタン*/
-.profile-editbutton {
-  margin-right: 3em;
-}
-.profile-editdiv:before {
-  display: none;
-}
-.profile-editbutton:hover .profile-editdiv{
-  /*カーソルを載せたとき*/
-  display: none;
-}
-.tag-add-name{
-  font-size: 0.6em;
-}
+  /*タグ追加*/
+  .tag-addbutton {
+    width: 5.5em;
+    font-size: 0.8125em;
+  }
+  .tag-holder{
+	  font-size: 0.8em;
+  }
   .tag-content{
     font-size: 1em;
   }
-/*ボタン*/
-.profile-button {
-  font-size: 0.7em;
+  /*追加タグデータ送信ボタン*/
+  .tag-submitbutton {
+    min-width: 5em;
+    width: 25%;
+    padding: 0.4em 0.3em;
+    font-size: 0.8em;
+  }
+
+  
+  /* 編集画面 */
+  .edit-window {
+	  width: 95%;
+  }
+  .edit-holder{
+	  font-size: 0.8em;
+  }
+  .edit-content{
+    font-size: 1em;
+  }
+ 
+  
+  /* Profile.html */
+  /* ページ全体 */
+  .all-area{
+    margin-top: 4em;
+  }
+  /* 各エリア */
+  .profile-area{
+    width: 92%;
+    margin: 1.25em 4%;
+  }
+  /* 各タイトル */
+  .profile-title{
+    font-size: 1em;
+  }
+  .profile-area div label{
+    font-size: 0.6em;
+  }
+  /* 各エリア重要な文字は大きく */
+  .profile-area div span{
+    font-size: 1em;
+  }
+  /* ユーザーが追加したタグについて */
+  .tag-user-area .tag-user-name{
+    font-size: 0.8em;  
+  }
+  /*タグ削除ボタン*/
+  .profile-deletebutton {
+    margin-right: 3em;
+  }
+  .profile-deletediv:before {
+    display: none;
+  }
+  .profile-deletebutton:hover .profile-deletediv{
+    /*カーソルを載せたとき*/
+    display: none;
+  }
+  /*タグ編集ボタン*/
+  .profile-editbutton {
+    margin-right: 3em;
+  }
+  .profile-editbutton:hover .profile-editdiv{
+    /*カーソルを載せたとき*/
+    display: none;
+  }
+  .tag-add-name{
+    font-size: 0.6em;
+  }
+  .tag-content{
+    font-size: 1em;
+  }
+  /*ボタン*/
+  .profile-button {
+    font-size: 0.7em;
+  }	
 }
-	
+
+
+
+
+/* 695px以下に適用されるCSS（スマホ用） */
+@media screen and (max-width: 695px) {
+  /* ログイン画面 */
+  .login-page {
+    max-width: 22.5em;
+    width: 90%;
+  }
+  .login-form {
+    max-width: 100%;
+  }
+  /* ログインボタン */
+  .login-button-area{
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  .loginbutton {
+    width: 35%;
+    min-width: 5em;
+    padding: 0.25em 0.3em;
+    font-size: 1em;
+  }
+  
+
+  /* サインアップ画面 */
+  /*サインアップボタン*/
+  .signupbutton {
+    width: 35%;
+    min-width: 5em;
+    padding: 0.25em 0.3em;
+    font-size: 1em;
+  }
+  
+  
+  /* 共通要素 */
+  h1 {
+    font-size: 2em;
+    line-height: 0.1;
+  }
+  /* 共通要素 */
+  /*ヘッダー*/
+  .site-header{
+    display: flex;
+    height: 4em;
+  }
+  /*メニュー1*/
+  nav ul{ 
+    display: none; 
+  } 
+  /*ハンバーガーメニュー*/
+  .menu-btn {
+    top: 2em;
+    right: 2em; 
+  }
+  .menu-btn span,
+  .menu-btn span:before,
+  .menu-btn span:after {
+    height: 0.12em;/*線の太さ*/
+    width: 1.4em;/*長さ*/
+  }
+  .menu-content {
+    width: 25%;
+  }
+  .menu-content ul {
+    padding: 3em 0.625em 0;
+  }
+  .hidden_menu{
+    display: initial;
+    border-bottom: solid 0.125em #c0c0c0;
+    list-style: none;
+  }
+  .menu-content ul li{
+    border-bottom: none;
+    list-style: none;
+  }
+  /*リロードボタン*/
+  .topbutton {
+    width: 2.5em;
+    height: 2.5em;
+    line-height: 2.5em;
+    font-size: 0.8em;
+  }
+
+
+  /* リスト */
+  .list{
+    margin-top: 4em;
+  }
+  .worksarea{
+    width: 92%;
+    min-width: 15.5em;
+    margin: 1.25em 4%;
+  }
+  /* 星 */
+  .favorite_area input[type="checkbox"]{
+    -webkit-appearance:none;
+  }
+  .subjectarea{
+    font-size: 1em;
+  }
+  .durationame{
+    font-size: 0.6em;
+  }
+  .durationarea{
+    font-size: 1em;
+  }
+  .list .tagarea{
+    font-size: 0.6em; 
+  }
+  .list .tagarea:before {
+    left: -1.1em;
+  }
+  .list .commentbox::before {
+    font-size: 0.6em;
+  }
+  .list .commentbox p{ 
+    font-size: 0.8em;
+  }
+  /* private workarea */
+  .worksarea_private{
+    width: 92%;
+    min-width: 15.5em;
+    padding: 0.625em 0.9375em;
+    margin: 1.25em 4%;
+  }
+  /*削除ボタン*/
+  .deletebutton {
+    margin: 0;
+    margin-top: 0.3em;
+  }
+  .deletebutton:hover .deletediv{
+    /*カーソルを載せたとき*/
+    display: none;
+  }
+  /*編集ボタン*/
+  .editbutton{
+    margin: 0;
+  }
+  .editbutton:hover .editdiv{
+    /*カーソルを載せたとき*/
+    display: none;
+  }
+  
+  
+  /* Private画面 */
+  /*追加ボタン*/
+  .addbutton {
+    top: 9.75em;
+    width: 3.5em;
+    height: 3.5em;
+    line-height: 3.5em;
+    font-size: 0.8em;
+  }
+  .window {
+	  width: 95%;
+  }
+  .open-message {
+    right: 0.5em;
+  }
+  .open-message:before {
+    left: 70%;
+  }
+  .holder{
+	  font-size: 0.8em;
+  }
+  .content{
+    font-size: 1em;
+  }
+  /*データ送信ボタン*/
+  .submitbutton {
+    min-width: 5em;
+    width: 25%;
+    padding: 0.4em 0.3em;
+    font-size: 1em;
+  }
+
+  /*タグ追加*/
+  .tag-addbutton {
+    width: 5.5em;
+    font-size: 0.8125em;
+  }
+  .tag-holder{
+	  font-size: 0.8em;
+  }
+  .tag-content{
+    font-size: 1em;
+  }
+  /*追加タグデータ送信ボタン*/
+  .tag-submitbutton {
+    min-width: 5em;
+    width: 25%;
+    padding: 0.4em 0.3em;
+    font-size: 0.8em;
+  }
+
+  
+  /* 編集画面 */
+  .edit-window {
+	  width: 95%;
+  }
+  .edit-holder{
+	  font-size: 0.8em;
+  }
+  .edit-content{
+    font-size: 1em;
+  }
+ 
+  
+  /* Profile.html */
+  /* ページ全体 */
+  .all-area{
+    margin-top: 4em;
+  }
+  /* 各エリア */
+  .profile-area{
+    width: 92%;
+    margin: 1.25em 4%;
+  }
+  /* 各タイトル */
+  .profile-title{
+    font-size: 1em;
+  }
+  .profile-area div label{
+    font-size: 0.6em;
+  }
+  /* 各エリア重要な文字は大きく */
+  .profile-area div span{
+    font-size: 1em;
+  }
+  /* ユーザーが追加したタグについて */
+  .tag-user-area .tag-user-name{
+    font-size: 0.8em;  
+  }
+  /*タグ削除ボタン*/
+  .profile-deletebutton {
+    margin-right: 3em;
+  }
+  .profile-deletediv:before {
+    display: none;
+  }
+  .profile-deletebutton:hover .profile-deletediv{
+    /*カーソルを載せたとき*/
+    display: none;
+  }
+  /*タグ編集ボタン*/
+  .profile-editbutton {
+    margin-right: 3em;
+  }
+  .profile-editbutton:hover .profile-editdiv{
+    /*カーソルを載せたとき*/
+    display: none;
+  }
+  .tag-add-name{
+    font-size: 0.6em;
+  }
+  .tag-content{
+    font-size: 1em;
+  }
+  /*ボタン*/
+  .profile-button {
+    font-size: 0.7em;
+  }
 }
