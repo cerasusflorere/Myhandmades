@@ -324,7 +324,7 @@
         
         for(let i=1; i<=tagnumber; i++){
           let element = document.getElementById('tag['+i+']');
-          if(element.checked){
+          if(element.checked == true){
             tag = element.value;
           }
         }
@@ -412,7 +412,7 @@
               const tags = JSON.parse(req.response);
               for(let i in tags) {
                 const tag = tags[i];
-                editaddToListTag(tagname, tag.tag, tag._id);
+                editaddToListTag(id, tagname, tag.tag, tag._id);
                 number++;
               }
               edittagnumber = number-1;
@@ -529,23 +529,23 @@
       }
       
       // タグデータ取得
-      function editaddToListTag(tagname, tag, tagid) {
-         const tagInput = document.createElement('input');
-         tagInput.type = "checkbox";
-         tagInput.id = 'tag[' + number + ']'; // ID を付与する
-         tagInput.value = tag;
-         tagInput.name = tag;
+      function editaddToListTag(id, tagname, tag, tagid) {
+        const tagInput = document.createElement('input');
+        tagInput.type = "checkbox";
+        tagInput.id = 'tag[' + number + ']'; // ID を付与する
+        tagInput.value = tag;
+        tagInput.name = tag;
         
         if(tagname == tag){
           tagInput.checked = true;
         }
         
-         const tagLavel = document.createElement('label');
-         tagLavel.innerText = tag;
- 
-         editlistAreaTag.appendChild(tagInput); // リストに tagLavel を追加
-         editlistAreaTag.appendChild(tagLavel);
-       }
+        const tagLabel = document.createElement('label');
+        tagLabel.innerText = tag;
+        
+        editlistAreaTag.appendChild(tagInput); // リストに tagLavel を追加
+        editlistAreaTag.appendChild(tagLabel);
+      }
       
       // 編集データの保存
       function editadd(id){
@@ -561,15 +561,13 @@
           let tag = "";
           const comment = document.getElementById('edit-comment').value;
        
-          console.log(openid);
           if(openid.checked){
             open = '1';
           }
           
           for(let i=1; i<=edittagnumber; i++){
             const element = document.getElementById('tag['+i+']');
-            console.log(element.checked);
-            if(element.checked){
+            if(element.checked == true){
               tag = element.value;
             }
           }
