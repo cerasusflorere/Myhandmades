@@ -47,7 +47,7 @@
     <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
     
     <script>
-      window.onload = Favorites; // 画面ロード時に実行
+      window.onload = allDatas; // 画面ロード時に実行
       var favorite_datas = [];
       let favorite_number = 0;
       const listArea = document.getElementById('list'); // リスト表示部
@@ -69,11 +69,11 @@
         }
         req.open('GET', url, true);
         req.send();
-        findAllDatas();
+        return true;
       }
       
       // 全データの取得
-      function findAllDatas() {        
+      var FindAllDatas = function findAllDatas(favorite_datas, favorite_number) {
         const url = '/findAllDatas'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
@@ -85,12 +85,18 @@
               const data = datas[i];
               
               const id = data._id;
+              let favorite_code = '0';
+              for(let i in favorite_datas){
+                if(favorite_datas[i] == id){
+                  favorite_code = '1';
+                }
+              }
               const userid = data.userid;
               const subject = data.subject;
               const duration = data.duration;
               const tag = data.tag;
               const comment = data.comment;
-              addToList(id, subject, duration, tag, comment);
+              setTimeout(AddToList(id, favorite_code, subject, duration, tag, comment), 4000);
             }
           }
         }
@@ -98,8 +104,13 @@
         req.send();
       }
       
+      async function allDatas(){
+        await Favorites();
+        setTimeout(FindAllDatas(favorite_datas, 1500));
+      }
+      
       // 表示
-      function addToList(id, subject, duration, tag, comment) {
+      var AddToList = function addToList(id, favorite_code, subject, duration, tag, comment) {
         const workDiv = document.createElement('div'); // 追加する本の div 要素
         workDiv.className = "worksarea";
         workDiv.id = id; // レスポンスから得た ID を付与する
@@ -116,9 +127,8 @@
         }
         
         for(let i in favorite_datas){
-          if(id == favorite_datas[i]){
+          if(favorite_code == '1' || favorite_datas[i] == id){
             favoriteInput.checked = true;
-            break;
           }
         }
                 
