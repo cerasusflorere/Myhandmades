@@ -200,6 +200,7 @@ nav a:active{
 }
 /*リロードボタン*/
 .topbutton {
+  -webkit-appearance: none;
   z-index: 1;
   position:fixed;
   width: 1.7em;/* 円の大きさ */
@@ -271,6 +272,7 @@ nav a:active{
   align-items: center;
 }
 .loginbutton {
+  -webkit-appearance: none;
   width: 12em;
   border-radius: 0.7em;
   padding: 0.5em 1em;
@@ -341,6 +343,7 @@ nav a:active{
 }
 /*サインアップボタン*/
 .signupbutton {
+  -webkit-appearance: none;
   width: 12em;
   border-radius: 0.7em;
   padding: 0.5em 1em;
@@ -390,10 +393,11 @@ nav a:active{
   margin: 0;
 }
 .favorite_area input[type="checkbox"]{
-   -webkit-appearance:none;
+  -webkit-appearance:none;
 }
 /* お気に入り登録前 */
 .favorite_area input[type="checkbox"]::before {
+  -webkit-appearance: none;
   content: '☆';
   color: #484848;
   line-height: 1;
@@ -809,6 +813,7 @@ nav a:active{
 }
 /*データ送信ボタン*/
 .submitbutton {
+  -webkit-appearance: none;
   overflow: hidden;
   outline: 0;
   width: 15em;
@@ -839,6 +844,7 @@ nav a:active{
 
 /*タグ追加*/
 .tag-addbutton {
+  -webkit-appearance: none;
   overflow: hidden;
   outline: 0;
   width: 5.5em;
@@ -916,6 +922,7 @@ nav a:active{
 }
 /*追加タグデータ送信ボタン*/
 .tag-submitbutton {
+  -webkit-appearance: none;
   overflow: hidden;
   outline: 0;
   width: 6.25em;
@@ -1155,6 +1162,7 @@ nav a:active{
 }
 /*ボタン*/
 .profile-button {
+  -webkit-appearance: none;
   width: auto;
   border-radius: 0.5em;
   padding: 0.25em 0.5em;
@@ -1231,13 +1239,6 @@ nav a:active{
     top: 2em;
     right: 2em; 
   }
-  /*リロードボタン*/
-  .topbutton {
-    width: 2.5em;
-    height: 2.5em;
-    line-height: 2.5em;
-    font-size: 0.8em;
-  }
 
 
   /* リスト */
@@ -1246,6 +1247,7 @@ nav a:active{
   }
   .worksarea{
     width: 92%;
+    max-width: 30em;
     margin: 1.25em 4%;
   }
   /* 星 */
@@ -1276,6 +1278,7 @@ nav a:active{
   /* private workarea */
   .worksarea_private{
     width: 92%;
+    max-width: 30em;
     padding: 0.625em 0.9375em;
     margin: 1.25em 4%;
   }
@@ -1300,16 +1303,6 @@ nav a:active{
   
   /* Private画面 */
   /*追加ボタン*/
-  .addbutton {
-    top: 9.75em;
-    width: 3.5em;
-    height: 3.5em;
-    line-height: 3.5em;
-    font-size: 0.8em;
-  }
-  .window {
-	  width: 95%;
-  }
   .open-message {
     right: 0.5em;
   }
@@ -1351,9 +1344,6 @@ nav a:active{
 
   
   /* 編集画面 */
-  .edit-window {
-	  width: 95%;
-  }
   .edit-holder{
 	  font-size: 0.8em;
   }
@@ -1370,6 +1360,7 @@ nav a:active{
   /* 各エリア */
   .profile-area{
     width: 92%;
+    max-width: 30em;
     margin: 1.25em 4%;
   }
   /* 各タイトル */
@@ -1498,6 +1489,7 @@ nav a:active{
   }
   /*リロードボタン*/
   .topbutton {
+    bottom: 5em;
     width: 2.5em;
     height: 2.5em;
     line-height: 2.5em;
@@ -1516,7 +1508,7 @@ nav a:active{
   }
   /* 星 */
   .favorite_area input[type="checkbox"]{
-    -webkit-appearance:none;
+    -webkit-appearance: none;
   }
   .subjectarea{
     font-size: 1em;
