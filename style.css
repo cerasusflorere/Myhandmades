@@ -392,24 +392,24 @@ nav a:active{
 .favorite-button{
   margin: 0;
 }
-.favorite_area input[type="checkbox"]{
-  -webkit-appearance:none;
+.favorite-button{
+  display: none;
 }
-/* お気に入り登録前 */
-.favorite_area input[type="checkbox"]::before {
-  content: '☆';
-  color: #484848;
+.favorite-button-icon {
   line-height: 1;
-  font-size: 1.8em;
+  font-size: 1.5em;
   top: 0;
   right: 0;
   position: absolute;
   cursor: pointer;
 }
+/* お気に入り登録前 */
+.before {
+  color: #484848;
+}
 /* お気に入り登録済 */
-.favorite_area input[type="checkbox"]:checked::before{
-  content: '★';
-  color: #ffffc1;
+.after {
+  color: #fffacd;
 }
 .subjectarea{
   display: block;
