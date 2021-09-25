@@ -397,7 +397,6 @@ nav a:active{
 }
 /* お気に入り登録前 */
 .favorite_area input[type="checkbox"]::before {
-  -webkit-appearance: none;
   content: '☆';
   color: #484848;
   line-height: 1;
@@ -1250,10 +1249,6 @@ nav a:active{
     max-width: 30em;
     margin: 1.25em 4%;
   }
-  /* 星 */
-  .favorite_area input[type="checkbox"]{
-    -webkit-appearance:none;
-  }
   .subjectarea{
     font-size: 1em;
   }
@@ -1507,9 +1502,6 @@ nav a:active{
     margin: 1.25em 4%;
   }
   /* 星 */
-  .favorite_area input[type="checkbox"]{
-    -webkit-appearance: none;
-  }
   .subjectarea{
     font-size: 1em;
   }
