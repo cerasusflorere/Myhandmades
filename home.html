@@ -96,7 +96,7 @@
               const duration = data.duration;
               const tag = data.tag;
               const comment = data.comment;
-              setTimeout(AddToList(id, favorite_code, subject, duration, tag, comment), 4000);
+              setTimeout(AddToList(id, favorite_number, favorite_code, subject, duration, tag, comment), 4000);
             }
           }
         }
@@ -110,7 +110,7 @@
       }
       
       // 表示
-      var AddToList = function addToList(id, favorite_code, subject, duration, tag, comment) {
+      var AddToList = function addToList(id, favorite_number, favorite_code, subject, duration, tag, comment) {
         const workDiv = document.createElement('div'); // 追加する本の div 要素
         workDiv.className = "worksarea";
         workDiv.id = id; // レスポンスから得た ID を付与する
@@ -126,12 +126,24 @@
           favorite(id);
         }
         
+        const favorite_icon_afterDiv = document.createElement('div');
         for(let i in favorite_datas){
           if(favorite_code == '1' || favorite_datas[i] == id){
             favoriteInput.checked = true;
+            favorite_code = '1';
+            favorite_icon_afterDiv.id = 'favorite_button_icon_after';
+            favorite_icon_afterDiv.className = 'favorite-button-icon after';
+            favorite_icon_afterDiv.innerText = '★';
           }
         }
-                
+        
+        const favorite_icon_beforeDiv = document.createElement('div');
+        if(favorite_code != '1'){
+           favorite_icon_beforeDiv.id = 'favorite_button_icon_before';
+           favorite_icon_beforeDiv.className = 'favorite-button-icon before';
+           favorite_icon_beforeDiv.innerText = '☆';
+        }
+        
         const subjectDiv = document.createElement('div');
         subjectDiv.className = 'subjectarea';
         subjectDiv.innerText = subject;
@@ -158,6 +170,12 @@
         commentP.innerText = comment;
     
         favoriteDiv.appendChild(favoriteInput);
+        if(favorite_code == '1'){
+          favoriteDiv.appendChild(favorite_icon_afterDiv);
+        }else{
+          favoriteDiv.appendChild(favorite_icon_beforeDiv);
+        }     
+        
         workDiv.appendChild(favoriteDiv); // workDiv にお気に入りボタンを追加
         workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
         if(duration != ''){
