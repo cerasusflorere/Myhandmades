@@ -117,6 +117,7 @@
         
         const favoriteDiv = document.createElement('div');
         favoriteDiv.className = 'favorite_area';
+        favoriteDiv.id = 'favorite_area'+id;
         
         const favoriteInput = document.createElement('input');
         favoriteInput.type = 'checkbox';
@@ -131,7 +132,8 @@
           if(favorite_code == '1' || favorite_datas[i] == id){
             favoriteInput.checked = true;
             favorite_code = '1';
-            favorite_icon_afterDiv.id = 'favorite_button_icon_after';
+            favorite_icon_afterDiv.id = 'favorite_button_icon_after'+id;
+            console.log(favorite_icon_afterDiv.id);
             favorite_icon_afterDiv.className = 'favorite-button-icon after';
             favorite_icon_afterDiv.innerText = '★';
           }
@@ -139,7 +141,8 @@
         
         const favorite_icon_beforeDiv = document.createElement('div');
         if(favorite_code != '1'){
-           favorite_icon_beforeDiv.id = 'favorite_button_icon_before';
+           favorite_icon_beforeDiv.id = 'favorite_button_icon_before'+id;
+          console.log(favorite_icon_beforeDiv.id);
            favorite_icon_beforeDiv.className = 'favorite-button-icon before';
            favorite_icon_beforeDiv.innerText = '☆';
         }
@@ -205,14 +208,30 @@
         const data = {workid: id};
         
         req.onreadystatechange = function() {
+          const favorite_area = document.getElementById('favorite_area'+id);
+          favorite_area.removeChild(favorite_area.children[1]);
           if(req.readyState == 4 && req.status != 200) {
             // お気に入りを外した
             alert(req.response);
+      
+            const favorite_icon_beforeDiv = document.createElement('div');
+            favorite_icon_beforeDiv.id = 'favorite_button_icon_before';
+            favorite_icon_beforeDiv.className = 'favorite-button-icon before';
+            favorite_icon_beforeDiv.innerText = '☆';
+        
+            favorite_area.appendChild(favorite_icon_beforeDiv);
+          }else{
+            const favorite_icon_afterDiv = document.createElement('div');
+            favorite_icon_afterDiv.id = 'favorite_button_icon_after';
+            favorite_icon_afterDiv.className = 'favorite-button-icon after';
+            favorite_icon_afterDiv.innerText = '★';
+        
+            favorite_area.appendChild(favorite_icon_afterDiv);
           }
         }
         req.open('POST', url, true);
         req.setRequestHeader('Content-Type', 'application/json');
-        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信 
+        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
       }
 
       // リロード
