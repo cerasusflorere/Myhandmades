@@ -125,7 +125,11 @@
             break;
           }
         }
-                
+        
+        const favorite_icon_afterDiv = document.createElement('div');
+        favorite_icon_afterDiv.className = 'favorite-button-icon after';
+        favorite_icon_afterDiv.innerText = '★';
+        
         const subjectDiv = document.createElement('div');
         subjectDiv.className = 'subjectarea';
         subjectDiv.innerText = subject;
@@ -152,6 +156,7 @@
         commentP.innerText = comment;
     
         favoriteDiv.appendChild(favoriteInput);
+        favoriteDiv.appendChild(favorite_icon_afterDiv);
         workDiv.appendChild(favoriteDiv); // workDiv にお気に入りボタンを追加
         workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
         if(duration != ''){
