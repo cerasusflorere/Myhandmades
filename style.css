@@ -83,6 +83,24 @@ footer {
   box-shadow: 0 0 1.25em 0 rgba(0, 0, 0, 0.2), 0 0.3125em 0.3125em 0 rgba(0, 0, 0, 0.24);
   overflow: hidden;
 }
+.header-alluser-top-button{
+  background: none;
+  border: none;
+  position: absolute;
+  width: 90%;
+  height: 4em;
+  cursor: pointer;
+  /* alluserのみ */
+}
+.header-top-button{
+  background: none;
+  border: none;
+  position: absolute;
+  width: 40%;
+  height: 4em;
+  cursor: pointer;
+  /* alluser以外 */
+}
 /*メニュー1*/
 nav ul{ 
   padding: 0;
@@ -200,7 +218,6 @@ nav a:active{
 }
 /*リロードボタン*/
 .topbutton {
-  -webkit-appearance: none;
   z-index: 1;
   position:fixed;
   width: 1.7em;/* 円の大きさ */
@@ -374,6 +391,9 @@ nav a:active{
   margin-top: 5em;
   padding-bottom: 0.2em;
 }
+.home{
+  margin-top: 2em;
+}
 .worksarea{
   display: block;
   width: 31.25em;
@@ -390,10 +410,9 @@ nav a:active{
   position: relative;
 }
 .favorite-button{
-  margin: 0;
-}
-.favorite-button{
-  display: none;
+  z-index: 2147483647;
+  opacity: 0;
+  cursor: pointer;
 }
 .favorite-button-icon {
   line-height: 1;
@@ -401,7 +420,6 @@ nav a:active{
   top: 0;
   right: 0;
   position: absolute;
-  cursor: pointer;
 }
 /* お気に入り登録前 */
 .before {
@@ -410,6 +428,19 @@ nav a:active{
 /* お気に入り登録済 */
 .after {
   color: #fffacd;
+}
+/* 写真表示 */
+.img-area{
+  position: relative;
+  width: 70%;
+  max-width: 12em;
+  margin: 0.3em;
+  margin-right: auto;
+  margin-left: auto;
+}
+.img-area img{
+  max-width: 100%;
+  max-height: 100%;
 }
 .subjectarea{
   display: block;
@@ -637,6 +668,85 @@ nav a:active{
 
 
 
+/* Home画面&Favorite画面 */
+/* 検索エリア */
+.search-area{
+  margin-top: 5em;
+  margin-left: 1.25em;
+}
+.select-button-area{
+  display: flex;
+  align-items: center;
+}
+.select-area{
+  overflow: hidden;
+  width: 12.5em;
+  text-align: center;
+  position: relative;
+  border-radius: 2px;
+  border: 2px solid #ffe4e1;
+  border-radius: 3.125em;
+  background: #ffffff;
+}
+.select-area select{
+	padding-right: 1em;
+	cursor: pointer;
+	text-indent: 0.01px;
+	text-overflow: ellipsis;
+	border: none;
+	outline: none;
+	background: transparent;
+	background-image: none;
+	box-shadow: none;
+	-webkit-appearance: none;
+	appearance: none;
+  padding: 0.5em;
+  font-weight: bold;
+  color: #696969;
+  text-align: center;
+}
+.select-area select::-ms-expand {
+  display: none;
+}
+.select-area select::before {
+  position: absolute;
+  top: 0.8em;
+  right: 0.8em;
+  width: 0;
+  height: 0;
+  padding: 0;
+  content: '';
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #ffe4e1;
+  pointer-events: none;
+}
+.select-button-area button{
+  display: inline-block;
+  width: 4.5em;
+  padding: 0.3em;
+  border-radius: 0.8em;
+  margin-left: 1em;
+  box-shadow: 0 0 0 0.3em #ffc0cb, 0 0.175em 0.2375em 0.3em rgb(0 0 0 / 50%);
+  border: 0.11em dashed #fff;
+  background: #ffc0cb;
+  overflow: hidden;
+  text-decoration: none;
+  text-align: center;
+  font-size: 0.8em;
+  color: #fff;
+}
+.select-button-area button:hover{
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+} 
+.select-button-area button:active{
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+
 
 /* Private画面 */
 /*追加ボタン*/
@@ -793,7 +903,80 @@ nav a:active{
 #open-button .open-knobs, #open-button .open-knobs:before, #open-button .open-layer{
     transition: 0.3s ease all;
 }
-
+/* 送付ファイル選択ボタン */
+.img-add-button{
+  display: flex;
+  align-items: center;
+}
+.img-add-button span {
+  display: inline-block;
+  width: 6.5em;
+  padding: 0.25em 0.3em;
+  border-radius: 0.5em;
+  margin: 0.625em;
+  margin-bottom : 1em ;
+  overflow: hidden;
+  background: #ffc0cb;/*ボタン色*/  
+  box-shadow: 0 0 0  0.25em #ffc0cb, 0 0.125em 0.1875em 0.25em rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 0.1em dashed #fff;/* 点線の色・サイズ */
+  text-decoration: none;
+  font-size: 0.8em;
+  color: #fff;
+  text-align: center;
+}
+.img-add-button span:hover {
+  /*カーソルを載せたとき*/
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+}
+.img-add-button span:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
+.img-add-name{
+  font-size: 0.8em;
+}
+/* 写真イメージ表示 */
+.img-add-area{
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.file-preview-add{
+  display: flex; 
+  flex-wrap: wrap;
+  height: 15vh;
+}
+.img-delete-button{
+  display: inline-block;
+  width: 4em;
+  padding: 0.1em 0.3em;
+  border-radius: 0.4em;
+  margin: 1em;
+  overflow: hidden;
+  background: #ffc0cb;/*ボタン色*/  
+  box-shadow: 0 0 0  0.25em #ffc0cb, 0 0.125em 0.1875em 0.25em rgba(0,0,0,0.5);/* 縁取り・影 */
+  border: 0.1em dashed #fff;/* 点線の色・サイズ */
+  text-decoration: none;
+  font-size: 0.8em;
+  color: #fff;
+  text-align: center;
+}
+.img-delete-button:hover {
+  /*カーソルを載せたとき*/
+  border-style: solid;
+  cursor: hand; 
+  cursor:pointer
+}
+.img-delete-button:active {
+  /*ボタンを押したとき*/
+  -webkit-transform: translateY(0.25em);
+  transform: translateY(0.25em);/*下に動く*/
+  border-bottom: none;/*線を消す*/
+}
 .holder{
 	z-index: -1;
 	font-size: 1em;
@@ -1238,11 +1421,18 @@ nav a:active{
     top: 2em;
     right: 2em; 
   }
+  /* リロードボタン */
+  .topbutton {
+    display: none;
+  }
 
 
   /* リスト */
   .list{
     margin-top: 4em;
+  }
+  .home{
+    margin-top: 2em;
   }
   .worksarea{
     width: 92%;
@@ -1346,6 +1536,13 @@ nav a:active{
     font-size: 1em;
   }
  
+  /* Home画面&Favorite画面 */
+  /* 検索エリア */
+  .search-area{
+    margin-top: 4em;
+    margin-left: 4%;
+  }
+  
   
   /* Profile.html */
   /* ページ全体 */
@@ -1452,6 +1649,10 @@ nav a:active{
     display: flex;
     height: 4em;
   }
+  .header-top-button{
+    width: 80%;
+    /* alluser以外 */
+  }
   /*メニュー1*/
   nav ul{ 
     display: none; 
@@ -1495,6 +1696,9 @@ nav a:active{
   /* リスト */
   .list{
     margin-top: 4em;
+  }
+  .home{
+    margin-top: 2em;
   }
   .worksarea{
     width: 92%;
