@@ -16,6 +16,7 @@
     <div class="headerbg">
       <div class="site-header">
         <h1>Myhandmades</h1>
+        <input type='button' class='header-top-button' onclick="home()"/>
         <nav>
           <ul>
               <li><a href="/">Home</a></li>
@@ -59,6 +60,11 @@
               </div>
               <div class="open-message">公開しますか？</div>
             </div>
+            <label for='file_input_add' class='img-add-button' id='file_label'>
+              <span>Your Image!</span>
+              <div id='img_add_name' class='img-add-name'>写真が選択されていません</div>
+              <input type="file" id="file_input_add" style="display:none;"/>
+            </label>
             <p class="holder">題名</p>
               <input type="text" class="content" id="subject" placeholder="subject" value=""/>
             <p class="holder">製作期間</p>
@@ -107,16 +113,69 @@
       
       let flag = 1; // タグを複数出すことのないように
       let editflag = 1;
+      let tag_editflag = 0; // タグ追加時にfindTagsを回す
       let number = 1; // タグにIDを振るため
+      let tag_sets = []; //タグを取得
       let tagnumber; // タグの数を管理
       let edittagnumber;
       const listAreaTag = document.getElementById('taglabel'); // タグリスト表示部
       let editlistAreaTag;
       let tagname; // タグの名前を渡すため
+      let img_url; // 画像URL受け渡し
+      let public_id; // 画像のpublic_id受け渡し
+      let subject_flag = 1; // subjectがないのに、追加させるのを防ぐ
+      let blobUrl; // 写真をその場に写すためのURL取得
+      let edit_id; // 編集する投稿のid
+      let img_already_flag; // 編集開始時に登録されている写真があり、そのまま写真は編集しないかどうか
+      let img_delete_flag; // 編集開始時に登録されている写真があり、追加写真はないが登録を消す。
       
+      // その場で写真を写す（追加）
+      document.getElementById('file_input_add').addEventListener('change', function (e) {
+        const img_name = document.getElementById('img_add_name'); // 写真を選択してくださいが消える
+        img_name.innerText = '';
+        const label_area = document.getElementById('file_label'); // 写真表示のため
+        const img_add_areaDiv = document.createElement('div'); // 写真と削除ボタンのエリア
+        img_add_areaDiv.className = 'img-add-area';
+        var img_area = document.createElement('img');  // 写真表示のため
+        img_area.id = 'file_preview_add';
+        img_area.className = 'file-preview-add';
+        img_add_areaDiv.appendChild(img_area); // 写真と削除ボタンのエリアを追加
+        label_area.after(img_add_areaDiv); // 写真を表示する
+        // 1枚だけ表示する
+        var file = e.target.files[0];
+        // ファイルのブラウザ上でのURLを取得する
+        blobUrl = window.URL.createObjectURL(file);
+        // img要素に表示
+        img_area.src = blobUrl;
+        
+        const img_delete_addButton = document.createElement('button');
+        img_delete_addButton.className = 'img-delete-button';
+        img_delete_addButton.innerText = 'Delete';
+        img_delete_addButton.onclick = function(){
+          img_delete_add(img_name, img_add_areaDiv, img_area, blobUrl);
+        }
+        
+        img_add_areaDiv.appendChild(img_delete_addButton);
+      });
+      
+      function img_delete_add(img_name, img_add_areaDiv, img_area, blobUrl){
+        window.URL.revokeObjectURL(blobUrl);
+        document.getElementById('file_input_add').value = ''
+        img_name.innerText = '写真を追加してください';
+        img_add_areaDiv.style.display = 'none';
+        img_area.removeAttribute('src');
+        if(img_area.hasAttribute('name')){
+          img_area.removeAttribute('name');
+        }
+        
+        if(img_delete_flag == 1){
+          img_delete_flag = 2;
+        }
+      }
       
       // 全データの取得
       function findDatas() {
+        findTags();
         const url = '/findDatas'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
@@ -133,7 +192,9 @@
               const tag = data.tag;
               const comment = data.comment;
               const open = data.open;
-              addToList(id, subject, duration, tag, comment, open);
+              const show_img_url = data.url;
+              const show_public_id = data.public_id;
+              addToList(id, subject, duration, tag, comment, open, show_img_url, show_public_id);
             }
           }
         }
@@ -142,7 +203,7 @@
       }
       
       // 表示
-      function addToList(id, subject, duration, tag, comment, open) {
+      function addToList(id, subject, duration, tag, comment, open, show_img_url, show_public_id) {
         const workDiv = document.createElement('div'); // 追加する本の div 要素
         workDiv.className = "worksarea_private";
         workDiv.id = id; // レスポンスから得た ID を付与する
@@ -160,6 +221,12 @@
           nowopenmessageDiv.className = 'nowopenmessage';
           nowopenmessageDiv.innerText = '公開！';
         }
+        
+        const imgDiv = document.createElement('div');
+        imgDiv.className = 'img-area';
+        
+        const imgImg = document.createElement('img');
+        imgImg.src = show_img_url;
 
         const subjectDiv = document.createElement('div');
         subjectDiv.className = "subjectarea";
@@ -186,7 +253,7 @@
         const delButton = document.createElement('button');
         delButton.className = 'deletebutton';
         delButton.onclick = function() {
-          disp(id);
+          disp(id, show_public_id);
         }
         
         const delI = document.createElement('i');
@@ -203,8 +270,9 @@
         const editA = document.createElement('a');
         editA.href = "#edit-modal";
         editA.className = 'editbutton';
+        editA.setAttribute('name', 'edit_button');
         editA.onclick = function() {
-          editData(id);
+          showedit(id, subject, duration, tag, comment, open, show_img_url, show_public_id);
         }
         
         const editInput = document.createElement('input');
@@ -224,10 +292,14 @@
           openDiv.appendChild(nowopenmessageDiv);
           workDiv.appendChild(openDiv);
         }
+        if(show_img_url != undefined && show_img_url != ''){
+          imgDiv.appendChild(imgImg);
+          workDiv.appendChild(imgDiv); // workDiv に写真を追加
+        }
         workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
         if(duration != ''){
           durationDiv.appendChild(durationSpan);
-          workDiv.appendChild(durationDiv); // workDiv に値段を追加
+          workDiv.appendChild(durationDiv); // workDiv に期間を追加
         }
         if(tag != ''){
           workDiv.appendChild(tagDiv); // workDiv にタグを追加
@@ -250,24 +322,41 @@
             
       // タグデータ取得
       function findTags() {
-        if(flag == 1){
-          const url = '/findTags'; // 通信先
-          const req = new XMLHttpRequest(); // 通信用オブジェクト
+        if(flag == 1 || tag_editflag == 1){
+          if(flag == 1){
+            const url = '/findTags'; // 通信先
+            const req = new XMLHttpRequest(); // 通信用オブジェクト
         
-          req.onreadystatechange = function() {
-            if(req.readyState == 4 && req.status == 200) {
-              const tags = JSON.parse(req.response);
-              for(let i in tags) {
-                const tag = tags[i];
-                addToListTag(tag.tag, tag._id);
-                number++;
+            req.onreadystatechange = function() {
+              if(req.readyState == 4 && req.status == 200) {
+                const tags = JSON.parse(req.response);
+                tag_sets = tags; // 編集で使うタグセット
+                for(let i in tags) {
+                  const tag = tags[i];
+                  addToListTag(tag.tag, tag._id);
+                  number++;
+                }
+                tagnumber = number-1;
               }
-              tagnumber = number-1;
             }
+            req.open('GET', url, true);
+            req.send();
+            flag = 2;
+          }else{
+            // タグを編集したときにtag_setsを更新する
+            const url = '/findTags'; // 通信先
+            const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+            req.onreadystatechange = function() {
+              if(req.readyState == 4 && req.status == 200) {
+                const tags = JSON.parse(req.response);
+                tag_sets = tags; // 編集で使うタグセット
+              }
+            }
+            req.open('GET', url, true);
+            req.send();
+            tag_editflag = 2;
           }
-          req.open('GET', url, true);
-          req.send();
-          flag = 2;
         }
       }
        
@@ -275,7 +364,7 @@
       function addToListTag(tag, id) {
          const tagInput = document.createElement('input');
          tagInput.type = "checkbox";
-         tagInput.id = 'tag[' + number + ']'; // ID を付与する
+         tagInput.id = id; // ID を付与する
          tagInput.value = tag;
         
          const tagLavel = document.createElement('label');
@@ -296,7 +385,20 @@
         req.onreadystatechange = function() {
           if(req.readyState == 4 && req.status == 200) {
             // 追加が成功したらフォームを空にする
+            const tag_id = req.response;
             document.getElementById('tag-add').value = '';
+            const tagInput = document.createElement('input');
+            tagInput.type = 'checkbox';
+            tagInput.id = tag_id; // まだid返してない
+            tagInput.value = tag;
+            const tagLabel = document.createElement('label');
+            tagLabel.innerText = tag;
+            
+            listAreaTag.appendChild(tagInput);
+            listAreaTag.appendChild(tagLabel); // 追加画面のタグリストに追加
+            
+            tag_editflag = 1;
+            findTags();
           }else if(req.readyState == 4 && req.status != 200) {
             alert(req.response);
           }
@@ -307,8 +409,29 @@
       }
       
       // データの保存
-      function add() {
-        const urladd = '/savework'; // 通信先
+      function add_img() {
+        URL.revokeObjectURL(blobUrl);
+        // 言語標準で用意されているFormDataにファイルデータを詰める
+        const data = new FormData();
+        const files = document.getElementById('file_input_add').files;
+        data.append('file', files[0]);
+                
+        const url = '/urlimagsave';
+        const req = new XMLHttpRequest();
+        req.onreadystatechange = function(){
+          if(req.readyState == 4 && req.status == 200) {
+            // 挿入した1件のデータが返ってくるので、それを表示させる
+            const return_datas = JSON.parse(req.response);
+            img_url = return_datas.url;
+            public_id = return_datas.public_id;
+          }
+        }
+        req.open('POST', url, true);
+        req.send(data); 
+      }
+      
+    　var data_add = function data_add(){
+       const urladd = '/savework'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
         const openid = document.getElementById('open-checkbox');
@@ -322,15 +445,15 @@
           open = '1';
         }
         
-        for(let i=1; i<=tagnumber; i++){
-          let element = document.getElementById('tag['+i+']');
+        for(let i in tag_sets){
+          let element = document.getElementById(tag_sets[i]._id);
           if(element.checked == true){
             tag = element.value;
           }
         }
         
         // 取得した情報をもとにオブジェクトを作る
-        const data = {subject:subject, duration:duration, tag:tag, comment:comment, open:open};
+        const datas = {subject:subject, duration:duration, tag:tag, comment:comment, open:open, url:img_url, public_id:public_id};
         
         req.onreadystatechange = function() {
           if(req.readyState == 4 && req.status == 200) {
@@ -338,6 +461,8 @@
             document.getElementById('subject').value = '';
             document.getElementById('duration').value = '';
             document.getElementById('comment').value = '';
+            img_url = '';
+            public_id = '';
             location.href = '/private';
           }else if(req.readyState == 4 && req.status != 200) {
             alert(req.response);
@@ -345,17 +470,27 @@
         }
         req.open('POST', urladd, true);
         req.setRequestHeader('Content-Type', 'application/json');
-        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
-      }            
-
+        req.send(JSON.stringify(datas)); // オブジェクトを文字列化して送信
+      }      
+      
+      async function add(){
+        const subject = document.getElementById('subject').value;
+        if(subject != ''){
+          await add_img();
+          setTimeout(data_add, 2500);
+          setTimeout(findTags, 10);
+        }else{
+          alert("題名がないと登録できないんですよねえ…");
+        }   
+      }
       
       // 削除機能
-      function disp(id){
+      function disp(id, public_id){
 	       // 「OK」時の処理開始 ＋ 確認ダイアログの表示
 	      if(window.confirm('本当に削除しますか？')){
           const url = '/deleteData'; // 通信先
           const req = new XMLHttpRequest(); // 通信用オブジェクト
-          const data = {id:id};
+          const data = {id:id, public_id:public_id};
 
           req.onreadystatechange = function() {
             if(req.readyState == 4 && req.status == 200) {
@@ -374,56 +509,12 @@
        	}
        }
       
-       // 編集
-      function editData(id){
+      // 編集画面表示
+      function showedit(id, subject, duration, tag, comment, open, show_img_url, show_public_id){
         editArea.innerHTML = '';
-        const url = '/findWork'; // 通信先
-        const req = new XMLHttpRequest(); // 通信用オブジェクト
-        const data = {id:id};
-        
-        req.onreadystatechange = function() {
-          if(req.readyState == 4 && req.status == 200) {
-            const datas = JSON.parse(req.response);
-            
-            for(let i in datas){
-              const dataset = datas[i];
-              
-              const workid = dataset._id;
-              const userid = dataset.userid;
-              const subject = dataset.subject;
-              const duration = dataset.duration;
-              tagname = dataset.tag;
-              const comment = dataset.comment;
-              const open = dataset.open;
-              showedit(workid, userid, subject, duration, tagname, comment, open);
-            }            
-          }
-        }
-        req.open('POST', url, true);
-        req.setRequestHeader('Content-Type', 'application/json');
-        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
-        
-        if(flag == 1){
-          const url = '/findTags'; // 通信先
-          const req = new XMLHttpRequest(); // 通信用オブジェクト
-        
-          req.onreadystatechange = function() {
-            if(req.readyState == 4 && req.status == 200) {
-              const tags = JSON.parse(req.response);
-              for(let i in tags) {
-                const tag = tags[i];
-                editaddToListTag(id, tagname, tag.tag, tag._id);
-                number++;
-              }
-              edittagnumber = number-1;
-            }
-          }
-          req.open('GET', url, true);
-          req.send();
-        }
-      }
-      
-      function showedit(id, userid, subject, duration, tag, comment, open){
+        img_delete_flag = '';
+        edit_id = id;
+        let tagname_edit; // checkされたタグ名
         const workP = document.createElement('p'); // 追加する本の div 要素
         workP.className = "edit-text";
         workP.id = id; // レスポンスから得た ID を付与する
@@ -453,6 +544,40 @@
         const openmessageDiv = document.createElement('div');
         openmessageDiv.className = "open-message";
         openmessageDiv.innerText = "公開しますか？";
+        
+        const imgLabel = document.createElement('label');
+        imgLabel.htmlFor = 'file_input_edit';
+        imgLabel.className = 'img-add-button';
+        imgLabel.id = 'file_label_edit';
+        
+        const imgSpan = document.createElement('span');
+        imgSpan.innerText = 'Your Image!';
+        
+        const imgDiv = document.createElement('div');
+        imgDiv.id = 'img_edit_name';
+        imgDiv.className = 'img-add-name';
+        imgDiv.innerText = '写真が選択されていません';
+        
+        const imgInput = document.createElement('input');
+        imgInput.type = 'file';
+        imgInput.id = 'file_input_edit';
+        imgInput.style.display = 'none';
+        
+        const imgDiv2 = document.createElement('div');
+        imgDiv2.className = 'img-add-area';
+        
+        const imgImg = document.createElement('img');
+        imgImg.id = 'file_preview_add';
+        imgImg.className = 'file-preview-add';
+        imgImg.name = 'already_img';
+        imgImg.src = show_img_url;
+        
+        const img_delete_editButton = document.createElement('button');
+        img_delete_editButton.className = 'img-delete-button';
+        img_delete_editButton.innerText = 'Delete';
+        img_delete_editButton.onclick = function(){
+          img_delete_add(imgDiv, imgDiv2, imgImg);
+        }    
         
         const subjectP = document.createElement('p');
         subjectP.className = 'holder';
@@ -504,7 +629,15 @@
           if(opencheckboxInput.checked == true){
             editopen = '1';
           }
-          editadd(id);
+          for(let i in tag_sets){
+            // checkされたタグを捜索
+            const taghtml = document.getElementById(tag_sets[i]._id);
+            if(taghtml.checked == true){
+              tagname_edit = taghtml.value;
+              break;
+            }
+          } 
+          editadd();
         }
         
         openbuttonDiv.appendChild(opencheckboxInput);
@@ -513,12 +646,43 @@
         openchooseDiv.appendChild(openbuttonDiv);
         openchooseDiv.appendChild(openmessageDiv); 
         workP.appendChild(openchooseDiv); // workP に公開オンオフボタンを追加
+        imgLabel.appendChild(imgSpan);
+        imgLabel.appendChild(imgDiv);
+        imgLabel.appendChild(imgInput);
+        workP.appendChild(imgLabel); // workP に写真ボタンを追加
+        if(show_img_url != undefined && show_img_url != ''){
+          img_delete_flag = 1;
+          imgDiv.innerText = '';
+          imgDiv2.appendChild(imgImg);
+          imgDiv2.appendChild(img_delete_editButton);
+          workP.appendChild(imgDiv2); // workP に写真表示を追加
+        }
+        
         workP.appendChild(subjectP); // workP にタイトルを追加 
         workP.appendChild(subjectInput); 
         workP.appendChild(durationP); // workPに製作期間を追加
         workP.appendChild(durationInput);
+        
+        for(let i in tag_sets){
+          // タグたちを追加
+          const tags = tag_sets[i];
+          const tagInput = document.createElement('input');
+          tagInput.type = 'checkbox';
+          tagInput.id = 'edit'+tags._id;
+          tagInput.value = tags.tag;
+          tagInput.name = tags.tag;
+          if(tags.tag == tag){
+            tagInput.checked = true;
+          }
+          const tag_name_Label = document.createElement('label');
+          tag_name_Label.innerText = tags.tag;
+          
+          tagForm.appendChild(tagInput);
+          tagForm.appendChild(tag_name_Label);
+        } 
+        
         workP.appendChild(tagForm); // workPにタグを追加
-        workP.appendChild(tagLabel);
+        workP.appendChild(tagLabel); // workPにタグ追加ボタン追加
         workP.appendChild(commentP); // workPにコメントを追加
         workP.appendChild(commentTextarea);
         buttonP.appendChild(buttonInput);
@@ -526,75 +690,140 @@
         editArea.appendChild(workP); // リストに workP を追加
         
         editlistAreaTag = document.getElementById('edit-taglabel');
-      }
-      
-      // タグデータ取得
-      function editaddToListTag(id, tagname, tag, tagid) {
-        const tagInput = document.createElement('input');
-        tagInput.type = "checkbox";
-        tagInput.id = 'tag[' + number + ']'; // ID を付与する
-        tagInput.value = tag;
-        tagInput.name = tag;
         
-        if(tagname == tag){
-          tagInput.checked = true;
-        }
+        // その場で写真を写す（編集） // ここやってる
+        document.getElementById('file_input_edit').addEventListener('change', function (e) {
+          img_delete_flag = 1;
+          const img_name = document.getElementById('img_add_name'); // 写真を選択してくださいが消える
+          img_name.innerText = '';
+          const label_area = document.getElementById('file_label_edit'); // 写真表示のため
+          const img_add_areaDiv = document.createElement('div'); // 写真と削除ボタンのエリア
+          img_add_areaDiv.className = 'img-add-area';
+          var img_area = document.createElement('img');  // 写真表示のため
+          img_area.id = 'file_preview_add';
+          img_area.className = 'file-preview-add';
+          img_add_areaDiv.appendChild(img_area); // 写真と削除ボタンのエリアを追加
+          label_area.after(img_add_areaDiv); // 写真を表示する
+          // 1枚だけ表示する
+          var file = e.target.files[0];
+          // ファイルのブラウザ上でのURLを取得する
+          blobUrl = window.URL.createObjectURL(file);
+          // img要素に表示
+          img_area.src = blobUrl;
         
-        const tagLabel = document.createElement('label');
-        tagLabel.innerText = tag;
+          const img_delete_addButton = document.createElement('button');
+          img_delete_addButton.className = 'img-delete-button';
+          img_delete_addButton.innerText = 'Delete';
+          img_delete_addButton.onclick = function(){
+            img_delete_add(img_name, img_add_areaDiv, img_area, blobUrl);
+          }
         
-        editlistAreaTag.appendChild(tagInput); // リストに tagLavel を追加
-        editlistAreaTag.appendChild(tagLabel);
+          img_add_areaDiv.appendChild(img_delete_addButton);
+        });
       }
       
       // 編集データの保存
-      function editadd(id){
-	       // 「OK」時の処理開始 ＋ 確認ダイアログの表示
-	      if(window.confirm('本当に編集しますか？')){
-          const urladd = '/editwork'; // 通信先
-          const req = new XMLHttpRequest(); // 通信用オブジェクト
-         
-          const openid = document.getElementById('open-checkbox-edit');
-          let open = '0';
-          const subject = document.getElementById('edit-subject').value;
-          const duration = document.getElementById('edit-duration').value;
-          let tag = "";
-          const comment = document.getElementById('edit-comment').value;
-       
-          if(openid.checked){
-            open = '1';
-          }
-          
-          for(let i=1; i<=edittagnumber; i++){
-            const element = document.getElementById('tag['+i+']');
-            if(element.checked == true){
-              tag = element.value;
-            }
-          }
+      function edit_img() {
+        URL.revokeObjectURL(blobUrl);
+        // 言語標準で用意されているFormDataにファイルデータを詰める
+        const data = new FormData();
+        const files = document.getElementById('file_input_edit').files;
+        if(files.length != 0){
+          data.append('file', files[0]);
         
-          // 取得した情報をもとにオブジェクトを作る
-          const data = {id:id, subject:subject, duration:duration, tag:tag, comment:comment, open:open};
-        
-          req.onreadystatechange = function() {
+          const url = '/urlimagsave';
+          const req = new XMLHttpRequest();
+          req.onreadystatechange = function(){
             if(req.readyState == 4 && req.status == 200) {
-              // 追加が成功したらフォームを空にする
-              document.getElementById('edit-subject').value = '';
-              document.getElementById('edit-duration').value = '';
-              document.getElementById('edit-comment').value = '';
-              location.href = '/private';
-            }else if(req.readyState == 4 && req.status != 200) {
-              alert(req.response);
+              // 挿入した1件のデータが返ってくるので、urlとpublic_idを取得
+              const return_datas = JSON.parse(req.response);
+              img_url = return_datas.url;
+              public_id = return_datas.public_id;
             }
           }
-          req.open('POST', urladd, true);
-          req.setRequestHeader('Content-Type', 'application/json');
-          req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信 
-      	      // 「OK」時の処理終了
+          req.open('POST', url, true);
+          req.send(data); 
+        }
+      }
+      
+      var data_edit = function data_edit(){
+	      const urladd = '/editwork'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        const openid = document.getElementById('open-checkbox-edit');
+        let open = '0';
+        const subject = document.getElementById('edit-subject').value;
+        const duration = document.getElementById('edit-duration').value;
+        const comment = document.getElementById('edit-comment').value;
+       
+        if(openid.checked){
+          open = '1';
+        }
+        
+        for(let i in tag_sets){
+          let element = document.getElementById('edit' + tag_sets[i]._id);
+         
+          if(element.checked == true){
+            tag = element.value;
+          }
+        }
+        
+        // 取得した情報をもとにオブジェクトを作る
+        let data;
+        img_already_flag = document.getElementsByName('already_img');
+        if(img_already_flag.length == 0 && img_delete_flag != 2){
+          // 新しい写真を投稿する
+          data = {id:edit_id, subject:subject, duration:duration, tag:tag, comment:comment, open:open, url:img_url, public_id:public_id};
+        }else if(img_delete_flag != 2){
+          // 写真は差し替えない
+          data = {id:edit_id, subject:subject, duration:duration, tag:tag, comment:comment, open:open};
+        }else if(img_delete_flag == 2){
+          // 写真を消す
+          data = {id:edit_id, subject:subject, duration:duration, tag:tag, comment:comment, open:open, url:'', public_id:''};
+        }
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            // 追加が成功したらフォームを空にする
+            edit_id = '';
+            document.getElementById('edit-subject').value = '';
+            document.getElementById('edit-duration').value = '';
+            document.getElementById('edit-comment').value = '';
+            img_url = '';
+            public_id = '';
+            img_already_flag = '';
+            img_delete_flag = '';
+            location.href = '/private';
+          }else if(req.readyState == 4 && req.status != 200) {
+            alert(req.response);
+          }
+        }
+        req.open('POST', urladd, true);
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信             
+      }
+      
+      async function editadd(){
+        // 「OK」時の処理開始 ＋ 確認ダイアログの表示
+        img_already_flag = document.getElementsByName('already_img');
+	      if(window.confirm('本当に編集しますか？')){
+          const subject = document.getElementById('edit-subject').value;
+          img_already_flag = document.getElementsByName('already_img');
+          if(subject != ''){
+            if(img_already_flag.length == 0 && img_delete_flag != 2){
+              img_delete_flag = '';
+              await edit_img();
+            }            
+            setTimeout(data_edit, 2500);
           }else{
-            // 「キャンセル」時の処理開始
-		        window.alert('キャンセルされました'); // 警告ダイアログを表示
-            // 「キャンセル」時の処理終了
-       	  }               
+            alert("題名がないと登録できないんですよねえ…");
+          }
+          // 「OK」時の処理終了
+        }else{
+          // 「キャンセル」時の処理開始
+		      window.alert('キャンセルされました'); // 警告ダイアログを表示
+          // 「キャンセル」時の処理終了
+       	}
       }
          
       // リロード
