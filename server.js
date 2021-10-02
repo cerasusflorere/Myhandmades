@@ -12,6 +12,39 @@ const MongoClient = mongodb.MongoClient;
 const ObjectID = mongodb.ObjectID;
 const mongouri = 'mongodb+srv://'+process.env.USER+':'+process.env.PASS+'@'+process.env.MONGOHOST;
 
+/// Cloudinaryと接続
+const cloudinary = require("cloudinary").v2;
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+}); 
+module.exports = cloudinary;
+
+// ほぼ確実に重複することないユニークなIDであるUUIDを作成する、uuidパッケージの定義
+// multerでファイル名を生成するときに同じファイル名の画像がアップロードされた時も
+// 別物として扱いたいので、それぞれの画像をユニークなファイル名に変換するため必要
+const { v4: uuid } = require('uuid');
+
+// multerの定義
+// multerを使うとmultipartなデータを扱えるようになり、指定したディレクトリへの保存も自動で行う
+const multer = require('multer');
+// アプロード先ディレクトリ、ファイル名の定義
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) { // アップロード先はpublic(ユーザがアクセス可能な場所)にする
+    cb(null, __dirname + '/public/');
+  },
+  filename: function(req, file, cb) {
+    // UUIDを生成し、それに元画像の拡張子を付けたものをファイル名として保存する
+    const filename = uuid();
+    const extension = file.originalname.split('.')[1];
+    cb(null, filename + '.' + extension);
+  }
+});
+const upload = multer({ 
+  storage: storage
+});
+
 ///ログイン機能＆サインアップ機能
 
 // トップ画面
@@ -209,7 +242,7 @@ function hashed(password) {
 }
 
 
-///メイン画面
+///Private画面
 //表示機能findDatas
 app.get('/findDatas', function(req, res){
   MongoClient.connect(mongouri, function(error, client) {
@@ -244,6 +277,8 @@ app.post('/deleteData', function(req, res){
 
       colWork.deleteOne({_id:{$eq:oid}}, function(err, result) {
         if(result.deletedCount) {
+          cloudinary.api.delete_resources_by_tag(target.id,
+  　　　　　　function(error, result) {console.log(result, error); });
           res.sendStatus(200); // OK を返す
         }else{
           res.sendStatus(404); // 該当する本が見つからなかった意味で 404 を返す
@@ -254,31 +289,7 @@ app.post('/deleteData', function(req, res){
   });
 });
 
-// 編集画面へfindWork
-app.post('/findWork', (req, res) => {
-  let received = '';
-  req.setEncoding('utf8');
-  req.on('data', function(chunk) {
-    received = chunk;
-  });
-  
-  req.on('end', function() {
-　  MongoClient.connect(mongouri, function(error, client) {
-      const db = client.db(process.env.DB); // 対象 DB
-      const colWork = db.collection('work'); // 対象コレクション
-      const target = JSON.parse(received); // 保存対象
-      const oid = new ObjectID(target.id);
-      const condition = {_id:{$eq:oid}};
-
-      colWork.find(condition).toArray(function(err, datas) {
-        res.json(datas); // レスポンスとしてユーザを JSON 形式で返却
-        client.close(); // DB を閉じる
-      });
-    });
-  });
-});
-
-// 編集機能editwork
+// 編集機能editwork 
 app.post('/editwork', function(req, res){
   let received = '';
   req.setEncoding('utf8');
@@ -292,6 +303,8 @@ app.post('/editwork', function(req, res){
       const colWork = db.collection('work'); // 対象コレクション
       const data = JSON.parse(received); // 保存対象
       const oid = new ObjectID(data.id);
+      console.log(oid);
+      const id = data.id;
       delete data.id;
       
       if(!data.subject) {
@@ -300,11 +313,23 @@ app.post('/editwork', function(req, res){
         return;
       }
       
-      colWork.updateOne({_id:oid}, {$set:data}, function(err, result) {
+      colWork.find({_id:oid}).toArray(function(errs, datas) {
+        if((datas.url && data.url) || data.url == ''){
+          cloudinary.api.delete_resources_by_tag(id,
+  　　　　　　function(error, results) {console.log(results, error); });
+        }
+        colWork.updateOne({_id:oid}, {$set:data}, function(err, result) {
+          if(data.url){
+            cloudinary.uploader.add_tag(oid, 
+              data.public_id,
+              function(error, results) {console.log(results, error)});  
+          }          
           //res.send(decodeURIComponent(result.insertedId)); // 追加したデータの ID を返す
-          client.close(); // DB を閉じる
+          console.log(err);
           res.status(200);
           res.send('Success');
+        });
+        client.close(); // DB を閉じる
       });
     });
   });
@@ -312,6 +337,18 @@ app.post('/editwork', function(req, res){
 
 
 /// 追加画面
+// 画像を追加する
+app.post('/urlimagsave', upload.single('file'), (req, res) => {
+  const userid = req.cookies.user;
+  cloudinary.uploader.upload(req.file.path, {folder: 'Myhandmades', tags: userid}, function(error, result) { 
+    console.log(result, error);
+    const url_add = result.url;
+    const public_id_add = result.public_id;
+    const data = {url:url_add, public_id:public_id_add};
+    res.json(data); // レスポンスとしてユーザを JSON 形式で返却
+  });
+});
+
 // 追加機能fileadd
 app.post('/savework', function(req, res){
   const userid = req.cookies.user;
@@ -326,6 +363,7 @@ app.post('/savework', function(req, res){
       const colWork = db.collection('work'); // 対象コレクション
       const data = JSON.parse(received); // 保存対象
       data["userid"] = userid;
+      console.log(data);
 
       if(!data.subject) {
         res.status(400);
@@ -334,6 +372,9 @@ app.post('/savework', function(req, res){
       }
       
       colWork.insertOne(data, function(err, result) {
+        cloudinary.uploader.add_tag(decodeURIComponent(result.insertedId), 
+          data.public_id,
+          function(error, result) {console.log(result, error)});
         //res.send(decodeURIComponent(result.insertedId)); // 追加したデータの ID を返す
         client.close(); // DB を閉じる
         res.status(200);
@@ -384,7 +425,7 @@ app.post('/savetag', function(req, res){
       colWork.insertOne(data, function(err, result) {
         client.close(); // DB を閉じる
         res.status(200);
-        res.send('Success');
+        res.send(decodeURIComponent(result.insertedId)); // 追加したデータの ID を返す
       });
     });
   });
@@ -456,9 +497,9 @@ app.post('/favorite_true', function(req, res){
           return;
         }else{
           colFavorite.insertOne(data, function(err, result) {
-          client.close(); // DB を閉じる
-          res.status(200);
-          res.send('Success');
+            client.close(); // DB を閉じる
+            res.status(200);
+            res.send('Success');
           });
         }
       });
@@ -682,5 +723,6 @@ app.post('/cancel', function(req, res){
     });
   }
 });
+
 
 const listener = app.listen(process.env.PORT);
