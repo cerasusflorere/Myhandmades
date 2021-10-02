@@ -15,6 +15,7 @@
     <div class="headerbg">
       <div class="site-header">
         <h1>Myhandmades</h1>
+        <input type='button' class='header-top-button' onclick="home()"/>
         <nav>
           <ul>
               <li><a href="/">Home</a></li>
@@ -40,16 +41,28 @@
       </div>
 　　</div>
     
+    <!-- 検索エリア -->
+    <div class='search-area'>
+      <div class='select-button-area'>
+        <div class='select-area'>
+          <select id='select_tags'>
+            <option id='all'>All</option>
+          </select>
+       </div>
+       <button onclick="tag_search()">Search</button>
+      </div>
+    </div>
+    
     <!-- リスト表示部 -->
-    <div id="list" class="list"></div>    
+    <div id="list" class="list home"></div>    
     
     <!-- トップに戻るボタン -->
     <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
     
     <script>
       window.onload = allDatas; // 画面ロード時に実行
-      var favorite_datas = [];
-      let favorite_number = 0;
+      let favorite_datas = [];
+      let all_datas = []; // 全データ
       const listArea = document.getElementById('list'); // リスト表示部
       
       // お気に入りデータのid取得
@@ -62,18 +75,16 @@
             const datas = JSON.parse(req.response);
             for(let i in datas) {
               const data = datas[i];              
-              favorite_datas[favorite_number] = data.workid;
-              favorite_number++;
+              favorite_datas[i] = data.workid;
             }
           }
         }
         req.open('GET', url, true);
         req.send();
-        return true;
       }
       
       // 全データの取得
-      var FindAllDatas = function findAllDatas(favorite_datas, favorite_number) {
+      function findAllDatas() {
         const url = '/findAllDatas'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
@@ -81,119 +92,141 @@
           if(req.readyState == 4 && req.status == 200) {
             const datas = JSON.parse(req.response);
             datas.reverse();
-            for(let i in datas) {
-              const data = datas[i];
-              
-              const id = data._id;
-              let favorite_code = '0';
-              for(let i in favorite_datas){
-                if(favorite_datas[i] == id){
-                  favorite_code = '1';
-                }
-              }
-              const userid = data.userid;
-              const subject = data.subject;
-              const duration = data.duration;
-              const tag = data.tag;
-              const comment = data.comment;
-              setTimeout(AddToList(id, favorite_number, favorite_code, subject, duration, tag, comment), 4000);
-            }
+            all_datas = datas;
           }
         }
         req.open('GET', url, true);
         req.send();
       }
       
-      async function allDatas(){
-        await Favorites();
-        setTimeout(FindAllDatas(favorite_datas, 1500));
+      function allDatas(){
+        new Promise((resolve) => {
+          Favorites();
+          resolve();
+        }).then(() => {
+          findAllDatas();
+          findTags();
+        }).then(() => {
+          addToList(all_datas);
+        })
       }
       
       // 表示
-      var AddToList = function addToList(id, favorite_number, favorite_code, subject, duration, tag, comment) {
-        const workDiv = document.createElement('div'); // 追加する本の div 要素
-        workDiv.className = "worksarea";
-        workDiv.id = id; // レスポンスから得た ID を付与する
+      function addToList(now_datas) {
+        for(let i in now_datas){
+          const id = now_datas[i]._id;
+          const subject = now_datas[i].subject;
+          const duration = now_datas[i].duration;
+          const tag = now_datas[i].tag;
+          const comment = now_datas[i].comment;
+          const show_img_url = now_datas[i].url;
+          let favorite_code;
+          
+          new Promise((resolve) => {
+            for(let j in favorite_datas){
+              if(favorite_datas[j] == id){
+                favorite_code = '1';
+                break;
+              }else{
+                favorite_code = '0';
+              }
+            }
+            resolve();
+          }).then(() => {
+            if(favorite_code == undefined){
+              location.href = '/';
+            }
+            const workDiv = document.createElement('div'); // 追加する本の div 要素
+            workDiv.className = "worksarea";
+            workDiv.id = id; // レスポンスから得た ID を付与する
         
-        const favoriteDiv = document.createElement('div');
-        favoriteDiv.className = 'favorite_area';
-        favoriteDiv.id = 'favorite_area'+id;
+            const favoriteDiv = document.createElement('div');
+            favoriteDiv.className = 'favorite_area';
+            favoriteDiv.id = 'favorite_area'+id;
         
-        const favoriteInput = document.createElement('input');
-        favoriteInput.type = 'checkbox';
-        favoriteInput.className = 'favorite-button';
-        favoriteInput.name = 'favorite_button';
-        favoriteInput.onclick = function(){
-          favorite(id);
-        }
+            const favoriteInput = document.createElement('input');
+            favoriteInput.type = 'checkbox';
+            favoriteInput.className = 'favorite-button';
+            favoriteInput.name = 'favorite_button';
+            favoriteInput.onclick = function(){
+              favorite(id);
+            }
+          
+            const favorite_icon_afterDiv = document.createElement('div');
+            if(favorite_code == '1'){
+              favoriteInput.checked = true;
+              favorite_icon_afterDiv.id = 'favorite_button_icon_after'+id;
+              favorite_icon_afterDiv.className = 'favorite-button-icon after';
+              favorite_icon_afterDiv.innerText = '★';
+            }
+         
+            const favorite_icon_beforeDiv = document.createElement('div');
+            if(favorite_code == '0'){
+              favorite_icon_beforeDiv.id = 'favorite_button_icon_before'+id;
+              favorite_icon_beforeDiv.className = 'favorite-button-icon before';
+              favorite_icon_beforeDiv.innerText = '☆';
+            }
         
-        const favorite_icon_afterDiv = document.createElement('div');
-        for(let i in favorite_datas){
-          if(favorite_code == '1' || favorite_datas[i] == id){
-            favoriteInput.checked = true;
-            favorite_code = '1';
-            favorite_icon_afterDiv.id = 'favorite_button_icon_after'+id;
-            console.log(favorite_icon_afterDiv.id);
-            favorite_icon_afterDiv.className = 'favorite-button-icon after';
-            favorite_icon_afterDiv.innerText = '★';
-          }
-        }
+            const imgDiv = document.createElement('div');
+            imgDiv.className = 'img-area';
         
-        const favorite_icon_beforeDiv = document.createElement('div');
-        if(favorite_code != '1'){
-           favorite_icon_beforeDiv.id = 'favorite_button_icon_before'+id;
-          console.log(favorite_icon_beforeDiv.id);
-           favorite_icon_beforeDiv.className = 'favorite-button-icon before';
-           favorite_icon_beforeDiv.innerText = '☆';
-        }
+            const imgImg = document.createElement('img');
+            imgImg.src = show_img_url;
         
-        const subjectDiv = document.createElement('div');
-        subjectDiv.className = 'subjectarea';
-        subjectDiv.innerText = subject;
+            const subjectDiv = document.createElement('div');
+            subjectDiv.className = 'subjectarea';
+            subjectDiv.innerText = subject;
         
-        const durationDiv = document.createElement('div');
-        durationDiv.className = 'durationame';
-        durationDiv.innerText = 'Duration: ';
+            const durationDiv = document.createElement('div');
+            durationDiv.className = 'durationame';
+            durationDiv.innerText = 'Duration: ';
 
-        const durationSpan = document.createElement('span');
-        durationSpan.className = 'durationarea';
-        durationSpan.innerText = duration;
+            const durationSpan = document.createElement('span');
+            durationSpan.className = 'durationarea';
+            durationSpan.innerText = duration;
         
-        const tag1Div = document.createElement('div');
-        tag1Div.className = 'tagarea1';
+            const tag1Div = document.createElement('div');
+            tag1Div.className = 'tagarea1';
 
-        const tagDiv = document.createElement('div');
-        tagDiv.className = 'tagarea';
-        tagDiv.innerText = tag;
+            const tagDiv = document.createElement('div');
+            tagDiv.className = 'tagarea';
+            tagDiv.innerText = tag;
         
-        const commentDiv = document.createElement('div');
-        commentDiv.className = 'commentbox';
+            const commentDiv = document.createElement('div');
+            commentDiv.className = 'commentbox';
         
-        const commentP = document.createElement('p');
-        commentP.innerText = comment;
+            const commentP = document.createElement('p');
+            commentP.innerText = comment;
     
-        favoriteDiv.appendChild(favoriteInput);
-        if(favorite_code == '1'){
-          favoriteDiv.appendChild(favorite_icon_afterDiv);
-        }else{
-          favoriteDiv.appendChild(favorite_icon_beforeDiv);
-        }     
+            favoriteDiv.appendChild(favoriteInput);
+            if(favorite_code == '1'){
+              favoriteDiv.appendChild(favorite_icon_afterDiv);
+            }else{
+              favoriteDiv.appendChild(favorite_icon_beforeDiv);
+            }     
         
-        workDiv.appendChild(favoriteDiv); // workDiv にお気に入りボタンを追加
-        workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
-        if(duration != ''){
-          durationDiv.appendChild(durationSpan);
-          workDiv.appendChild(durationDiv); // workDiv に製作期間を追加
+            workDiv.appendChild(favoriteDiv); // workDiv にお気に入りボタンを追加
+            if(show_img_url != undefined && show_img_url != ''){
+              imgDiv.appendChild(imgImg);
+              workDiv.appendChild(imgDiv); // workDiv に写真を追加
+            }
+            workDiv.appendChild(subjectDiv); // workDiv にタイトルを追加
+            if(duration != ''){
+              durationDiv.appendChild(durationSpan);
+              workDiv.appendChild(durationDiv); // workDiv に製作期間を追加
+            }
+            if(tag != ''){
+              tag1Div.appendChild(tagDiv);
+              workDiv.appendChild(tag1Div); // workDiv にタグを追加
+            }
+            if(comment != ''){
+              commentDiv.appendChild(commentP);
+              workDiv.appendChild(commentDiv);  // workDivにコメントを追加  
+            }
+            
+            listArea.appendChild(workDiv); // リストに workDiv を追加
+          });     
         }
-        if(tag != ''){
-          tag1Div.appendChild(tagDiv);
-          workDiv.appendChild(tag1Div); // workDiv にタグを追加
-        }
-        if(comment != ''){
-          commentDiv.appendChild(commentP);
-          workDiv.appendChild(commentDiv);  // workDivにコメントを追加  
-        }  
-        listArea.appendChild(workDiv); // リストに workDiv を追加
       }
       
       // お気に入り登録
@@ -234,6 +267,53 @@
         req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
       }
 
+      // タグデータ取得
+      function findTags() {
+        const select_tags = document.getElementById('select_tags');
+        const url = '/findTags'; // 通信先
+        const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+        req.onreadystatechange = function() {
+          if(req.readyState == 4 && req.status == 200) {
+            const tags = JSON.parse(req.response);
+            for(let i in tags){
+              const option = document.createElement('option');
+              option.value = tags[i].tag;
+              option.textContent = tags[i].tag;
+              
+              select_tags.appendChild(option);
+            }
+          }
+        }
+        req.open('GET', url, true);
+        req.send();
+      }
+      
+      // タグ検索
+      function tag_search(){
+        var now_datas = [];
+        var number = 0;
+        const select_tag = document.getElementById('select_tags');
+        const tag_number = select_tag.selectedIndex;
+        const tag = select_tag.options[tag_number].value;
+        
+        new Promise((resolve) => {
+          for(let i in all_datas){
+            if(all_datas[i].tag == tag){
+              now_datas[number] = all_datas[i];
+              number++;
+            }
+          }
+          if(tag=='All'){
+            now_datas = all_datas;
+          }
+          resolve();
+        }).then(() => {
+          listArea.innerHTML = '';
+          addToList(now_datas);
+        });     
+      }      
+            
       // リロード
       function home(){
          scrollTo(0, 0);
