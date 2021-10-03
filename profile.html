@@ -49,13 +49,13 @@
       <div class='profile-area'>
         <span class='profile-title'>Your profile</span>
         <div>
-          <label>Username: </label><span id='profile-username'></span>
+          <label>Username:  </label><span id='profile-username'></span>
         </div>
         <div>
-          <label>Create Date: </label><span id='profile-create-date'></span>
+          <label>Create Date:  </label><span id='profile-create-date'></span>
         </div>
         <div>
-          <label>Final Login Date: </label><span id='profile-final-login-date'></span>
+          <label>Final Login Date:  </label><span id='profile-final-login-date'></span>
         </div>
       </div>
       
@@ -196,8 +196,8 @@
           profile_createdate.innerText = createdate;          
         }
 
-        if(typeof profile_final_login_date !== 'undefined'){
-          const profile_final_login_date = document.getElementById('final-login-date');
+        if(typeof final_login_date !== 'undefined'){
+          const profile_final_login_date = document.getElementById('profile-final-login-date');
           profile_final_login_date.innerText = final_login_date;
         }
 
