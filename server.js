@@ -216,9 +216,10 @@ app.post('/login', function(req, res){
   });
 });
 
+// Guestログイン機能
 app.get('/gest', function(req, res){
-  const userName = "a";
-  const password = "a";
+  const userName = "YouareGest";
+  const password = "YouareGest";
   MongoClient.connect(mongouri, function(error, client) {
     const db = client.db(process.env.DB); // 対象 DB
     const col = db.collection('users'); // 対象コレクション
@@ -655,7 +656,7 @@ app.post('/change', function(req, res){
   const newpassword = req.body.newpassword;
   const renewpassword = req.body.renewpassword;
   
-  if(userName == 'a' || password == 'a'){
+  if(userName == 'YouareGest' || password == 'YouareGest'){
     res.redirect('/profile'); // リダイレクト
   }else if(userName == ''){
     res.redirect('/profile');
