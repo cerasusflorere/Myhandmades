@@ -538,8 +538,8 @@ app.post('/editwork', function(req, res){
           console.log(err);
           res.status(200);
           res.send('Success');
-        });
-        client.close(); // DB を閉じる
+          client.close(); // DB を閉じる
+        });        
       });
     });
   });
