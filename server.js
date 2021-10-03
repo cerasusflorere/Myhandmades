@@ -147,26 +147,22 @@ app.post('/signup', function(req, res){
       const col = db.collection('users'); // 対象コレクション
       const user = JSON.parse(received); // 保存対象
 
-      if(!user.name) {
+      if(user.name.trim().length < 8) {
         res.status(400);
-        res.send('ユーザー名が入力されてないので登録できません…');
+        res.send('usernameは8文字以上でお願いします');
         return;
-      }else if(!user.password){
+      }else if(user.password.trim().length < 8){
         res.status(400);
-        res.send('パスワードの入力をお願いします');
-        return;        
-      }else if(!user.repassword){
-        res.status(400);
-        res.send('パスワードの再確認ができません');
-        return;             
+        res.send('passwordは8文字以上お願いします');
+        return;                    
       }else if(user.password != user.repassword){
         res.status(400);
-        res.send('パスワードが一致しませんねぇ…');
+        res.send('passwordが一致しませんねぇ…');
         return;          
       }
       
       const dt = new Date();
-      const date = String(dt.toFormat("YYYY/MM/DD")); // これを元に日付を登録
+      const date = String(dt.toFormat("YYYY/MM/DD")); // これを元に日付を登録、要検討
       
       // パスワードをハッシュ化する (この手の情報は平文で保存するべきではない)
       const userinfo = {name: user.name, password:hashed(user.password)}; // 保存対象
@@ -665,9 +661,7 @@ app.post('/change', function(req, res){
     res.redirect('/profile');
   }else if(password == ''){
     res.redirect('/profile'); // リダイレクト
-  }else if(newpassword == ''){
-    res.redirect('/profile'); // リダイレクト
-  }else if(renewpassword == ''){
+  }else if(newpassword.trim().length < 8){
     res.redirect('/profile'); // リダイレクト
   }else if(newpassword !== renewpassword){
     res.redirect('/profile'); // リダイレクト
@@ -677,9 +671,8 @@ app.post('/change', function(req, res){
     MongoClient.connect(mongouri, function(error, client) {
       const db = client.db(process.env.DB); // 対象 DB
       const col = db.collection('users'); // 対象コレクション
-      const redata = {password:newpassword};
-      const data = JSON.parse(JSON.stringify(redata)); // 保存対象
-      const afterdata = {password:hashed(data.password)};
+      const data = JSON.parse(JSON.stringify(newpassword)); // 保存対象
+      const afterdata = {password:hashed(data)};
     
       const userId = req.cookies.user;
       const oid = new ObjectID(userId);
@@ -688,10 +681,10 @@ app.post('/change', function(req, res){
       col.findOne(condition, function(err, users){
         if(users) {
           // ユーザ名、ハッシュ化したパスワード値で検索する
-          col.updateOne({_id:oid}, {$set:afterdata}, function(err, result) {
-          client.close(); // DB を閉じる
-          res.status(200);
-          res.redirect('/profile'); // リダイレクト
+          col.updateOne({_id:oid}, {$set:afterdata}, (errs, result) => {
+            // 要検討
+            res.status(200);
+            res.redirect('/profile'); // リダイレクト
           });
         }else{
           res.redirect('/profile'); // リダイレクト
@@ -728,11 +721,7 @@ app.post('/cancel', function(req, res){
         if(result.deletedCount) {
           colWork.deleteMany({userid:{$eq:userId}}, function(errs, results) {
             // workコレクションから消した
-            if(results.deletedCount) {
-              // 写真たちを消す
-              cloudinary.api.delete_resources_by_tag(oid,
-  　　　　　　   function(error, result_img) {console.log(result_img, error); });
-            }
+            // 写真削除要検討
           });
           res.redirect('/cancel');
         }else{
