@@ -164,7 +164,7 @@
               
               if(data.name){
                 username = data.name;
-                if(username == 'a'){
+                if(username == 'YouareGest'){
                   username = 'Gest';
                 }
                 createdate = data.create_date;
@@ -392,11 +392,10 @@
           }else if(document.change_form.nowpassword.value == ''){
             alert("現在のパスワードがないと変更できませんので…");
             return;
-          }else if(document.change_form.newpassword.value == ''){
+          }else if(document.change_form.newpassword.value.trim().length < 8){
             alert("新しいパスワードを教えてください！");
-            return;
-          }else if(document.change_form.renewpassword.value == ''){
-            alert("ユーザー名が入力されてないので登録できません…");
+            document.change_form.newpassword.value = '';
+            document.change_form.renewpassword.value = '';
             return;
           }else if(document.change_form.newpassword.value !== document.change_form.renewpassword.value){
             alert("大変言いずらいのですが、新しいパスワードが一致しないですねぇ…");
@@ -409,6 +408,7 @@
             document.change_form.newpassword.value = '';
             return;
           }
+          console.log('☆');
           document.change_form.submit();
       	  // 「OK」時の処理終了
         }else{
