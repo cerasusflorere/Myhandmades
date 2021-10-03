@@ -16,7 +16,8 @@
     <div class="headerbg">
       <div class="site-header">
         <h1>Myhandmades</h1>
-        <input type='button' class='header-top-button' onclick="home()"/>
+        <input type='button' class='header-top-button' onclick="goTop()"/>
+        <!-- ここからヘッダーメニュー -->
         <nav>
           <ul>
               <li><a href="/">Home</a></li>
@@ -24,10 +25,11 @@
               <li><a href="/private">Private</a></li>
           </ul>
         </nav>
+        <!-- ここまでヘッダーメニュー -->
+        <!-- ここからハンバーガーメニュー -->
         <div class="hamburger-menu">
           <input type="checkbox" id="menu-btn-check"/>
           <label for="menu-btn-check" class="menu-btn"><span></span></label>
-          <!--ここからメニュー-->
           <div class="menu-content">
             <ul>
               <li class='hidden_menu'><a href="/">Home</a></li>
@@ -37,8 +39,8 @@
               <li><a href="/logout">Logout</a></li>
             </ul>
           </div>
-          <!--ここまでメニュー-->
         </div>
+        <!-- ここまでハンバーガーメニュー -->
       </div>
 　　</div>
     
@@ -104,26 +106,23 @@
   
         
     <!-- トップに戻るボタン -->
-    <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
+    <button type="button" class="topbutton" onclick="goTop()"><i class="fas fa-caret-up"></i></button>
     
     <script>
-      window.onload = findDatas; // 画面ロード時に実行
+      window.onload = findData; // 画面ロード時に実行
       const listArea = document.getElementById('list'); // リスト表示部
       const editArea = document.getElementById('editlist'); // 編集するものを表示
+      const listAreaTag = document.getElementById('taglabel'); // タグリスト表示部
+      let editlistAreaTag; // 編集画面にタグたちを表示するため
       
       let flag = 1; // タグを複数出すことのないように
-      let editflag = 1;
       let tag_editflag = 0; // タグ追加時にfindTagsを回す
-      let number = 1; // タグにIDを振るため
       let tag_sets = []; //タグを取得
-      let tagnumber; // タグの数を管理
-      let edittagnumber;
-      const listAreaTag = document.getElementById('taglabel'); // タグリスト表示部
-      let editlistAreaTag;
+      let tagnumber; // タグの数を管理      
       let tagname; // タグの名前を渡すため
       let img_url; // 画像URL受け渡し
       let public_id; // 画像のpublic_id受け渡し
-      let subject_flag = 1; // subjectがないのに、追加させるのを防ぐ
+      let subject_flag = 1; // subjectがないのに、追加するのを防ぐ
       let blobUrl; // 写真をその場に写すためのURL取得
       let edit_id; // 編集する投稿のid
       let img_already_flag; // 編集開始時に登録されている写真があり、そのまま写真は編集しないかどうか
@@ -155,7 +154,7 @@
           img_delete_add(img_name, img_add_areaDiv, img_area, blobUrl);
         }
         
-        img_add_areaDiv.appendChild(img_delete_addButton);
+        img_add_areaDiv.appendChild(img_delete_addButton); // 写真削除ボタン追加
       });
       
       function img_delete_add(img_name, img_add_areaDiv, img_area, blobUrl){
@@ -164,27 +163,29 @@
         img_name.innerText = '写真を追加してください';
         img_add_areaDiv.style.display = 'none';
         img_area.removeAttribute('src');
+        // 編集時にすでに登録されていた写真を消した
         if(img_area.hasAttribute('name')){
           img_area.removeAttribute('name');
         }
         
+        // 編集時にすでに登録されていた写真を消した
         if(img_delete_flag == 1){
           img_delete_flag = 2;
         }
       }
       
-      // 全データの取得
-      function findDatas() {
+      // 全データの取得、画面ロード時に実行
+      function findData() {
+        // タグを取得しておく
         findTags();
-        const url = '/findDatas'; // 通信先
+        
+        const url = '/findData'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
         req.onreadystatechange = function() {
           if(req.readyState == 4 && req.status == 200) {
             const datas = JSON.parse(req.response);
-            for(let i in datas) {
-              const data = datas[i];
-              
+            datas.forEach((data) => {              
               const id = data._id;
               const userid = data.userid;
               const subject = data.subject;
@@ -195,7 +196,7 @@
               const show_img_url = data.url;
               const show_public_id = data.public_id;
               addToList(id, subject, duration, tag, comment, open, show_img_url, show_public_id);
-            }
+            });
           }
         }
         req.open('GET', url, true);
@@ -204,12 +205,12 @@
       
       // 表示
       function addToList(id, subject, duration, tag, comment, open, show_img_url, show_public_id) {
-        const workDiv = document.createElement('div'); // 追加する本の div 要素
+        const workDiv = document.createElement('div'); // 表示する作品の div 要素
         workDiv.className = "worksarea_private";
-        workDiv.id = id; // レスポンスから得た ID を付与する
+        workDiv.id = id; // 作品IDをIDとして付与する
         
-        let openDiv;
-        let openI;
+        let openDiv; // 公開アイコンエリア
+        let openI; // 公開アイコン
         if(open == '1'){
           openDiv = document.createElement('div');
           openDiv.className = 'openarea';
@@ -222,75 +223,73 @@
           nowopenmessageDiv.innerText = '公開！';
         }
         
-        const imgDiv = document.createElement('div');
+        const imgDiv = document.createElement('div'); // 写真エリア
         imgDiv.className = 'img-area';
         
-        const imgImg = document.createElement('img');
+        const imgImg = document.createElement('img'); // 写真自体
         imgImg.src = show_img_url;
 
-        const subjectDiv = document.createElement('div');
+        const subjectDiv = document.createElement('div'); // 作品題名
         subjectDiv.className = "subjectarea";
         subjectDiv.innerText = subject;
         
-        const durationDiv = document.createElement('div');
+        const durationDiv = document.createElement('div'); // 製作期間
         durationDiv.className = 'durationame';
         durationDiv.innerText = 'Duration: ';
 
         const durationSpan = document.createElement('span');
         durationSpan.className = 'durationarea';
         durationSpan.innerText = duration;
+        
+        const tag1Div = document.createElement('div'); // タグエリア
+        tag1Div.className = 'tagarea1';
 
-        const tagDiv = document.createElement('div');
+        const tagDiv = document.createElement('div'); // タグ本体
         tagDiv.className = 'tagarea';
         tagDiv.innerText = tag;
         
-        const commentDiv = document.createElement('div');
+        const commentDiv = document.createElement('div'); // コメントボックス
         commentDiv.className = 'commentbox';
         
-        const commentP = document.createElement('p');
+        const commentP = document.createElement('p'); // コメント自体
         commentP.innerText = comment;
 
-        const delButton = document.createElement('button');
+        const delButton = document.createElement('button'); // 削除ボタン
         delButton.className = 'deletebutton';
         delButton.onclick = function() {
           disp(id, show_public_id);
         }
         
-        const delI = document.createElement('i');
+        const delI = document.createElement('i'); // 削除ボタンアイコン
         delI.className = 'fas fa-trash worksicon fa-fw';
         
-        const delDiv = document.createElement('div');
+        const delDiv = document.createElement('div'); // 「削除]チップツール
         delDiv.className = 'deletediv';
         delDiv.innerText = 'Delete';
         
-        const editForm = document.createElement('form');
+        const editForm = document.createElement('form'); // 編集ボタン
         editForm.action = '#edit-modal'
         editForm.method = 'post';
         
-        const editA = document.createElement('a');
+        const editA = document.createElement('a'); 
         editA.href = "#edit-modal";
         editA.className = 'editbutton';
         editA.setAttribute('name', 'edit_button');
         editA.onclick = function() {
-          showedit(id, subject, duration, tag, comment, open, show_img_url, show_public_id);
+          showEditData(id, subject, duration, tag, comment, open, show_img_url, show_public_id);
         }
         
-        const editInput = document.createElement('input');
-        editInput.type = 'hidden';
-        editInput.value = id;
-        editInput.id = 'edit';
-        
-        const editI = document.createElement('i');
+        const editI = document.createElement('i'); // 編集ボタンアイコン
         editI.className = 'fas fa-edit worksicon fa-fw';
                         
-        const editDiv = document.createElement('div');
+        const editDiv = document.createElement('div'); // 「編集」チップツール
         editDiv.className = 'editdiv';
         editDiv.innerText = 'Edit';
 
         if(open == "1"){
           openDiv.appendChild(openI);
           openDiv.appendChild(nowopenmessageDiv);
-          workDiv.appendChild(openDiv);
+          workDiv.appendChild(openDiv); // workDiv に公開設定なら公開アイコンを追加
         }
         if(show_img_url != undefined && show_img_url != ''){
           imgDiv.appendChild(imgImg);
@@ -302,7 +301,8 @@
           workDiv.appendChild(durationDiv); // workDiv に期間を追加
         }
         if(tag != ''){
-          workDiv.appendChild(tagDiv); // workDiv にタグを追加
+          tag1Div.appendChild(tagDiv);
+          workDiv.appendChild(tag1Div); // workDiv にタグを追加
         }
         if(comment != ''){
           commentDiv.appendChild(commentP);
@@ -315,13 +315,13 @@
         editA.appendChild(editI);
         editA.appendChild(editDiv);
         editForm.appendChild(editA);
-        editForm.appendChild(editInput);
         workDiv.appendChild(editForm); // workDiv に編集ボタン追加        
         listArea.appendChild(workDiv); // リストに workDiv を追加
       }
             
       // タグデータ取得
       function findTags() {
+        // 重ねて表示しないようにする
         if(flag == 1 || tag_editflag == 1){
           if(flag == 1){
             const url = '/findTags'; // 通信先
@@ -334,9 +334,8 @@
                 for(let i in tags) {
                   const tag = tags[i];
                   addToListTag(tag.tag, tag._id);
-                  number++;
+                  tagnumber = i;
                 }
-                tagnumber = number-1;
               }
             }
             req.open('GET', url, true);
@@ -362,17 +361,90 @@
        
       //　taglabelへ追加
       function addToListTag(tag, id) {
-         const tagInput = document.createElement('input');
+         const tagInput = document.createElement('input'); // タグのチェックボックス
          tagInput.type = "checkbox";
          tagInput.id = id; // ID を付与する
          tagInput.value = tag;
         
-         const tagLavel = document.createElement('label');
+         const tagLavel = document.createElement('label'); // タグの説明
          tagLavel.innerText = tag;
  
          listAreaTag.appendChild(tagInput); // リストに tagLavel を追加
          listAreaTag.appendChild(tagLavel);
-       }     
+      }      
+      
+      // 新規投稿
+      function add(){
+        const subject = document.getElementById('subject').value;
+        if(subject != ''){
+          // 題名がある場合追加する
+          new Promise((resolve) => {
+            // 画像データを保存する
+            URL.revokeObjectURL(blobUrl);
+            // 言語標準で用意されているFormDataにファイルデータを詰める
+            const data = new FormData();
+            const files = document.getElementById('file_input_add').files;
+            data.append('file', files[0]);
+                
+            const url = '/urlimagsave';
+            const req = new XMLHttpRequest();
+            req.onreadystatechange = function(){
+              if(req.readyState == 4 && req.status == 200) {
+                const return_datas = JSON.parse(req.response);
+                img_url = return_datas.url;
+                public_id = return_datas.public_id;
+                resolve();
+              }              
+            }
+            req.open('POST', url, true);
+            req.send(data); 
+          }).then(() => {
+            // 他の情報を保存する
+            const urladd = '/savework'; // 通信先
+            const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+            const openid = document.getElementById('open-checkbox');
+            let open = '0';
+            const subject = document.getElementById('subject').value;
+            const duration = document.getElementById('duration').value;
+            let tag = "";
+            const comment = document.getElementById('comment').value;
+        
+            if(openid.checked){
+              open = '1';
+            }
+         
+            tag_sets.forEach((tag_set) => {
+              let element = document.getElementById(tag_set._id);
+              if(element.checked == true){
+                tag = element.value;
+              }
+            });
+        
+            // 取得した情報をもとにオブジェクトを作る
+            const datas = {subject:subject, duration:duration, tag:tag, comment:comment, open:open, url:img_url, public_id:public_id};
+        
+            req.onreadystatechange = function() {
+              if(req.readyState == 4 && req.status == 200) {
+                // 追加が成功したらフォームを空にする
+                document.getElementById('subject').value = '';
+                document.getElementById('duration').value = '';
+                document.getElementById('comment').value = '';
+                img_url = '';
+                public_id = '';
+                location.href = '/private';
+              }else if(req.readyState == 4 && req.status != 200) {
+                alert(req.response);
+              }
+            }
+            req.open('POST', urladd, true);
+            req.setRequestHeader('Content-Type', 'application/json');
+            req.send(JSON.stringify(datas)); // オブジェクトを文字列化して送信
+          });
+        }else{
+          alert("題名がないと登録できないんですよねえ…");
+        }   
+      }      
       
       // タグを追加する
       function tagadd(){
@@ -386,10 +458,11 @@
           if(req.readyState == 4 && req.status == 200) {
             // 追加が成功したらフォームを空にする
             const tag_id = req.response;
+            console.log(tag_id);
             document.getElementById('tag-add').value = '';
             const tagInput = document.createElement('input');
             tagInput.type = 'checkbox';
-            tagInput.id = tag_id; // まだid返してない
+            tagInput.id = tag_id;
             tagInput.value = tag;
             const tagLabel = document.createElement('label');
             tagLabel.innerText = tag;
@@ -406,82 +479,6 @@
         req.open('POST', url, true);
         req.setRequestHeader('Content-Type', 'application/json');
         req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信
-      }
-      
-      // データの保存
-      function add_img() {
-        URL.revokeObjectURL(blobUrl);
-        // 言語標準で用意されているFormDataにファイルデータを詰める
-        const data = new FormData();
-        const files = document.getElementById('file_input_add').files;
-        data.append('file', files[0]);
-                
-        const url = '/urlimagsave';
-        const req = new XMLHttpRequest();
-        req.onreadystatechange = function(){
-          if(req.readyState == 4 && req.status == 200) {
-            // 挿入した1件のデータが返ってくるので、それを表示させる
-            const return_datas = JSON.parse(req.response);
-            img_url = return_datas.url;
-            public_id = return_datas.public_id;
-          }
-        }
-        req.open('POST', url, true);
-        req.send(data); 
-      }
-      
-    　var data_add = function data_add(){
-       const urladd = '/savework'; // 通信先
-        const req = new XMLHttpRequest(); // 通信用オブジェクト
-        
-        const openid = document.getElementById('open-checkbox');
-        let open = '0';
-        const subject = document.getElementById('subject').value;
-        const duration = document.getElementById('duration').value;
-        let tag = "";
-        const comment = document.getElementById('comment').value;
-        
-        if(openid.checked){
-          open = '1';
-        }
-        
-        for(let i in tag_sets){
-          let element = document.getElementById(tag_sets[i]._id);
-          if(element.checked == true){
-            tag = element.value;
-          }
-        }
-        
-        // 取得した情報をもとにオブジェクトを作る
-        const datas = {subject:subject, duration:duration, tag:tag, comment:comment, open:open, url:img_url, public_id:public_id};
-        
-        req.onreadystatechange = function() {
-          if(req.readyState == 4 && req.status == 200) {
-            // 追加が成功したらフォームを空にする
-            document.getElementById('subject').value = '';
-            document.getElementById('duration').value = '';
-            document.getElementById('comment').value = '';
-            img_url = '';
-            public_id = '';
-            location.href = '/private';
-          }else if(req.readyState == 4 && req.status != 200) {
-            alert(req.response);
-          }
-        }
-        req.open('POST', urladd, true);
-        req.setRequestHeader('Content-Type', 'application/json');
-        req.send(JSON.stringify(datas)); // オブジェクトを文字列化して送信
-      }      
-      
-      async function add(){
-        const subject = document.getElementById('subject').value;
-        if(subject != ''){
-          await add_img();
-          setTimeout(data_add, 2500);
-          setTimeout(findTags, 10);
-        }else{
-          alert("題名がないと登録できないんですよねえ…");
-        }   
       }
       
       // 削除機能
@@ -510,11 +507,11 @@
        }
       
       // 編集画面表示
-      function showedit(id, subject, duration, tag, comment, open, show_img_url, show_public_id){
-        editArea.innerHTML = '';
+      function showEditData(id, subject, duration, tag, comment, open, show_img_url, show_public_id){
+        editArea.innerHTML = ''; // 複数表示するのを防ぐ
         img_delete_flag = '';
         edit_id = id;
-        let tagname_edit; // checkされたタグ名
+        
         const workP = document.createElement('p'); // 追加する本の div 要素
         workP.className = "edit-text";
         workP.id = id; // レスポンスから得た ID を付与する
@@ -624,19 +621,6 @@
         buttonInput.className = 'submitbutton';
         buttonInput.value = 'Edit';
         buttonInput.onclick = function(){
-          let editopen = '0';
-          const editsubject = subjectInput.value;
-          if(opencheckboxInput.checked == true){
-            editopen = '1';
-          }
-          for(let i in tag_sets){
-            // checkされたタグを捜索
-            const taghtml = document.getElementById(tag_sets[i]._id);
-            if(taghtml.checked == true){
-              tagname_edit = taghtml.value;
-              break;
-            }
-          } 
           editadd();
         }
         
@@ -646,6 +630,7 @@
         openchooseDiv.appendChild(openbuttonDiv);
         openchooseDiv.appendChild(openmessageDiv); 
         workP.appendChild(openchooseDiv); // workP に公開オンオフボタンを追加
+        
         imgLabel.appendChild(imgSpan);
         imgLabel.appendChild(imgDiv);
         imgLabel.appendChild(imgInput);
@@ -663,12 +648,11 @@
         workP.appendChild(durationP); // workPに製作期間を追加
         workP.appendChild(durationInput);
         
-        for(let i in tag_sets){
+        tag_sets.forEach((tags) => {
           // タグたちを追加
-          const tags = tag_sets[i];
           const tagInput = document.createElement('input');
           tagInput.type = 'checkbox';
-          tagInput.id = 'edit'+tags._id;
+          tagInput.id = 'edit'+tags._id; // 後で参照するためidは一意に
           tagInput.value = tags.tag;
           tagInput.name = tags.tag;
           if(tags.tag == tag){
@@ -679,7 +663,7 @@
           
           tagForm.appendChild(tagInput);
           tagForm.appendChild(tag_name_Label);
-        } 
+        });
         
         workP.appendChild(tagForm); // workPにタグを追加
         workP.appendChild(tagLabel); // workPにタグ追加ボタン追加
@@ -691,7 +675,7 @@
         
         editlistAreaTag = document.getElementById('edit-taglabel');
         
-        // その場で写真を写す（編集） // ここやってる
+        // その場で写真を写す（編集） 
         document.getElementById('file_input_edit').addEventListener('change', function (e) {
           img_delete_flag = 1;
           const img_name = document.getElementById('img_add_name'); // 写真を選択してくださいが消える
@@ -722,31 +706,60 @@
         });
       }
       
-      // 編集データの保存
-      function edit_img() {
-        URL.revokeObjectURL(blobUrl);
-        // 言語標準で用意されているFormDataにファイルデータを詰める
-        const data = new FormData();
-        const files = document.getElementById('file_input_edit').files;
-        if(files.length != 0){
-          data.append('file', files[0]);
+      // 編集
+      function editadd(){
+        // 「OK」時の処理開始 ＋ 確認ダイアログの表示
+        img_already_flag = document.getElementsByName('already_img');
+	      if(window.confirm('本当に編集しますか？')){
+          const subject = document.getElementById('edit-subject').value;
+          img_already_flag = document.getElementsByName('already_img');
+          if(subject != ''){
+            // 題名がある場合編集する
+            if(img_already_flag.length == 0 && img_delete_flag != 2){
+              img_delete_flag = '';
+              new Promise((resolve) => {
+                URL.revokeObjectURL(blobUrl);
+                // 言語標準で用意されているFormDataにファイルデータを詰める
+                const data = new FormData();
+                const files = document.getElementById('file_input_edit').files;
         
-          const url = '/urlimagsave';
-          const req = new XMLHttpRequest();
-          req.onreadystatechange = function(){
-            if(req.readyState == 4 && req.status == 200) {
-              // 挿入した1件のデータが返ってくるので、urlとpublic_idを取得
-              const return_datas = JSON.parse(req.response);
-              img_url = return_datas.url;
-              public_id = return_datas.public_id;
-            }
+                if(files.length != 0){
+                  data.append('file', files[0]);
+        
+                  const url = '/urlimagsave';
+                  const req = new XMLHttpRequest();
+                  req.onreadystatechange = function(){
+                    if(req.readyState == 4 && req.status == 200) {
+                      // 挿入した1件のデータが返ってくるので、urlとpublic_idを取得
+                      const return_datas = JSON.parse(req.response);
+                      img_url = return_datas.url;
+                      public_id = return_datas.public_id;
+                      resolve();
+                    }
+                  }
+                  req.open('POST', url, true);
+                  req.send(data); 
+                }
+              }).then(() => {
+                data_edit();
+              });
+            }else{
+              data_edit();
+            }            
+            
+          }else{
+            alert("題名がないと登録できないんですよねえ…");
           }
-          req.open('POST', url, true);
-          req.send(data); 
-        }
-      }
+          // 「OK」時の処理終了
+        }else{
+          // 「キャンセル」時の処理開始
+		      window.alert('キャンセルされました'); // 警告ダイアログを表示
+          // 「キャンセル」時の処理終了
+       	}
+      }      
       
-      var data_edit = function data_edit(){
+      // 画像以外のデータを編集 
+      function data_edit(){
 	      const urladd = '/editwork'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
@@ -754,19 +767,20 @@
         let open = '0';
         const subject = document.getElementById('edit-subject').value;
         const duration = document.getElementById('edit-duration').value;
+        let tag = '';
         const comment = document.getElementById('edit-comment').value;
        
         if(openid.checked){
           open = '1';
         }
         
-        for(let i in tag_sets){
-          let element = document.getElementById('edit' + tag_sets[i]._id);
+        tag_sets.forEach((tag_set) => {
+          let element = document.getElementById('edit' + tag_set._id);
          
           if(element.checked == true){
             tag = element.value;
           }
-        }
+        });
         
         // 取得した情報をもとにオブジェクトを作る
         let data;
@@ -802,32 +816,9 @@
         req.setRequestHeader('Content-Type', 'application/json');
         req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信             
       }
-      
-      async function editadd(){
-        // 「OK」時の処理開始 ＋ 確認ダイアログの表示
-        img_already_flag = document.getElementsByName('already_img');
-	      if(window.confirm('本当に編集しますか？')){
-          const subject = document.getElementById('edit-subject').value;
-          img_already_flag = document.getElementsByName('already_img');
-          if(subject != ''){
-            if(img_already_flag.length == 0 && img_delete_flag != 2){
-              img_delete_flag = '';
-              await edit_img();
-            }            
-            setTimeout(data_edit, 2500);
-          }else{
-            alert("題名がないと登録できないんですよねえ…");
-          }
-          // 「OK」時の処理終了
-        }else{
-          // 「キャンセル」時の処理開始
-		      window.alert('キャンセルされました'); // 警告ダイアログを表示
-          // 「キャンセル」時の処理終了
-       	}
-      }
          
       // リロード
-      function home(){
+      function goTop(){
          scrollTo(0, 0);
       }
     </script>
