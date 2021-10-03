@@ -48,6 +48,9 @@
           location.href = '/';
         }else if(req.readyState == 4 && req.status != 200) {
           alert(req.response);
+          document.getElementById('userName').value = '';
+          document.getElementById('password').value = '';
+          document.getElementById('repassword').value = '';
         }
       }
       req.open('POST', urladd, true);
@@ -61,6 +64,8 @@
       alert("パスワードの再確認ができません");
     }else{
       alert("パスワードが一致しませんねぇ…");
+      document.getElementById('password').value = '';
+      document.getElementById('repassword').value = '';
     }
   }
 </script>
