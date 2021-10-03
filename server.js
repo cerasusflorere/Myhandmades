@@ -46,6 +46,10 @@ const upload = multer({
   storage: storage
 });
 
+
+require('date-utils');
+
+
 ///ログイン機能＆サインアップ機能
 
 // トップ画面
@@ -161,9 +165,12 @@ app.post('/signup', function(req, res){
         return;          
       }
       
+      const dt = new Date();
+      const date = String(dt.toFormat("YYYY/MM/DD")); // これを元に日付を登録
+      
       // パスワードをハッシュ化する (この手の情報は平文で保存するべきではない)
       const userinfo = {name: user.name, password:hashed(user.password)}; // 保存対象
-
+      
       const condition = {name:{$eq:user.name}}; // ユーザ名で検索する
       col.findOne(condition, function(err, users){
         if(users) {
@@ -171,14 +178,13 @@ app.post('/signup', function(req, res){
           res.send('既にそのユーザー名は登録されているので、別の名前で登録して欲しいです…');
           return;
         }else{
-          col.insertOne(userinfo, function(err, result) {
-            client.close(); // DB を閉じる
+          col.insertOne(userinfo, (errs, result) => {
+            client.close();
             res.status(200);
             res.send('Success');        
-          });
-        }
-        client.close();
-      });
+          });          
+        }        
+      });      
     });
   });
 });
@@ -193,14 +199,21 @@ app.post('/login', function(req, res){
     const db = client.db(process.env.DB); // 対象 DB
     const col = db.collection('users'); // 対象コレクション
     
+    const dt = new Date();
+    const date = String(dt.toFormat("YYYY/MM/DD")); // これを元に日付を登録
+    const data = {update_date: date};
+    
     // ユーザ名、ハッシュ化したパスワード値で検索する
     const condition = {name:{$eq:userName}, password:{$eq:hashed(password)}};
     col.findOne(condition, function(err, user){
-      client.close();
       if(user) {
-        res.cookie('user', user._id); // ヒットしたらクッキーに保存
-        res.redirect('/'); // リダイレクト
+        col.updateOne(condition, {$set:data}, function(err, result) {
+          client.close();
+          res.cookie('user', user._id); // ヒットしたらクッキーに保存
+          res.redirect('/'); // リダイレクト
+        });
       }else{
+        client.close();
         res.redirect('/failed'); // リダイレクト
       }
     });
