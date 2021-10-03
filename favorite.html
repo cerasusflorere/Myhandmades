@@ -14,7 +14,8 @@
     <div class="headerbg">
       <div class="site-header">
         <h1>Myhandmades</h1>
-        <input type='button' class='header-top-button' onclick="home()"/>
+        <input type='button' class='header-top-button' onclick="goTop()"/>
+        <!-- ここからヘッダーメニュー -->
         <nav>
           <ul>
               <li><a href="/">Home</a></li>
@@ -22,10 +23,11 @@
               <li><a href="/private">Private</a></li>
           </ul>
         </nav>
+        <!-- ここまでヘッダーメニュー -->
+        <!-- ここからハンバーガーメニュー -->
         <div class="hamburger-menu">
           <input type="checkbox" id="menu-btn-check"/>
           <label for="menu-btn-check" class="menu-btn"><span></span></label>
-          <!--ここからメニュー-->
           <div class="menu-content">
             <ul>
               <li class='hidden_menu'><a href="/">Home</a></li>
@@ -35,8 +37,8 @@
               <li><a href="/logout">Logout</a></li>
             </ul>
           </div>
-          <!--ここまでメニュー-->
         </div>
+        <!-- ここまでハンバーガーメニュー -->
       </div>
 　　</div>
     
@@ -48,7 +50,7 @@
             <option id='all'>All</option>
           </select>
        </div>
-       <button onclick="tag_search()">Search</button>
+       <button onclick="searchTag()">Search</button>
       </div>
     </div>
     
@@ -56,63 +58,100 @@
     <div id="list" class="list home"></div>    
     
     <!-- トップに戻るボタン -->
-    <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
+    <button type="button" class="topbutton" onclick="goTop()"><i class="fas fa-caret-up"></i></button>
     
     <script>
+      window.onload = fetchFavoriteData(); // 画面ロード時に実行
       let favorite_data_id = []; // お気に入り登録してあるworkid
       let favorite_numbers = 0; // お気に入り登録してある数
       let favorite_datas = [];  // お気に入り登録してある全作品
-      const listArea = document.getElementById('list'); // リスト表示部
-      window.onload = getFavoriteDatas(); // 画面ロード時に実行
+      const listArea = document.getElementById('list'); // リスト表示部      
+      
+      function fetchFavoriteData(){
+        new Promise((resolve) => {
+          findTags();
+          // お気に入り登録された作品のIDを取得
+          const url = '/findFavorites'; // 通信先
+          const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+          req.onreadystatechange = function() {
+            if(req.readyState == 4 && req.status == 200) {
+              const datas = JSON.parse(req.response);
+              for(let i in datas) {
+                const data = datas[i];              
+                favorite_data_id[favorite_numbers] = data.workid;
+                favorite_numbers++;
+              }
+              resolve();
+            }
+          }
+          req.open('GET', url, true);
+          req.send();
+        }).then(() => {
+          // 全作品データを取得⇒お気に入り登録された作品IDを作品IDが一致したら作品データを取得
+          const url = '/fetchAllData'; // 通信先
+          const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+          req.onreadystatechange = function() {
+            if(req.readyState == 4 && req.status == 200) {
+              const datas = JSON.parse(req.response);
+              all_datas = datas;
+              all_datas.forEach((all_data) => {
+                for(let j in favorite_data_id){
+                  if(all_data._id == favorite_data_id[j]){
+                    favorite_datas[j] = all_data;
+                  }
+                }
+              });           
+            }
+          }
+          req.open('GET', url, true);
+          req.send();
+        });
+      }
       
       // 表示
       function addToList(now_datas) {
         now_datas.forEach((now_data) => {
-          id = now_data._id;
-          subject = now_data.subject;
-          duration = now_data.duration;
-          tag = now_data.tag;
-          comment = now_data.comment;
-          show_img_url = now_data.url;
-          show_public_id = now_data.public_id;
+          const id = now_data._id;
+          const subject = now_data.subject;
+          const duration = now_data.duration;
+          const tag = now_data.tag;
+          const comment = now_data.comment;
+          const show_img_url = now_data.url;
+          const show_public_id = now_data.public_id;
           
-          const workDiv = document.createElement('div'); // 追加する本の div 要素
+          const workDiv = document.createElement('div'); // 表示する作品の div 要素
           workDiv.className = "worksarea";
-          workDiv.id = id; // レスポンスから得た ID を付与する
+          workDiv.id = id; // 作品IDをIDとして付与する
         
-          const favoriteDiv = document.createElement('div');
+          const favoriteDiv = document.createElement('div'); // お気に入りボタンエリア
           favoriteDiv.className = 'favorite_area';
         
-          const favoriteInput = document.createElement('input');
+          const favoriteInput = document.createElement('input'); // お気に入りボタン本体
           favoriteInput.type = 'checkbox';
           favoriteInput.className = 'favorite-button';
           favoriteInput.name = 'favorite_button';
           favoriteInput.onclick = function(){
             registerfavorite(id);
           }
+          favoriteInput.checked = true; // お気に入り一覧のデータはすべてお気に入り登録済み          
         
-          for(let i in now_datas){
-            if(id == now_datas[i]){
-              favoriteInput.checked = true;
-              break;
-            }
-          }
-        
-          const favorite_icon_afterDiv = document.createElement('div');
+          const favorite_icon_afterDiv = document.createElement('div'); // お気に入りボタン見た目
           favorite_icon_afterDiv.className = 'favorite-button-icon after';
           favorite_icon_afterDiv.innerText = '★';
         
-          const imgDiv = document.createElement('div');
+          const imgDiv = document.createElement('div'); // 写真エリア
           imgDiv.className = 'img-area';
         
-          const imgImg = document.createElement('img');
+          const imgImg = document.createElement('img'); // 写真自体
           imgImg.src = show_img_url;
         
-          const subjectDiv = document.createElement('div');
+          const subjectDiv = document.createElement('div'); // 作品題名
           subjectDiv.className = 'subjectarea';
           subjectDiv.innerText = subject;
         
-          const durationDiv = document.createElement('div');
+          const durationDiv = document.createElement('div'); // 製作期間
           durationDiv.className = 'durationame';
           durationDiv.innerText = 'Duration: ';
 
@@ -120,17 +159,17 @@
           durationSpan.className = 'durationarea';
           durationSpan.innerText = duration;
         
-          const tag1Div = document.createElement('div');
+          const tag1Div = document.createElement('div'); // タグエリア
           tag1Div.className = 'tagarea1';
 
-          const tagDiv = document.createElement('div');
+          const tagDiv = document.createElement('div'); // タグ本体
           tagDiv.className = 'tagarea';
           tagDiv.innerText = tag;
         
-          const commentDiv = document.createElement('div');
+          const commentDiv = document.createElement('div'); // コメントボックス
           commentDiv.className = 'commentbox';
         
-          const commentP = document.createElement('p');
+          const commentP = document.createElement('p'); // コメント自体
           commentP.innerText = comment;
     
           favoriteDiv.appendChild(favoriteInput);
@@ -156,48 +195,6 @@
         
           listArea.appendChild(workDiv); // リストに workDiv を追加
         });
-      }
-      
-      function getFavoriteDatas(){
-        new Promise((resolve) => {
-          const url = '/findFavorites'; // 通信先
-          const req = new XMLHttpRequest(); // 通信用オブジェクト
-        
-          req.onreadystatechange = function() {
-            if(req.readyState == 4 && req.status == 200) {
-              const datas = JSON.parse(req.response);
-              for(let i in datas) {
-                const data = datas[i];              
-                favorite_data_id[favorite_numbers] = data.workid;
-                favorite_numbers++;
-              }
-              resolve();
-            }
-          }
-          req.open('GET', url, true);
-          req.send();
-        }).then(() => {
-          const url = '/findAllDatas'; // 通信先
-          const req = new XMLHttpRequest(); // 通信用オブジェクト
-        
-          req.onreadystatechange = function() {
-            if(req.readyState == 4 && req.status == 200) {
-              const datas = JSON.parse(req.response);
-              all_datas = datas;
-              all_datas.forEach((all_data) => {
-                for(let j in favorite_data_id){
-                  if(all_data._id == favorite_data_id[j]){
-                    favorite_datas[j] = all_data;
-                  }
-                }
-              });           
-            }
-          }
-          req.open('GET', url, true);
-          req.send();
-        }).then(() => {
-          findTags();
-        });
       }      
       
       // お気に入り登録
@@ -205,7 +202,7 @@
         const favorite = document.getElementsByName('favorite_button');
         const favorite_icon = document.getElementById('favorite_icon');
         
-        const url = '/favorite_true'; // 通信先
+        const url = '/registerfavorite'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
         // 取得した情報をもとにオブジェクトを作る
@@ -224,7 +221,7 @@
         req.send(JSON.stringify(data)); // オブジェクトを文字列化して送信 
       }
       
-      // タグデータ取得
+      // タグデータ取得、ドロップダウンリストに追加
       function findTags() {
         const select_tags = document.getElementById('select_tags');
         const url = '/findTags'; // 通信先
@@ -247,29 +244,35 @@
       }
       
       // タグ検索
-      function tag_search(){
-        now_datas = [];
+      function searchTag(){
+        now_datas = []; // 初期化
         let number = 0;
         const select_tag = document.getElementById('select_tags');
         const tag_number = select_tag.selectedIndex;
-        const tag = select_tag.options[tag_number].value;
+        const tag = select_tag.options[tag_number].value; // 指定したタグを取得
         
-        favorite_datas.forEach((favorite_data) => {
-          if(favorite_data.tag == tag){
-            now_datas[number] = favorite_data;
-            number++;
+        new Promise((resolve) => {
+          // タグ絞り込み
+          favorite_datas.forEach((favorite_data) => {
+            if(favorite_data.tag == tag){
+              now_datas[number] = favorite_data;
+              number++;
+            }
+          });
+          // 全件
+          if(tag=='All'){
+            now_datas = favorite_datas;
           }
-        });
-        if(tag=='All'){
-          now_datas = favorite_datas;
-        }
+          resolve();
+        }).then(() => {
+          listArea.innerHTML = '';
+          addToList(now_datas);
+        });       
         
-        listArea.innerHTML = '';
-        addToList(now_datas);
       }      
 
       // リロード
-      function home(){
+      function goTop(){
          scrollTo(0, 0);
       }
     </script>
