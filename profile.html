@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=yes">
     <meta name="description" content="A cool thing made with Glitch">
     <title>Profile</title>
-    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
+    <link rel="icon" href="https://cdn.glitch.com/34865540-8bcf-4a7a-be9a-bf41d595b649%2Ffavicon.ico2.png?v=1632386757534" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <link href="https://use.fontawesome.com/releases/v5.10.2/css/all.css" rel="stylesheet">
   </head>
@@ -15,6 +15,8 @@
     <div class="headerbg">
       <div class="site-header">
         <h1>Myhandmades</h1>
+        <input type='button' class='header-top-button' onclick="goTop()"/>
+        <!-- ここからヘッダーメニュー -->
         <nav>
           <ul>
               <li><a href="/">Home</a></li>
@@ -22,10 +24,11 @@
               <li><a href="/private">Private</a></li>
           </ul>
         </nav>
+        <!-- ここまでヘッダーメニュー -->
+        <!-- ここからハンバーガーメニュー -->
         <div class="hamburger-menu">
           <input type="checkbox" id="menu-btn-check"/>
           <label for="menu-btn-check" class="menu-btn"><span></span></label>
-          <!--ここからメニュー-->
           <div class="menu-content">
             <ul>
               <li class='hidden_menu'><a href="/">Home</a></li>
@@ -35,8 +38,8 @@
               <li><a href="/logout">Logout</a></li>
             </ul>
           </div>
-          <!--ここまでメニュー-->
         </div>
+        <!-- ここまでハンバーガーメニュー -->
       </div>
 　　</div>
     
@@ -113,7 +116,7 @@
     </div>    
     
     <!-- トップに戻るボタン -->
-    <button type="button" class="topbutton" onclick="home()"><i class="fas fa-caret-up"></i></button>
+    <button type="button" class="topbutton" onclick="goTop()"><i class="fas fa-caret-up"></i></button>
     
     <script>
       window.onload = findTags; // 画面ロード時に実行
@@ -122,9 +125,9 @@
       
       let username;
       let createdate;
-      let final_login_date; // 変数に-はだめ
-      let postnumbers;
-      let taginfo = [,]; // タグについて｛'tagname', 'tagpost'}
+      let final_login_date; 
+      let postnumbers; // 投稿した全作品数
+      let taginfo = [,]; // タグについて ['tagname', 'tagpost']
       let tagnumber; // タグの数を把握
       
       // タグデータ取得
@@ -141,7 +144,7 @@
               taginfo[i][1] = 0;
               tagnumber = i;
             }
-            findUserDatas(tagnumber, taginfo);
+            findUserData(tagnumber, taginfo);
           }
         }
         req.open('GET', url, true);
@@ -149,8 +152,8 @@
       }
       
       // プロフィールデータの取得
-      function findUserDatas(tagnumber, taginfo) {
-        const url = '/findUserDatas'; // 通信先
+      function findUserData(tagnumber, taginfo) {
+        const url = '/findUserData'; // 通信先
         const req = new XMLHttpRequest(); // 通信用オブジェクト
         
         req.onreadystatechange = function() {
@@ -183,7 +186,7 @@
         req.send();
       }
       
-      // プロフィール、投稿数表示
+      // プロフィール、投稿数表示 
       function addToListProfile(username, createdate, final_login_date, postnumbers, tagnumber, taginfo) {
         const profile_username = document.getElementById('profile-username');
         profile_username.innerText = username;
@@ -198,33 +201,34 @@
           profile_final_login_date.innerText = final_login_date;
         }
 
-        
+        // 全作品数
         const profile_number_all = document.getElementById('profile-number-all');
         profile_number_all.innerText = postnumbers;
         
+        // タグごととの作品数 ただし、投稿のある作品のみ
         if(tagnumber > 0){
           for(i=0; i <= tagnumber; i++){
             if(taginfo[i][1] > 0){
-              const tag_post_area = document.createElement('div');
+              const tag_post_area = document.createElement('div'); // タグごと作品数エリア
               tag_post_area.className = 'tag-post-area';
               tag_post_area.id = 'tag['+i+']';
             
-              const tag_post_name = document.createElement('label');
+              const tag_post_name = document.createElement('label'); // タグ名
               tag_post_name.className = 'tag-post-name';
               tag_post_name.innerText = taginfo[i][0]+': ';
               
-              const tag_post_number = document.createElement('span');
+              const tag_post_number = document.createElement('span'); // 作品数
               tag_post_number.className = 'tag_post_number';
               tag_post_number.innerText = taginfo[i][1];
               
               
               tag_post_area.appendChild(tag_post_name);
               tag_post_area.appendChild(tag_post_number);
-              taglistArea.appendChild(tag_post_area);
+              taglistArea.appendChild(tag_post_area); // タグごとの作品数追加
             }
           }
         }
-        findUserTag();
+        findUserTag(); 
       }
       
       // ユーザーが追加したタグデータを取得
@@ -234,12 +238,11 @@
         req.onreadystatechange = function() {
           if(req.readyState == 4 && req.status == 200) {
             const tags = JSON.parse(req.response);
-            for(let i in tags) {
-              const tag = tags[i];
+            tags.forEach((tag) => {
               if(tag.tag !== 'undefined'){
                 addToListTag(tag.tag, tag._id);
               }              
-            }
+            });
           }
         }
         req.open('GET', url, true);
@@ -248,45 +251,45 @@
       
       // ユーザが追加したタグデータを表示
       function addToListTag(tag, id){
-        const tag_user_area = document.createElement('div');
+        const tag_user_area = document.createElement('div'); // タグデータ表示エリア
         tag_user_area.className = 'tag-user-area'
-        tag_user_area.id = id;
+        tag_user_area.id = id; // タグIDをidとして付与
          
-        const tag_user_name = document.createElement('label');
+        const tag_user_name = document.createElement('label'); // タグの名前
         tag_user_name.className = 'tag-user-name';
         tag_user_name.innerText = tag;
         
-        const tag_user_button_area = document.createElement('span');
+        const tag_user_button_area = document.createElement('span'); // タグ削除ボタンエリア
         tag_user_button_area.className = 'tag-user-button-area';
         
-        const delButton = document.createElement('button');
+        const delButton = document.createElement('button'); // タグ削除ボタン本体
         delButton.className = 'profile-deletebutton';
         delButton.onclick = function() {
           disptag(id);
         }
         
-        const delI = document.createElement('i');
+        const delI = document.createElement('i'); // タグ削除ボタンアイコン
         delI.className = 'fas fa-trash worksicon';
         
-        const delDiv = document.createElement('div');
+        const delDiv = document.createElement('div'); // 「Delete」ツールチップ
         delDiv.className = 'profile-deletediv';
         delDiv.innerText = 'Delete';
         
-        const editForm = document.createElement('form');
+        const editForm = document.createElement('form'); // タグ編集ボタンエリア
         editForm.action = '#edit-tag-modal'
         editForm.method = 'post';
         
-        const editA = document.createElement('a');
+        const editA = document.createElement('a'); // タグ編集ボタン本体
         editA.href = "#edit-tag-modal";
         editA.className = 'profile-editbutton';
         editA.onclick = function() {
           editTag(tag, id);
         }
         
-        const editI = document.createElement('i');
+        const editI = document.createElement('i'); // タグ編集ボタンアイコン
         editI.className = 'fas fa-edit worksicon';
                         
-        const editDiv = document.createElement('div');
+        const editDiv = document.createElement('div'); // 「Edit」ツールチップ
         editDiv.className = 'profile-editdiv';
         editDiv.innerText = 'Edit';
           
@@ -302,6 +305,7 @@
         tag_user_area.appendChild(tag_user_button_area);
         usertagList.appendChild(tag_user_area); // リストに tag_user_area を追加
         
+        // タグを追加していてくれていたら感謝の旨を表示
         const message = document.getElementById('post-message');
         message.innerText = 'Thanks to you, this app is easier to use!'; 
       }
@@ -331,7 +335,7 @@
        	}
       }
       
-      // ユーザーが追加したタグの編集するタグを表示する
+      // ユーザーが追加したタグの内、編集するタグデータを表示する
       function editTag(tag, id){
         const tagName = document.getElementById('tag-edit');
         tagName.value = tag;
@@ -375,10 +379,10 @@
       function change(){
         if(document.change_form.change_username.value == 'a' || document.change_form.nowpassword.value == 'a'){
           alert("そのアカウントではパスワード変更は無効です！");
-          document.change_form.change_username.value == '';
-          document.change_form.nowpassword.value == '';
-          document.change_form.newpassword.value == '';
-          document.change_form.renewpassword.value == '';
+          document.change_form.change_username.value = '';
+          document.change_form.nowpassword.value = '';
+          document.change_form.newpassword.value = '';
+          document.change_form.renewpassword.value = '';
           return;
         }else if(window.confirm('本当にパスワードを変更しますか？')){
           //クライアント側の入力チェック
@@ -396,9 +400,13 @@
             return;
           }else if(document.change_form.newpassword.value !== document.change_form.renewpassword.value){
             alert("大変言いずらいのですが、新しいパスワードが一致しないですねぇ…");
+            document.change_form.newpassword.value = '';
+            document.change_form.renewpassword.value = '';
             return;
           }else if(document.change_form.nowpassword.value === document.change_form.newpassword.value){
             alert("違うパスワードにして欲しかったりなんかします");
+            document.change_form.nowpassword.value = '';
+            document.change_form.newpassword.value = '';
             return;
           }
           document.change_form.submit();
@@ -414,6 +422,8 @@
       function cancel(){
         if(document.cancel_form.username.value == 'a'|| document.cancel_form.password.value == 'a'){
           alert("そのアカウントの退会は禁ず！");
+          document.cancel_form.username.value = '';
+          document.cancel_form.password.value = '';
           return;
         }else if(window.confirm('本当に退会しますか？')){
           //クライアント側の入力チェック
@@ -434,7 +444,7 @@
       }      
 
       // リロード
-      function home(){
+      function goTop(){
          scrollTo(0, 0);
       }
     </script>
