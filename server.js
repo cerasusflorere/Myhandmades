@@ -482,19 +482,24 @@ app.post('/deleteData', function(req, res){
     MongoClient.connect(mongouri, function(error, client) {
       const db = client.db(process.env.DB); // 対象 DB
       const colWork = db.collection('work'); // 対象コレクション
+      const colFavorite = db.collection('favorite'); // 対象コレクション
       const target = JSON.parse(received); // 保存対象
       const oid = new ObjectID(target.id);
 
       colWork.deleteOne({_id:{$eq:oid}}, function(err, result) {
+        // workコレクションから削除した
         if(result.deletedCount) {
           cloudinary.api.delete_resources_by_tag(target.id,
-  　　　　　　function(error, result) {console.log(result, error); });
+  　　　　　　function(error_cloudinary, result_cloudinary) {console.log(error_cloudinary, result_cloudinary); });
+          colFavorite.deleteMany({workid:{$eq:target.id}}, function(errs, results) {
+            // Favoriteコレクションから削除した // 要検討
+          });
           res.sendStatus(200); // OK を返す
         }else{
           res.sendStatus(404); // 該当する作品が見つからなかった意味で 404 を返す
         }
-        client.close(); // DB を閉じる
-      });
+         client.close(); // DB を閉じる
+      });      
     });
   });
 });
