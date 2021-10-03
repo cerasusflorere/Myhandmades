@@ -378,28 +378,75 @@
         const subject = document.getElementById('subject').value;
         if(subject != ''){
           // 題名がある場合追加する
-          new Promise((resolve) => {
-            // 画像データを保存する
-            URL.revokeObjectURL(blobUrl);
-            // 言語標準で用意されているFormDataにファイルデータを詰める
-            const data = new FormData();
-            const files = document.getElementById('file_input_add').files;
-            data.append('file', files[0]);
+          // 写真の有無
+          const img_exist = document.getElementById('file_preview_add');
+          // 写真がある場合
+          if(img_exist != null && img_exist.hasAttribute('src')){
+            new Promise((resolve) => {
+              // 画像データを保存する
+              URL.revokeObjectURL(blobUrl);
+              // 言語標準で用意されているFormDataにファイルデータを詰める
+              const data = new FormData();
+              const files = document.getElementById('file_input_add').files;
+              data.append('file', files[0]);
                 
-            const url = '/urlimagsave';
-            const req = new XMLHttpRequest();
-            req.onreadystatechange = function(){
-              if(req.readyState == 4 && req.status == 200) {
-                const return_datas = JSON.parse(req.response);
-                img_url = return_datas.url;
-                public_id = return_datas.public_id;
-                resolve();
-              }              
-            }
-            req.open('POST', url, true);
-            req.send(data); 
-          }).then(() => {
-            // 他の情報を保存する
+              const url = '/urlimagsave';
+              const req = new XMLHttpRequest();
+              req.onreadystatechange = function(){
+                if(req.readyState == 4 && req.status == 200) {
+                  const return_datas = JSON.parse(req.response);
+                  img_url = return_datas.url;
+                  public_id = return_datas.public_id;
+                  resolve();
+                }              
+              }
+              req.open('POST', url, true);
+              req.send(data); 
+            }).then(() => {
+              // 他の情報を保存する
+              const urladd = '/savework'; // 通信先
+              const req = new XMLHttpRequest(); // 通信用オブジェクト
+        
+              const openid = document.getElementById('open-checkbox');
+              let open = '0';
+              const subject = document.getElementById('subject').value;
+              const duration = document.getElementById('duration').value;
+              let tag = "";
+              const comment = document.getElementById('comment').value;
+        
+              if(openid.checked){
+                open = '1';
+              }
+         
+              tag_sets.forEach((tag_set) => {
+                let element = document.getElementById(tag_set._id);
+                if(element.checked == true){
+                  tag = element.value;
+                }
+              });
+        
+              // 取得した情報をもとにオブジェクトを作る
+              const datas = {subject:subject, duration:duration, tag:tag, comment:comment, open:open, url:img_url, public_id:public_id};
+        
+              req.onreadystatechange = function() {
+                if(req.readyState == 4 && req.status == 200) {
+                  // 追加が成功したらフォームを空にする
+                  document.getElementById('subject').value = '';
+                  document.getElementById('duration').value = '';
+                  document.getElementById('comment').value = '';
+                  img_url = '';
+                  public_id = '';
+                  location.href = '/private';
+                }else if(req.readyState == 4 && req.status != 200) {
+                  alert(req.response);
+                }
+              }
+              req.open('POST', urladd, true);
+              req.setRequestHeader('Content-Type', 'application/json');
+              req.send(JSON.stringify(datas)); // オブジェクトを文字列化して送信
+            });            
+          }else{
+            // 写真がない場合
             const urladd = '/savework'; // 通信先
             const req = new XMLHttpRequest(); // 通信用オブジェクト
         
@@ -422,7 +469,7 @@
             });
         
             // 取得した情報をもとにオブジェクトを作る
-            const datas = {subject:subject, duration:duration, tag:tag, comment:comment, open:open, url:img_url, public_id:public_id};
+            const datas = {subject:subject, duration:duration, tag:tag, comment:comment, open:open};
         
             req.onreadystatechange = function() {
               if(req.readyState == 4 && req.status == 200) {
@@ -440,7 +487,7 @@
             req.open('POST', urladd, true);
             req.setRequestHeader('Content-Type', 'application/json');
             req.send(JSON.stringify(datas)); // オブジェクトを文字列化して送信
-          });
+　        }
         }else{
           alert("題名がないと登録できないんですよねえ…");
         }   
@@ -713,9 +760,12 @@
 	      if(window.confirm('本当に編集しますか？')){
           const subject = document.getElementById('edit-subject').value;
           img_already_flag = document.getElementsByName('already_img');
+          // 写真の有無
+          const img_exist = document.getElementById('file_preview_add');
           if(subject != ''){
+            console.log('764');
             // 題名がある場合編集する
-            if(img_already_flag.length == 0 && img_delete_flag != 2){
+            if(img_already_flag.length == 0 && img_delete_flag != 2 && img_exist != null && img_exist.hasAttribute('src')){
               img_delete_flag = '';
               new Promise((resolve) => {
                 URL.revokeObjectURL(blobUrl);
@@ -744,6 +794,7 @@
                 data_edit();
               });
             }else{
+              console.log('795');
               data_edit();
             }            
             
@@ -789,11 +840,15 @@
           // 新しい写真を投稿する
           data = {id:edit_id, subject:subject, duration:duration, tag:tag, comment:comment, open:open, url:img_url, public_id:public_id};
         }else if(img_delete_flag != 2){
+          console.log('☆');
           // 写真は差し替えない
           data = {id:edit_id, subject:subject, duration:duration, tag:tag, comment:comment, open:open};
         }else if(img_delete_flag == 2){
           // 写真を消す
           data = {id:edit_id, subject:subject, duration:duration, tag:tag, comment:comment, open:open, url:'', public_id:''};
+        }else{
+          // 写真は元からない
+          data = {id:edit_id, subject:subject, duration:duration, tag:tag, comment:comment, open:open};
         }
         
         req.onreadystatechange = function() {
