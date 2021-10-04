@@ -88,6 +88,7 @@
           req.open('GET', url, true);
           req.send();          
         }).then(() => {
+          console.log(favorite_data_id);
           // 全作品データを取得
           const url = '/fetchAllData'; // 通信先
           const req = new XMLHttpRequest(); // 通信用オブジェクト
@@ -106,6 +107,7 @@
       
       // 表示
       function addToList(now_datas) {
+        listArea.innerHTML = '';
         now_datas.forEach((now_data) => {
           const id = now_data._id;
           const subject = now_data.subject;
@@ -117,15 +119,24 @@
           
           new Promise((resolve) => {
             // お気に入り登録状況をfavorite_codeに変換
-            for(let j in favorite_data_id){
-              if(favorite_data_id[j] == id){
-                favorite_code = '1';
-                break;
-              }else{
-                favorite_code = '0';
+            if(favorite_data_id.length != 0){
+              for(let i in favorite_data_id){
+                if(favorite_data_id[i] == id){
+                  favorite_code = '1';
+                  resolve();
+                  break;                  
+                }else if(favorite_data_id[i] != id){
+                  favorite_code = '0';
+                }
+                if(i == favorite_data_id.length-1 && favorite_data_id[i] != id){
+                  favorite_code = '0';
+                  resolve();
+                }
               }
+            }else{
+              favorite_code = '0';
+              resolve();
             }
-            resolve();
           }).then(() => {
             const workDiv = document.createElement('div'); // 表示する作品の div 要素
             workDiv.className = "worksarea";
